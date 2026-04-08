@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Great Debate: Understanding Suicidality</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .perspective-card { transition: all 0.3s ease; }
+        .perspective-card:hover { transform: translateY(-4px); }
+
+        /* Custom highlight for scientific/difficult words */
+        .highlight-term {
+            border-bottom: 2px dotted #3b82f6; /* Blue-500 */
+            font-weight: 700;
+            color: #0f172a; /* Slate-900 */
+            cursor: help;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 10;
+        }
+        .highlight-term:hover {
+            background-color: #eff6ff; /* Blue-50 */
+            border-radius: 2px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-blue-200">
+
+    <!-- Global Tooltip Element -->
+    <div id="global-tooltip" class="fixed hidden z-50 bg-slate-900 text-white text-sm rounded-lg shadow-2xl p-4 max-w-xs pointer-events-none transition-opacity duration-200 opacity-0 border border-slate-700"></div>
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white p-5 shadow-lg flex justify-between items-center z-10 shrink-0 border-b-4 border-blue-500">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white">Is Suicidality an Illness?</h1>
+            <p class="text-slate-400 text-sm md:text-base mt-1">Debating the medical model vs. contextualizing extreme pain.</p>
+        </div>
+        <div class="hidden md:block">
+            <span class="bg-blue-900/50 text-blue-300 px-4 py-2 rounded-full border border-blue-700/50 text-sm font-medium">
+                Clinical Ethics & Sociology
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden max-w-7xl w-full mx-auto bg-slate-50 shadow-2xl">
+        
+        <!-- Sidebar Navigation -->
+        <div class="w-full md:w-1/3 lg:w-1/4 border-r border-slate-200 overflow-y-auto relative bg-white flex flex-col">
+            <div class="p-5 border-b border-slate-100 bg-slate-50">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Debate Stages</h2>
+            </div>
+            <div class="flex-1 overflow-y-auto p-3" id="nav-container">
+                <!-- Navigation items injected by JS -->
+            </div>
+            <div class="p-4 bg-slate-100 text-xs text-slate-500 text-center border-t border-slate-200">
+                💡 <strong>Tip:</strong> Hover over dotted words to view psychological definitions.
+            </div>
+        </div>
+
+        <!-- Main Display Area -->
+        <div class="w-full md:w-2/3 lg:w-3/4 flex flex-col relative overflow-y-auto bg-slate-50/50">
+            <div id="content-display" class="p-6 md:p-10 w-full h-full">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- DICTIONARY FOR SCIENTIFIC/COMPLEX TERMS ---
+        const glossary = {
+            "Standalone Illness": "A distinct medical condition with its own pathology, separate from other disorders like depression. Some clinicians propose 'Suicidal Behavior Disorder' as its own diagnosis.",
+            "Medical Model": "A perspective that views mental health crises primarily as biological diseases or chemical imbalances within the individual's brain.",
+            "Biopsychosocial Model": "A holistic framework that looks at the interconnection between biology, psychology, and severe socio-environmental factors (like poverty, abuse, or bullying).",
+            "Pathologize": "To treat a behavior or feeling as a psychological disorder or disease. In this context, it means treating the desire to die solely as a brain defect.",
+            "Iatrogenic Harm": "Harm or trauma caused by medical treatment itself. For example, a teenager experiencing trauma from being forcibly hospitalized or restrained.",
+            "Systemic Failure": "When the structures of society (schools, justice systems, communities) fail to protect or support an individual, causing profound despair.",
+            "Suicidality": "The broad clinical term encompassing suicidal thoughts, ideation, plans, and attempts. It exists on a wide spectrum.",
+            "Symptom vs. Disease": "The core of the debate: Is the desire to die a symptom of an underlying issue (like trauma or a toxic environment) or a disease in itself that needs 'curing'?"
+        };
+
+        // Helper function to wrap words in the interactive tooltip class
+        function term(phrase, dictionaryKey) {
+            return `<span class="highlight-term" data-term="${dictionaryKey}">${phrase}</span>`;
+        }
+
+        // --- LESSON DATA ---
+        const debateData = [
+            {
+                id: "intro",
+                isIntro: true,
+                title: "The Core Question",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+                content: `
+                    <div class="max-w-3xl mx-auto text-center fade-in pt-8">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-100 text-blue-600 mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-6">Is Suicidality a Standalone Illness?</h2>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-6 text-left">
+                            When a teenager expresses ${term("Suicidality", "Suicidality")}, it is a terrifying moment that requires immediate care. However, the psychological community is currently engaged in a profound debate regarding <i>how</i> we categorize and treat this distress. 
+                        </p>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-10 text-left">
+                            Should we view suicidal thoughts as a ${term("Standalone Illness", "Standalone Illness")}—a distinct medical pathology that needs to be "cured" with clinical intervention? Or is it a perfectly logical (though extreme) <i>symptom</i> of unbearable socio-environmental pain that requires us to fix the teenager's environment?
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mb-10">
+                            <div class="bg-white p-6 rounded-xl border border-rose-100 shadow-sm border-t-4 border-t-rose-400">
+                                <h3 class="font-bold text-rose-800 mb-2">Side A: It IS an Illness</h3>
+                                <p class="text-sm text-slate-600">The ${term("Medical Model", "Medical Model")} argues that severe suicidality involves distinct neurobiological changes. By treating it as a medical emergency (like a heart attack), we can use targeted clinical therapies, hospitalization, and medication to save lives directly.</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl border border-blue-100 shadow-sm border-t-4 border-t-blue-400">
+                                <h3 class="font-bold text-blue-800 mb-2">Side B: It is a SYMPTOM</h3>
+                                <p class="text-sm text-slate-600">The ${term("Biopsychosocial Model", "Biopsychosocial Model")} argues that when we rigidly ${term("Pathologize", "Pathologize")} the desire to die, we ignore the external environment. Treating the brain without addressing abuse, bullying, or systemic trauma can lead to ${term("Iatrogenic Harm", "Iatrogenic Harm")}.</p>
+                            </div>
+                        </div>
+
+                        <button onclick="selectScenario(1)" class="px-8 py-4 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 flex items-center gap-2 mx-auto">
+                            Enter the Debate
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </button>
+                        <p class="mt-8 text-xs text-slate-400 max-w-lg mx-auto">Note: This is an educational tool exploring psychological frameworks. It is not a substitute for professional mental health intervention or emergency services.</p>
+                    </div>
+                `
+            },
+            {
+                id: "opening",
+                title: "Opening Arguments",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M12 2v20"/></svg>`,
+                context: `Before looking at specific cases, we must understand the core philosophies of the two sides regarding ${term('Symptom vs. Disease', 'Symptom vs. Disease')}.`,
+                approaches: [
+                    {
+                        type: "Affirmative: It is a Standalone Illness",
+                        color: "rose",
+                        advice: "Suicidality should be treated as its own distinct clinical disorder (e.g., 'Suicidal Behavior Disorder'). It has biological and neurological roots. Just like a physical emergency, it requires immediate medical intervention, stabilization, and specific clinical treatments.",
+                        impact: "Focuses on immediate safety and specific anti-suicide clinical therapies. Validates the severity of the crisis as a true medical emergency, reducing the stigma that suicide is a 'choice'."
+                    },
+                    {
+                        type: "Negative: It is a Contextual Symptom",
+                        color: "blue",
+                        advice: "Suicidality is a human response to unbearable psychological, social, or environmental pain. Calling it an 'illness' ignores the root causes—such as trauma, abuse, or systemic failure. We must treat the environment and the pain, not just sedate the individual.",
+                        impact: "Focuses on holistic healing and changing the teen's environment. Prevents the teen from feeling like their brain is 'broken' when they are actually reacting normally to a toxic situation."
+                    }
+                ]
+            },
+            {
+                id: "case-1",
+                title: "Round 1: The Cyberbullying Crisis",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`,
+                context: "A teenager's private photos are leaked to their entire high school. They are facing relentless, malicious cyberbullying. Desperate and feeling their life is ruined, they tell a counselor they want to end their life.",
+                approaches: [
+                    {
+                        type: "The Medical Model Response",
+                        color: "rose",
+                        advice: "This acute stress has triggered a severe psychiatric crisis. The immediate priority is containing the 'illness' of suicidality. We must hospitalize the teen to ensure their safety and use medication to stabilize their neurochemistry until the crisis passes.",
+                        impact: "Guarantees physical safety in the short term. However, critics argue it risks ${term('Iatrogenic Harm', 'Iatrogenic Harm')} by locking up the victim while the bullies remain free, treating the victim as the 'sick' one."
+                    },
+                    {
+                        type: "The Contextual Model Response",
+                        color: "blue",
+                        advice: "The teen is not 'sick'; their environment is completely hostile and unsafe right now. It makes perfect sense that they want an escape from this torture. Let's create physical safety, involve the authorities regarding the leak, and remove them from this school environment.",
+                        impact: "Validates the pain as a logical response to a ${term('Systemic Failure', 'Systemic Failure')} (the school/internet failing to protect them). Focuses on fixing the environment to save the teen."
+                    }
+                ]
+            },
+            {
+                id: "case-2",
+                title: "Round 2: Existential Exhaustion",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+                context: "A teenager who has grown up in severe poverty, while also acting as a full-time caretaker for a sick parent, quietly states they are just 'too tired to keep waking up' and have passive thoughts of not wanting to exist.",
+                approaches: [
+                    {
+                        type: "The Medical Model Response",
+                        color: "rose",
+                        advice: "The patient is presenting with clinical dysthymia and passive suicidality. We must view this as a depressive illness that is draining their energy. They need psychiatric medication to elevate their serotonin levels so they can function and handle their responsibilities.",
+                        impact: "May provide a temporary neurochemical boost to help them survive. Critics argue this is a prime example of ignoring the environment: giving a pill to a child starving under the weight of adult responsibilities does not lighten the load."
+                    },
+                    {
+                        type: "The Contextual Model Response",
+                        color: "blue",
+                        advice: "You are carrying the weight of three adults on your shoulders. Anyone in your position would be fundamentally exhausted. Your desire to rest is completely valid; it is not a psychiatric disease. Let's focus on getting social services and community aid to lighten your load.",
+                        impact: "Practices profound validation without immediately locking them up or medicating them. Actively works to fix the socioeconomic roots of their despair."
+                    }
+                ]
+            },
+            {
+                id: "conclusion",
+                title: "Conclusion: Finding the Synthesis",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>`,
+                context: "After reviewing both sides of the debate, modern best practices in psychology often seek a 'middle path' that combines the strengths of both frameworks.",
+                approaches: [
+                    {
+                        type: "The Synthesis",
+                        color: "slate",
+                        advice: "We must acknowledge that while suicidal ideation can become a self-sustaining neurobiological crisis (requiring medical safety protocols), it almost always originates as a symptom of profound environmental, systemic, or psychological pain.",
+                        impact: "Treats the immediate danger with medical seriousness, but treats the long-term healing as a contextual, environmental issue. It validates the teenager's pain without ignoring their safety."
+                    }
+                ]
+            }
+        ];
+
+        let currentIndex = 0;
+
+        // Render the left-side navigation bar
+        function renderNavigation() {
+            const container = document.getElementById('nav-container');
+            container.innerHTML = '';
+            
+            debateData.forEach((item, index) => {
+                const btn = document.createElement('button');
+                const isActive = index === currentIndex;
+                
+                btn.className = `w-full text-left p-4 mb-2 rounded-xl flex items-center gap-3 transition-all ${
+                    isActive 
+                    ? 'bg-slate-900 text-white shadow-md' 
+                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 hover:border-slate-300'
+                }`;
+                
+                btn.onclick = () => selectScenario(index);
+                
+                btn.innerHTML = `
+                    <div class="${isActive ? 'text-blue-400' : 'text-slate-400'} flex-shrink-0">
+                        ${item.icon}
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm ${isActive ? 'text-white' : 'text-slate-800'}">${item.title}</div>
+                    </div>
+                `;
+                
+                container.appendChild(btn);
+            });
+        }
+
+        // Handle switching between scenarios
+        function selectScenario(index) {
+            currentIndex = index;
+            renderNavigation();
+            
+            const item = debateData[index];
+            const display = document.getElementById('content-display');
+            
+            // If it's the intro page, render the static HTML
+            if (item.isIntro) {
+                display.innerHTML = item.content;
+                return;
+            }
+            
+            // Otherwise, build the dynamic Scenario page HTML
+            // Color palette: Slate (Synthesis), Rose (Medical), Blue (Contextual)
+            const colors = {
+                slate: { bg: 'bg-slate-100', border: 'border-slate-300', text: 'text-slate-800', badge: 'bg-slate-200 text-slate-700' },
+                rose: { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-800', badge: 'bg-rose-100 text-rose-700' },
+                blue: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-900', badge: 'bg-blue-100 text-blue-700' }
+            };
+
+            let approachesHtml = '';
+            
+            // Dynamic grid sizing based on number of approaches (1 for conclusion, 2 for debate rounds)
+            const gridCols = item.approaches.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2';
+
+            item.approaches.forEach(app => {
+                const c = colors[app.color];
+                approachesHtml += `
+                    <div class="${c.bg} border ${c.border} rounded-2xl p-6 perspective-card relative overflow-hidden flex flex-col h-full shadow-sm">
+                        <div class="absolute top-0 left-0 w-1.5 h-full ${c.badge.split(' ')[0]}"></div>
+                        <div class="flex flex-col mb-4">
+                            <span class="text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-full ${c.badge} self-start mb-2">Perspective</span>
+                            <h3 class="font-bold text-lg ${c.text}">${app.type}</h3>
+                        </div>
+                        <div class="mb-4 flex-grow">
+                            <h4 class="text-xs uppercase font-bold text-slate-400 mb-1 tracking-wider">The Argument:</h4>
+                            <p class="italic text-slate-700 font-medium leading-relaxed">"${app.advice.replace(/"/g, '')}"</p>
+                        </div>
+                        <div class="pt-4 border-t border-black/5 mt-auto">
+                            <h4 class="text-xs uppercase font-bold text-slate-400 mb-1 tracking-wider">Psychological Impact:</h4>
+                            <p class="text-sm text-slate-600 leading-relaxed">${app.impact}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            display.innerHTML = `
+                <div class="max-w-4xl mx-auto fade-in pb-10">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-full uppercase tracking-wide mb-4">
+                        Debate Stage ${index}
+                    </div>
+                    
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">${item.title}</h2>
+                    
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 mb-8 shadow-sm">
+                        <h3 class="flex items-center gap-2 text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            The Context
+                        </h3>
+                        <p class="text-lg text-slate-700 font-medium leading-relaxed">${item.context}</p>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-slate-800 mb-6">How do the two models respond?</h3>
+                    
+                    <div class="grid grid-cols-1 ${gridCols} gap-6 items-stretch">
+                        ${approachesHtml}
+                    </div>
+
+                    <div class="mt-12 pt-6 border-t border-slate-200 flex justify-between">
+                        ${index > 0 
+                            ? `<button onclick="selectScenario(${index - 1})" class="text-slate-500 hover:text-slate-800 font-medium flex items-center gap-2 px-4 py-2 hover:bg-slate-200 rounded-lg transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Previous</button>` 
+                            : `<div></div>`
+                        }
+                        
+                        ${index < debateData.length - 1 
+                            ? `<button onclick="selectScenario(${index + 1})" class="bg-slate-900 text-white hover:bg-slate-800 font-medium flex items-center gap-2 px-5 py-2 rounded-lg transition-colors shadow-md">Next Stage <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>` 
+                            : `<button onclick="selectScenario(0)" class="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2 px-4 py-2 hover:bg-blue-50 rounded-lg transition-colors">Back to Intro <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>`
+                        }
+                    </div>
+                </div>
+            `;
+
+            // Auto-scroll to top on mobile view
+            if (window.innerWidth < 768) {
+                document.getElementById('content-display').scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // --- TOOLTIP LOGIC ---
+        const tooltip = document.getElementById('global-tooltip');
+
+        // Handle Mouse Hover (Desktop)
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.classList.contains('highlight-term')) {
+                const termKey = e.target.getAttribute('data-term');
+                const definition = glossary[termKey];
+                
+                if (definition) {
+                    tooltip.innerHTML = `<strong class="block mb-1 text-blue-300 font-bold uppercase tracking-wider text-xs">${termKey}</strong><span class="leading-relaxed block">${definition}</span>`;
+                    tooltip.classList.remove('hidden');
+                    
+                    // Slight delay to allow CSS transition to kick in smoothly
+                    requestAnimationFrame(() => tooltip.classList.remove('opacity-0'));
+                }
+            }
+        });
+
+        // Make the tooltip follow the mouse
+        document.addEventListener('mousemove', (e) => {
+            if (!tooltip.classList.contains('hidden')) {
+                let x = e.clientX + 15;
+                let y = e.clientY + 20;
+                
+                // Prevent the tooltip from going off the right side of the screen
+                const rect = tooltip.getBoundingClientRect();
+                if (x + rect.width > window.innerWidth) {
+                    x = e.clientX - rect.width - 15;
+                }
+                
+                // Prevent the tooltip from going off the bottom of the screen
+                if (y + rect.height > window.innerHeight) {
+                    y = e.clientY - rect.height - 15;
+                }
+                
+                tooltip.style.left = x + 'px';
+                tooltip.style.top = y + 'px';
+            }
+        });
+
+        // Hide the tooltip when the mouse leaves the word
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.classList.contains('highlight-term')) {
+                tooltip.classList.add('opacity-0');
+                setTimeout(() => tooltip.classList.add('hidden'), 200);
+            }
+        });
+
+        // Initialize Application
+        window.onload = () => {
+            renderNavigation();
+            selectScenario(0);
+            // Clean up any visible '${...}' template literals in the HTML
+            setTimeout(() => {
+                document.querySelectorAll('*').forEach(el => {
+                    if (el.childNodes.length) {
+                        el.childNodes.forEach(node => {
+                            if (node.nodeType === Node.TEXT_NODE && node.textContent.match(/\$\{[^}]+\}/g)) {
+                                node.textContent = node.textContent.replace(/\$\{[^}]+\}/g, '');
+                            }
+                        });
+                    }
+                });
+            }, 100);
+        };
+    </script>
+</body>
+</html>

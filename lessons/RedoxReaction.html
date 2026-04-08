@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastering Redox Reactions & Calculations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .pulse-text { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; transform: scale(1.02); } 100% { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-900 to-indigo-800 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-6 py-6">
+            <div class="flex items-center gap-4">
+                <div class="bg-white/20 p-3 rounded-lg backdrop-blur-sm">
+                    <i class="fas fa-atom text-3xl text-blue-200"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tight">Redox Reactions & Stoichiometry</h1>
+                    <p class="text-blue-200 mt-1 font-medium">From Electron Transfer to Quantitative Titration Calculations</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-8 space-y-12">
+
+        <!-- SECTION 1: CORE DEFINITIONS -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-100 px-6 py-4 border-b border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-book-open text-rose-600"></i> 1. The Core Concept of Redox
+                </h2>
+            </div>
+            
+            <div class="p-6 md:p-8">
+                <p class="text-slate-700 mb-4 text-lg">A <strong>Redox</strong> reaction fundamentally involves the transfer of electrons between chemical species. Because electrons cannot exist on their own in a standard chemical system, Oxidation and Reduction <em>must always</em> occur simultaneously.</p>
+                <p class="text-slate-700 mb-6 text-lg">Remember the universal mnemonic: <strong class="text-rose-600">OIL RIG</strong> (<strong>O</strong>xidation <strong>I</strong>s <strong>L</strong>oss, <strong>R</strong>eduction <strong>I</strong>s <strong>G</strong>ain of electrons).</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-rose-50 p-4 rounded-lg border border-rose-200">
+                        <div class="text-sm text-rose-800 font-bold mb-1">Oxidation Half-Equation:</div>
+                        <div class="font-mono text-lg text-rose-900 bg-white p-2 rounded shadow-sm">Zn(s) → Zn²⁺(aq) + 2e⁻</div>
+                        <p class="text-xs text-rose-700 mt-2">Zinc metal loses electrons (is oxidized) and acts as the <strong>Reducing Agent</strong>.</p>
+                    </div>
+
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <div class="text-sm text-blue-800 font-bold mb-1">Reduction Half-Equation:</div>
+                        <div class="font-mono text-lg text-blue-900 bg-white p-2 rounded shadow-sm">Cu²⁺(aq) + 2e⁻ → Cu(s)</div>
+                        <p class="text-xs text-blue-700 mt-2">Copper(II) ions gain electrons (are reduced) and act as the <strong>Oxidizing Agent</strong>.</p>
+                    </div>
+
+                    <!-- Moles Connection Intro -->
+                    <div class="col-span-1 md:col-span-2 bg-gradient-to-r from-emerald-50 to-teal-50 p-5 rounded-lg border border-emerald-200 shadow-sm mt-2">
+                        <h4 class="text-emerald-800 font-bold mb-2 flex items-center gap-2"><i class="fas fa-balance-scale"></i> The First Golden Rule of Redox Math</h4>
+                        <p class="text-sm text-emerald-900">
+                            Notice that exactly <strong>2 electrons</strong> are transferred per atom in the example above. In macroscopic lab settings, we deal with <em>moles</em>. 
+                            <strong>1 mole of Zn metal</strong> releases <strong>2 moles of electrons</strong>. To maintain balance, we require exactly <strong>1 mole of Cu²⁺</strong> to consume those 2 moles of electrons. 
+                            <br><br>
+                            This is the unbreakable mathematical rule of redox chemistry: <strong class="bg-emerald-200 px-2 py-1 rounded">Moles of electrons lost = Moles of electrons gained</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: BALANCING & TITRATION CALCULATIONS (EXPANDED) -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-100 px-6 py-4 border-b border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-flask text-emerald-600"></i> 2. Balancing Equations & Titration Calculations
+                </h2>
+            </div>
+            <div class="p-6 md:p-8">
+                <p class="text-slate-700 mb-6 text-lg">In quantitative chemistry, we use <strong>Redox Titrations</strong> to find the unknown concentration of a substance. First, we must combine half-equations to find the reacting <em>mole ratio</em>. Let's look at the classic reaction between Permanganate (MnO₄⁻) and Iron(II) (Fe²⁺).</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <div class="font-bold text-purple-800 mb-2">Reduction (Gaining e⁻)</div>
+                        <div class="font-mono text-sm bg-white p-2 rounded">MnO₄⁻ + 8H⁺ + <span class="text-purple-600 font-bold text-base">5e⁻</span> → Mn²⁺ + 4H₂O</div>
+                        <p class="text-xs text-purple-700 mt-2">1 mole of MnO₄⁻ requires <strong>5 moles of electrons</strong>.</p>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                        <div class="font-bold text-amber-800 mb-2">Oxidation (Losing e⁻)</div>
+                        <div class="font-mono text-sm bg-white p-2 rounded">Fe²⁺ → Fe³⁺ + <span class="text-amber-600 font-bold text-base">1e⁻</span></div>
+                        <p class="text-xs text-amber-700 mt-2">1 mole of Fe²⁺ provides only <strong>1 mole of electrons</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 p-5 rounded-xl text-center mb-8">
+                    <h4 class="font-bold text-slate-800 mb-2">Finding the Stoichiometric Ratio</h4>
+                    <p class="text-sm text-slate-600 mb-4">To make the electrons balance, we must multiply the Iron half-equation by 5. This tells us the exact mole ratio: <strong>1 mole of MnO₄⁻ reacts with exactly 5 moles of Fe²⁺</strong>.</p>
+                    <div class="font-mono text-lg text-slate-800 bg-white py-3 px-4 rounded border border-slate-300 inline-block shadow-sm">
+                        MnO₄⁻ + <span class="text-emerald-600 font-bold text-xl">5</span>Fe²⁺ + 8H⁺ → Mn²⁺ + <span class="text-emerald-600 font-bold text-xl">5</span>Fe³⁺ + 4H₂O
+                    </div>
+                </div>
+
+                <!-- Deep Dive: Concrete Calculation Example -->
+                <div class="mt-8 bg-white border-2 border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                    <div class="bg-slate-800 text-white px-5 py-3 font-bold flex items-center gap-2">
+                        <i class="fas fa-calculator text-emerald-400"></i> Deep Dive: Titration Calculation Example
+                    </div>
+                    <div class="p-6">
+                        <p class="text-slate-700 mb-5">Let's put the mole ratio to work. Suppose you perform a titration where it takes exactly <strong>20.0 mL of 0.020 M KMnO₄</strong> to completely react with <strong>25.0 mL of an unknown Fe²⁺ solution</strong>. What is the concentration of the Fe²⁺ solution?</p>
+                        
+                        <div class="space-y-6">
+                            <!-- Step 1 -->
+                            <div class="flex items-start gap-4">
+                                <div class="bg-indigo-100 text-indigo-800 rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0 mt-1 shadow-sm">1</div>
+                                <div class="w-full">
+                                    <h5 class="font-bold text-slate-800">Calculate moles of the known substance (KMnO₄)</h5>
+                                    <p class="text-sm text-slate-600 mb-2">Convert volume to Liters (20.0 mL = 0.0200 L) and multiply by Molarity.</p>
+                                    <div class="font-mono bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm">
+                                        <span class="text-slate-500">Formula:</span> Moles = Concentration (M) × Volume (L)<br>
+                                        <span class="text-slate-500">Math:</span> Moles MnO₄⁻ = 0.020 mol/L × 0.0200 L<br>
+                                        <span class="text-indigo-700 font-bold text-base mt-2 inline-block">= 0.00040 moles MnO₄⁻</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 2 -->
+                            <div class="flex items-start gap-4">
+                                <div class="bg-indigo-100 text-indigo-800 rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0 mt-1 shadow-sm">2</div>
+                                <div class="w-full">
+                                    <h5 class="font-bold text-slate-800">Use the mole ratio to find moles of the unknown (Fe²⁺)</h5>
+                                    <p class="text-sm text-slate-600 mb-2">Multiply the moles of known by the stoichiometric ratio (Unknown / Known).</p>
+                                    <div class="font-mono bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm">
+                                        <span class="text-slate-500">Ratio:</span> 5 moles Fe²⁺ / 1 mole MnO₄⁻<br>
+                                        <span class="text-slate-500">Math:</span> 0.00040 moles MnO₄⁻ × (5 / 1)<br>
+                                        <span class="text-indigo-700 font-bold text-base mt-2 inline-block">= 0.0020 moles Fe²⁺</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3 -->
+                            <div class="flex items-start gap-4">
+                                <div class="bg-indigo-100 text-indigo-800 rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0 mt-1 shadow-sm">3</div>
+                                <div class="w-full">
+                                    <h5 class="font-bold text-slate-800">Calculate the final concentration</h5>
+                                    <p class="text-sm text-slate-600 mb-2">Divide the moles of the unknown by its original volume in Liters (25.0 mL = 0.0250 L).</p>
+                                    <div class="font-mono bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm">
+                                        <span class="text-slate-500">Formula:</span> Concentration = Moles / Volume (L)<br>
+                                        <span class="text-slate-500">Math:</span> [Fe²⁺] = 0.0020 moles / 0.0250 L<br>
+                                        <span class="text-emerald-700 font-bold text-lg mt-2 inline-block bg-emerald-100 px-2 py-1 rounded">= 0.080 M</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 3: OXIDATION NUMBER CALCULATOR -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-100 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-calculator text-indigo-600"></i> 3. Oxidation Number Math Analyzer
+                </h2>
+            </div>
+            
+            <div class="p-6 md:p-8">
+                
+                <!-- The Algebraic Explanation -->
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-8 text-blue-900 shadow-sm">
+                    <h3 class="font-bold flex items-center gap-2 mb-2 text-lg"><i class="fas fa-info-circle text-blue-600"></i> The Algebraic Formula for Oxidation States</h3>
+                    <p class="text-slate-700 mb-4">To calculate an unknown oxidation state, we use a simple algebraic sum based on fixed rules (e.g., Oxygen is usually -2, Hydrogen is +1, Group 1 metals are +1). The sum of all oxidation states in a molecule or ion <strong>must equal its overall charge</strong>.</p>
+                    
+                    <div class="font-mono text-center bg-white p-4 rounded-lg shadow-sm border border-blue-100 font-bold text-sm md:text-base text-indigo-900">
+                        (Atoms of A × Ox State of A) + (Atoms of B × Ox State of B) = Overall Charge
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="bg-white/60 p-3 rounded border border-blue-100 text-sm">
+                            <strong class="text-slate-800">Neutral Molecules (e.g., H₂O):</strong><br>
+                            The overall charge is 0. So, the algebraic sum equals 0.
+                        </div>
+                        <div class="bg-white/60 p-3 rounded border border-blue-100 text-sm">
+                            <strong class="text-slate-800">Polyatomic Ions (e.g., SO₄²⁻):</strong><br>
+                            The overall charge is -2. So, the algebraic sum equals -2.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Selection List -->
+                    <div class="lg:col-span-1 border-r border-slate-100 pr-0 lg:pr-6">
+                        <h3 class="font-bold text-slate-700 mb-4 uppercase text-sm tracking-wider">Select a Species to Analyze</h3>
+                        <div class="space-y-3">
+                            <button onclick="analyzeMolecule('kmno4')" id="btn-kmno4" class="w-full text-left px-4 py-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 font-bold text-indigo-700 transition-all shadow-sm">KMnO₄ (Permanganate)</button>
+                            <button onclick="analyzeMolecule('cr2o7')" id="btn-cr2o7" class="w-full text-left px-4 py-3 rounded-lg border-2 border-slate-200 bg-white hover:bg-slate-50 font-bold text-slate-600 transition-all">K₂Cr₂O₄ (Dichromate)</button>
+                            <button onclick="analyzeMolecule('clo3')" id="btn-clo3" class="w-full text-left px-4 py-3 rounded-lg border-2 border-slate-200 bg-white hover:bg-slate-50 font-bold text-slate-600 transition-all">ClO₃⁻ (Chlorate Ion)</button>
+                            <button onclick="analyzeMolecule('h2so4')" id="btn-h2so4" class="w-full text-left px-4 py-3 rounded-lg border-2 border-slate-200 bg-white hover:bg-slate-50 font-bold text-slate-600 transition-all">H₂SO₄ (Sulfuric Acid)</button>
+                            <button onclick="analyzeMolecule('h2o2')" id="btn-h2o2" class="w-full text-left px-4 py-3 rounded-lg border-2 border-slate-200 bg-white hover:bg-slate-50 font-bold text-slate-600 transition-all">H₂O₂ (Peroxide Exception)</button>
+                        </div>
+                        
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6">
+                            <p class="text-xs text-yellow-800 font-medium">
+                                <i class="fas fa-lightbulb text-yellow-500 mr-1"></i>
+                                Notice that Hydrogen is almost always +1 and Oxygen is almost always -2. Use these knowns to find the transition metal or central non-metal!
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Analysis Display -->
+                    <div class="lg:col-span-2 min-h-[350px]">
+                        <div id="analysis-panel" class="bg-slate-50 rounded-xl border border-slate-200 p-6 h-full flex flex-col fade-in">
+                            <div class="text-center mb-6">
+                                <div class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Analyzing Target Atom</div>
+                                <h3 id="target-atom" class="text-2xl font-bold text-slate-800 mb-1">Manganese (Mn)</h3>
+                                <div id="molecule-formula" class="text-3xl font-mono text-slate-800 font-bold tracking-widest bg-white inline-block px-4 py-2 rounded-lg shadow-sm border border-slate-100">
+                                    K<span class="text-indigo-600 border-b-4 border-indigo-600">Mn</span>O₄
+                                </div>
+                                <div id="molecule-type" class="text-sm font-semibold text-emerald-600 mt-3">Neutral Molecule (Overall Charge = 0)</div>
+                            </div>
+
+                            <div class="flex-grow">
+                                <div class="space-y-3 mb-6" id="analysis-steps">
+                                    <!-- Steps injected by JS -->
+                                    <div class="flex items-center gap-3 bg-white p-3 rounded shadow-sm border border-slate-100">
+                                        <div class="bg-slate-200 text-slate-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">1</div>
+                                        <div class="text-slate-700">K is a Group 1 metal <i class="fas fa-arrow-right text-slate-400 mx-2"></i> <span class="text-blue-600 font-bold">+1</span></div>
+                                    </div>
+                                    <div class="flex items-center gap-3 bg-white p-3 rounded shadow-sm border border-slate-100">
+                                        <div class="bg-slate-200 text-slate-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">2</div>
+                                        <div class="text-slate-700">O is usually <i class="fas fa-arrow-right text-slate-400 mx-2"></i> <span class="text-red-600 font-bold">-2</span> (We have 4 of them)</div>
+                                    </div>
+                                    <div class="flex items-center gap-3 bg-white p-3 rounded shadow-sm border border-slate-100 border-l-4 border-l-indigo-500">
+                                        <div class="bg-slate-200 text-slate-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">3</div>
+                                        <div class="text-slate-700">Let oxidation state of Mn be <span class="text-indigo-600 font-bold italic">x</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
+                                    <div class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">Algebraic Calculation</div>
+                                    <div id="math-equation" class="font-mono text-lg text-slate-800 mb-2 font-bold">(+1) + <span class="italic text-indigo-600">x</span> + 4(-2) = 0</div>
+                                    <div id="math-solve-1" class="font-mono text-slate-600 text-sm mb-2">1 + <span class="italic text-indigo-600">x</span> - 8 = 0 <i class="fas fa-arrow-right text-slate-400 mx-2"></i> <span class="italic text-indigo-600">x</span> - 7 = 0</div>
+                                    <div id="math-solve-2" class="font-mono text-xl text-slate-800 font-bold mt-3 pt-3 border-t border-indigo-200"><span class="italic text-indigo-600">x</span> = <span class="bg-indigo-600 text-white px-3 py-1 rounded pulse-text">+7</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: KNOWLEDGE CHECK -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-12">
+            <div class="bg-slate-100 px-6 py-4 border-b border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-clipboard-check text-green-600"></i> 4. Calculations Knowledge Check
+                </h2>
+            </div>
+            <div class="p-6 md:p-8 space-y-8" id="quiz-container">
+                
+                <!-- Q1 -->
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                    <p class="font-bold text-slate-800 text-lg mb-4">1. What is the algebraic setup to find the oxidation state of Sulfur (x) in the Sulfate ion (SO₄²⁻)?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all">
+                            <input type="radio" name="q1" value="wrong1" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700 font-mono">x + 4(-2) = 0</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all">
+                            <input type="radio" name="q1" value="correct" id="q1-correct" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700 font-mono">x + 4(-2) = -2</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all">
+                            <input type="radio" name="q1" value="wrong2" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700 font-mono">x - 2 = -2</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all">
+                            <input type="radio" name="q1" value="wrong3" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700 font-mono">x + (-2) = -2</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                    <p class="font-bold text-slate-800 text-lg mb-4">2. In a titration, you find that 0.010 moles of Cr₂O₇²⁻ react completely with an unknown Fe²⁺ solution. The mole ratio is 1 mole Cr₂O₇²⁻ : 6 moles Fe²⁺. How many moles of Fe²⁺ reacted?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all">
+                            <input type="radio" name="q2" value="wrong1" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">0.010 moles</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all">
+                            <input type="radio" name="q2" value="wrong2" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">0.0017 moles (0.010 / 6)</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all">
+                            <input type="radio" name="q2" value="correct" id="q2-correct" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">0.060 moles (0.010 × 6)</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all">
+                            <input type="radio" name="q2" value="wrong3" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">0.10 moles</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row items-center gap-4 border-t border-slate-200 pt-6 mt-6">
+                    <button onclick="checkQuiz()" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-xl shadow-sm transition-colors text-lg flex items-center justify-center gap-2">
+                        <i class="fas fa-check-circle"></i> Submit Answers
+                    </button>
+                    <div id="quiz-result" class="hidden font-bold text-lg px-6 py-3 rounded-xl border w-full md:w-auto text-center">
+                        <!-- Result injected here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- Oxidation Analyzer Logic ---
+        const molecules = {
+            'kmno4': {
+                target: "Manganese (Mn)",
+                formulaHTML: 'K<span class="text-indigo-600 border-b-4 border-indigo-600">Mn</span>O₄',
+                type: "Neutral Molecule (Overall Charge = 0)",
+                steps: [
+                    { step: 1, text: 'K is a Group 1 metal <i class="fas fa-arrow-right text-slate-400 mx-2"></i> <span class="text-blue-600 font-bold">+1</span>' },
+                    { step: 2, text: 'O is usually <i class="fas fa-arrow-right text-slate-400 mx-2"></i> <span class="text-red-600 font-bold">-2</span> (We have 4 of them)' },
+                    { step: 3, text: 'Let oxidation state of Mn be <span class="text-indigo-600 font-bold italic">x</span>' }
+                ],
+                equation: '(+1) + <span class="italic text-indigo-600">x</span> + 4(-2) = 0',
+                solve1: '1 + <span class="italic text-indigo-600">x</span> - 8 = 0 <i class="fas fa-arrow-right text-slate-400 mx-2"></i> <span class="italic text-indigo-600">x</span> - 7 = 0',
+                solve2: '<span class="italic text-indigo-600">x</span> = <span class="bg-indigo-600 text-white px-3 py-1 rounded pulse-text">+7</span>'
+            },
+            'cr2o7': {
+                target: "Chromium (Cr)",
+                formulaHTML: 'K₂<span class="text-indigo-600 border-b-4 border-indigo-600">Cr₂</span>O₇',
+                type: "Neutral Molecule (Overall Charge = 0)",
+                steps: [
+                    { step: 1, text: 'K is +1 (We have 2 of them) <i class="fas fa-arrow-right text-slate-400 mx-2"></i> 2(+1) = <span class="text-blue-600 font-bold">+2</span>' },
+                    { step: 2, text: 'O is -2 (We have 7 of them) <i class="fas fa-arrow-right text-slate-400 mx-2"></i> 7(-2) = <span class="text-red-600 font-bold">-14</span>' },
+                    { step: 3, text: 'Notice there are <span class="font-bold">two</span> Cr atoms, so we use <span class="text-indigo-600 font-bold italic">2x</span>' }
+                ],
+                equation: '2(+1) + <span class="italic text-indigo-600">2x</span> + 7(-2) = 0',
+                solve1: '2 + <span class="italic text-indigo-600">2x</span> - 14 = 0 <i class="fas fa-arrow-right text-slate-400 mx-2"></i> 2x = +12',
+                solve2: '<span class="italic text-indigo-600">x</span> = <span class="bg-indigo-600 text-white px-3 py-1 rounded pulse-text">+6</span>'
+            },
+            'clo3': {
+                target: "Chlorine (Cl)",
+                formulaHTML: '<span class="text-indigo-600 border-b-4 border-indigo-600">Cl</span>O₃⁻',
+                type: "Polyatomic Ion (Overall Charge = -1)",
+                steps: [
+                    { step: 1, text: 'O is usually <i class="fas fa-arrow-right text-slate-400 mx-2"></i> <span class="text-red-600 font-bold">-2</span> (We have 3 of them)' },
+                    { step: 2, text: 'The overall charge is -1, so the sum must equal -1.' },
+                    { step: 3, text: 'Let oxidation state of Cl be <span class="text-indigo-600 font-bold italic">x</span>' }
+                ],
+                equation: '<span class="italic text-indigo-600">x</span> + 3(-2) = -1',
+                solve1: '<span class="italic text-indigo-600">x</span> - 6 = -1 <i class="fas fa-arrow-right text-slate-400 mx-2"></i> add 6 to both sides',
+                solve2: '<span class="italic text-indigo-600">x</span> = <span class="bg-indigo-600 text-white px-3 py-1 rounded pulse-text">+5</span>'
+            },
+            'h2so4': {
+                target: "Sulfur (S)",
+                formulaHTML: 'H₂<span class="text-indigo-600 border-b-4 border-indigo-600">S</span>O₄',
+                type: "Neutral Molecule (Overall Charge = 0)",
+                steps: [
+                    { step: 1, text: 'H is usually <i class="fas fa-arrow-right text-slate-400 mx-2"></i> <span class="text-blue-600 font-bold">+1</span> (We have 2 of them)' },
+                    { step: 2, text: 'O is usually <i class="fas fa-arrow-right text-slate-400 mx-2"></i> <span class="text-red-600 font-bold">-2</span> (We have 4 of them)' },
+                    { step: 3, text: 'Let oxidation state of S be <span class="text-indigo-600 font-bold italic">x</span>' }
+                ],
+                equation: '2(+1) + <span class="italic text-indigo-600">x</span> + 4(-2) = 0',
+                solve1: '2 + <span class="italic text-indigo-600">x</span> - 8 = 0 <i class="fas fa-arrow-right text-slate-400 mx-2"></i> <span class="italic text-indigo-600">x</span> - 6 = 0',
+                solve2: '<span class="italic text-indigo-600">x</span> = <span class="bg-indigo-600 text-white px-3 py-1 rounded pulse-text">+6</span>'
+            },
+            'h2o2': {
+                target: "Oxygen (O) - The Peroxide Exception",
+                formulaHTML: 'H₂<span class="text-indigo-600 border-b-4 border-indigo-600">O₂</span>',
+                type: "Neutral Molecule (Overall Charge = 0)",
+                steps: [
+                    { step: 1, text: 'H is universally <i class="fas fa-arrow-right text-slate-400 mx-2"></i> <span class="text-blue-600 font-bold">+1</span> with non-metals (We have 2)' },
+                    { step: 2, text: 'Let oxidation state of O be <span class="text-indigo-600 font-bold italic">x</span> (Notice there are 2 O atoms)' },
+                    { step: 3, text: 'This is a special case! We solve for O instead of assuming -2.' }
+                ],
+                equation: '2(+1) + <span class="italic text-indigo-600">2x</span> = 0',
+                solve1: '2 + <span class="italic text-indigo-600">2x</span> = 0 <i class="fas fa-arrow-right text-slate-400 mx-2"></i> 2x = -2',
+                solve2: '<span class="italic text-indigo-600">x</span> = <span class="bg-indigo-600 text-white px-3 py-1 rounded pulse-text">-1</span>'
+            }
+        };
+
+        function analyzeMolecule(key) {
+            // Reset button styles
+            const buttons = ['kmno4', 'cr2o7', 'clo3', 'h2so4', 'h2o2'];
+            buttons.forEach(b => {
+                const btn = document.getElementById(`btn-${b}`);
+                btn.className = 'w-full text-left px-4 py-3 rounded-lg border-2 border-slate-200 bg-white hover:bg-slate-50 font-bold text-slate-600 transition-all';
+            });
+
+            // Highlight active button
+            const activeBtn = document.getElementById(`btn-${key}`);
+            activeBtn.className = 'w-full text-left px-4 py-3 rounded-lg border-2 border-indigo-500 bg-indigo-50 font-bold text-indigo-700 transition-all shadow-sm';
+
+            // Re-trigger animation
+            const panel = document.getElementById('analysis-panel');
+            panel.classList.remove('fade-in');
+            void panel.offsetWidth; // trigger reflow
+            panel.classList.add('fade-in');
+
+            // Update content
+            const data = molecules[key];
+            document.getElementById('target-atom').innerText = data.target;
+            document.getElementById('molecule-formula').innerHTML = data.formulaHTML;
+            document.getElementById('molecule-type').innerText = data.type;
+
+            // Update steps
+            const stepsHtml = data.steps.map(s => `
+                <div class="flex items-center gap-3 bg-white p-3 rounded shadow-sm border border-slate-100 ${s.step === data.steps.length ? 'border-l-4 border-l-indigo-500' : ''}">
+                    <div class="bg-slate-200 text-slate-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">${s.step}</div>
+                    <div class="text-slate-700">${s.text}</div>
+                </div>
+            `).join('');
+            document.getElementById('analysis-steps').innerHTML = stepsHtml;
+
+            // Update Math
+            document.getElementById('math-equation').innerHTML = data.equation;
+            document.getElementById('math-solve-1').innerHTML = data.solve1;
+            document.getElementById('math-solve-2').innerHTML = data.solve2;
+        }
+
+        // --- Quiz Logic ---
+        function checkQuiz() {
+            let score = 0;
+            const total = 2;
+            
+            if (document.getElementById('q1-correct').checked) score++;
+            if (document.getElementById('q2-correct').checked) score++;
+            
+            const resultDiv = document.getElementById('quiz-result');
+            resultDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800', 'border-green-200', 'border-yellow-200', 'border-red-200');
+            
+            if (score === total) {
+                resultDiv.classList.add('bg-green-100', 'text-green-800', 'border-green-200');
+                resultDiv.innerHTML = `<i class="fas fa-star text-yellow-500 mr-2"></i> Perfect! ${score}/${total} correct. Your math is spot on!`;
+            } else if (score > 0) {
+                resultDiv.classList.add('bg-yellow-100', 'text-yellow-800', 'border-yellow-200');
+                resultDiv.innerHTML = `Good start! You got ${score}/${total} correct. Review the calculation steps above!`;
+            } else {
+                resultDiv.classList.add('bg-red-100', 'text-red-800', 'border-red-200');
+                resultDiv.innerHTML = `You got ${score}/${total} correct. Take another look at the algebraic rules.`;
+            }
+        }
+    </script>
+</body>
+</html>

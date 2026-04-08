@@ -1,0 +1,27 @@
+{
+  "tesseract_path": "",
+  "poppler_path": "",
+  "ocr_languages": "eng+chi_tra",
+  "filename_template": "[{year}][{publisher}][{subject}]Mock Exam Papers[{part}].pdf",
+  "confidence_threshold": 0.9,
+  "preserve_timestamps": true,
+  "max_filename_length": 120,
+  "ocr_dpi": 300,
+  "debug_mode": false,
+  "auto_install": true,
+  "preprocessing": {
+    "binarize": false,
+    "deskew": false,
+    "contrast": false
+  },
+  "custom_publishers": [
+    "Aristo", "Oxford", "Longman", "Pearson", "Pilot",
+    "Marshall Cavendish", "Hong Kong Educational", "Pan Lloyds",
+    "Manhattan", "Jing Kung", "Classroom", "Keys Press",
+    "精工", "雅集", "牛津", "朗文", "培生", "啟思",
+    "齡記", "樂思", "文達", "導師", "荃記"
+  ],
+  "subject_mapping_path": "",
+  "db_path": "",
+  "reports_dir": ""
+}

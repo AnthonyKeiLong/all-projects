@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE Chemical Equilibrium Mastery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+        }
+        
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .ice-table th, .ice-table td {
+            padding: 0.75rem 1rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .ice-table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        /* Custom styling to hide default details marker and add smooth transition */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .shift-arrow {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-slate-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-flask text-blue-600 text-2xl"></i>
+                <span class="font-bold text-xl text-slate-800">HKDSE Equilibrium<span class="text-blue-600">Mastery</span></span>
+            </div>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
+                <a href="#basics" class="hover:text-blue-600 transition">Basics</a>
+                <a href="#ice-tables" class="hover:text-blue-600 transition">ICE Tables</a>
+                <a href="#simulator" class="hover:text-blue-600 transition">Le Châtelier</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-br from-blue-900 to-indigo-800 text-white py-16">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <div class="inline-block bg-blue-800/50 px-4 py-1.5 rounded-full text-blue-200 text-sm font-semibold mb-4 border border-blue-700">Topic 5 & 11 Aligned</div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Mastering HKDSE Chemical Equilibrium</h1>
+            <p class="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto mb-8">Master the Kc calculations using ICE tables with authentic HKDSE past-paper formats, proper units (mol dm⁻³), and predict shifts using Le Châtelier's Principle.</p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12 space-y-16">
+
+        <!-- SECTION 1: THE BASICS -->
+        <section id="basics" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                <span class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i class="fas fa-balance-scale"></i></span>
+                The Concept of Equilibrium
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <p class="text-slate-600 mb-4 leading-relaxed">
+                        A dynamic equilibrium occurs in a closed system when the rate of the <strong>forward</strong> reaction equals the rate of the <strong>backward</strong> reaction. The macroscopic properties (like concentration and color) remain constant.
+                    </p>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <p class="text-sm font-semibold text-slate-500 mb-2 uppercase tracking-wide">The Equilibrium Constant (K_c)</p>
+                        <p class="font-mono text-center text-lg text-slate-800 mb-2">aA + bB ⇌ cC + dD</p>
+                        <div class="flex justify-center mt-3 text-lg font-mono text-blue-700">
+                            K<sub>c</sub> = <span class="mx-2 flex flex-col items-center">
+                                <span>[C]<sup>c</sup>[D]<sup>d</sup></span>
+                                <span class="w-full border-t border-blue-700 my-1"></span>
+                                <span>[A]<sup>a</sup>[B]<sup>b</sup></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-lg">
+                        <h4 class="font-bold text-emerald-900">K<sub>c</sub> &gt; 1 (Products Favored)</h4>
+                        <p class="text-sm text-emerald-800">The equilibrium position lies to the right. The yield of products is high.</p>
+                    </div>
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
+                        <h4 class="font-bold text-amber-900">K<sub>c</sub> &approx; 1 (Balanced)</h4>
+                        <p class="text-sm text-amber-800">Significant amounts of both reactants and products exist in the equilibrium mixture.</p>
+                    </div>
+                    <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg">
+                        <h4 class="font-bold text-rose-900">K<sub>c</sub> &lt; 1 (Reactants Favored)</h4>
+                        <p class="text-sm text-rose-800">The equilibrium position lies to the left. The yield of products is low.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: ICE TABLES -->
+        <section id="ice-tables" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg"><i class="fas fa-table"></i></span>
+                ICE Table Mastery (HKDSE Style)
+            </h2>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                
+                <!-- Basic Perfect Square Example -->
+                <div class="mb-10">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-2">The Standard Setup (Perfect Square)</h3>
+                    <p class="text-slate-600 mb-6">Let's look at the classic reaction between Hydrogen and Iodine forming Hydrogen Iodide. If initial concentrations are equal, the expression simplifies beautifully.</p>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 overflow-x-auto">
+                                <p class="font-mono text-center text-lg text-slate-800 mb-4 font-bold border-b border-slate-200 pb-2">H₂(g) + I₂(g) ⇌ 2HI(g)</p>
+                                <table class="w-full ice-table text-sm">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left w-1/4">Step</th>
+                                            <th class="w-1/4">[H₂]</th>
+                                            <th class="w-1/4">[I₂]</th>
+                                            <th class="w-1/4">[HI]</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="bg-white">
+                                            <td class="font-bold text-left text-indigo-700">Initial (mol dm⁻³)</td>
+                                            <td>0.500</td>
+                                            <td>0.500</td>
+                                            <td>0.000</td>
+                                        </tr>
+                                        <tr class="bg-slate-50">
+                                            <td class="font-bold text-left text-amber-600">Change (mol dm⁻³)</td>
+                                            <td class="text-amber-600">- x</td>
+                                            <td class="text-amber-600">- x</td>
+                                            <td class="text-amber-600">+ 2x</td>
+                                        </tr>
+                                        <tr class="bg-indigo-50 font-bold border-t-2 border-indigo-200">
+                                            <td class="text-left text-emerald-700">Equilibrium</td>
+                                            <td class="text-emerald-700">0.500 - x</td>
+                                            <td class="text-emerald-700">0.500 - x</td>
+                                            <td class="text-emerald-700">2x</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Basic Exam Question -->
+                        <div class="flex flex-col justify-center">
+                            <details class="bg-indigo-50 rounded-xl border border-indigo-200 overflow-hidden group shadow-sm">
+                                <summary class="font-bold text-indigo-900 cursor-pointer p-4 bg-indigo-100 flex items-center justify-between hover:bg-indigo-200 transition">
+                                    <span class="flex items-center gap-2"><i class="fas fa-file-alt text-indigo-600"></i> DSE Question: Perfect Square</span>
+                                    <i class="fas fa-chevron-down text-indigo-600 transition-transform duration-300 group-open:-rotate-180"></i>
+                                </summary>
+                                <div class="p-5 text-sm text-indigo-900">
+                                    <p class="italic mb-4">"A mixture of 0.500 mol of H₂(g) and 0.500 mol of I₂(g) is allowed to reach equilibrium in a closed container of volume 1.00 dm³ at 430 °C. The equilibrium constant, K<sub>c</sub>, for the reaction H₂(g) + I₂(g) ⇌ 2HI(g) at this temperature is 54.3. Calculate the equilibrium concentration of HI(g). <span class="float-right font-bold">(3 marks)</span>"</p>
+                                    
+                                    <div class="font-mono bg-white p-4 rounded border border-indigo-100 space-y-2 text-slate-800 shadow-inner">
+                                        <div class="text-slate-500 text-xs mb-2">// Step-by-Step Solution:</div>
+                                        <div>1. K<sub>c</sub> = [HI]² / ([H₂][I₂]) = 54.3</div>
+                                        <div>2. Substitute: (2x)² / (0.500 - x)² = 54.3</div>
+                                        <div>3. Take square root on both sides:</div>
+                                        <div class="pl-4 text-indigo-700">&radic;54.3 = 2x / (0.500 - x)</div>
+                                        <div class="pl-4 text-indigo-700">7.369 = 2x / (0.500 - x)</div>
+                                        <div>4. Solve for x:</div>
+                                        <div class="pl-4">3.6845 - 7.369x = 2x</div>
+                                        <div class="pl-4">9.369x = 3.6845 &rarr; <span class="font-bold">x = 0.393</span></div>
+                                        <div class="pt-2 border-t border-indigo-50 mt-2 font-bold text-emerald-700">
+                                            5. [HI] = 2x = 2(0.393) = 0.786 mol dm⁻³
+                                        </div>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full h-px bg-slate-200 my-10"></div>
+
+                <!-- ADVANCED SCENARIOS -->
+                <h3 class="text-2xl font-bold text-slate-800 flex items-center gap-2 mb-6">
+                    <i class="fas fa-graduation-cap text-purple-600"></i> Advanced Scenarios
+                </h3>
+
+                <div class="space-y-8">
+                    
+                    <!-- Scenario 1: Esterification / Quadratic Formula -->
+                    <div class="bg-white border border-purple-200 rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-purple-50 px-5 py-3 font-bold text-purple-900 border-b border-purple-200 flex items-center gap-2">
+                            <span class="bg-purple-200 text-purple-800 text-xs px-2 py-1 rounded">Scenario 1</span>
+                            Esterification (Quadratic Required)
+                        </div>
+                        <div class="p-5">
+                            <p class="text-sm text-slate-700 mb-4">A staple of HKDSE Chemistry. When starting with unequal reactant amounts, the expression won't simplify into a perfect square, requiring the quadratic formula: <span class="font-mono bg-slate-100 px-1 rounded">x = (-b &plusmn; &radic;(b² - 4ac)) / 2a</span></p>
+                            
+                            <!-- Scenario 1 Exam Question -->
+                            <details class="bg-white rounded-lg border border-purple-200 overflow-hidden group mt-4 shadow-sm">
+                                <summary class="font-bold text-purple-900 cursor-pointer p-4 bg-purple-50 flex items-center justify-between hover:bg-purple-100 transition">
+                                    <span class="flex items-center gap-2"><i class="fas fa-file-signature text-purple-600"></i> DSE Question: Esterification Equilibrium</span>
+                                    <i class="fas fa-chevron-down text-purple-600 transition-transform duration-300 group-open:-rotate-180"></i>
+                                </summary>
+                                <div class="p-5 text-sm text-slate-800 border-t border-purple-100 bg-slate-50">
+                                    <p class="italic mb-4 text-purple-900">"In an experiment, 3.00 mol of ethanoic acid and 2.00 mol of ethanol were mixed and allowed to reach equilibrium at room temperature. The volume of the reaction mixture was 1.00 dm³. K<sub>c</sub> = 4.00. Calculate the equilibrium concentration of ethyl ethanoate. <span class="float-right font-bold">(4 marks)</span>"</p>
+                                    
+                                    <div class="font-mono bg-white p-4 rounded border border-purple-100 shadow-sm space-y-2 text-xs md:text-sm">
+                                        <div class="grid grid-cols-4 gap-2 text-center border-b border-slate-200 pb-2 mb-2 font-bold text-slate-600">
+                                            <div class="text-left">ICE (mol dm⁻³)</div>
+                                            <div>CH₃COOH</div><div>C₂H₅OH</div><div>CH₃COOC₂H₅ + H₂O</div>
+                                        </div>
+                                        <div class="grid grid-cols-4 gap-2 text-center">
+                                            <div class="text-left">Initial:</div><div>3.00</div><div>2.00</div><div>0 / 0</div>
+                                            <div class="text-left">Change:</div><div>-x</div><div>-x</div><div>+x / +x</div>
+                                            <div class="text-left">Eq:</div><div>3.00-x</div><div>2.00-x</div><div>x / x</div>
+                                        </div>
+                                        <div class="my-3 border-t border-dashed border-slate-200"></div>
+                                        <div class="text-purple-700 font-bold">4.00 = (x)(x) / [(3.00 - x)(2.00 - x)]</div>
+                                        <div>4.00(6.00 - 5.00x + x²) = x²</div>
+                                        <div>24.0 - 20.0x + 4.00x² = x²</div>
+                                        <div><span class="font-bold text-amber-600">3.00x² - 20.0x + 24.0 = 0</span>  &larr; (ax² + bx + c = 0)</div>
+                                        <div class="text-slate-500 mt-2">// Using quadratic formula:</div>
+                                        <div>x = [20.0 &plusmn; &radic;((-20.0)² - 4(3.00)(24.0))] / 2(3.00)</div>
+                                        <div>x = [20.0 &plusmn; &radic;(112)] / 6.00</div>
+                                        <div>x₁ &approx; 5.09 (Reject, because x > initial 2.00)</div>
+                                        <div class="font-bold text-emerald-600 text-base mt-2">x₂ &approx; 1.57 mol dm⁻³ = [CH₃COOC₂H₅]</div>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Scenario 2: Starting with Products -->
+                        <div class="bg-white border border-orange-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+                            <div class="bg-orange-50 px-5 py-3 font-bold text-orange-900 border-b border-orange-200 flex items-center gap-2">
+                                <span class="bg-orange-200 text-orange-800 text-xs px-2 py-1 rounded">Scenario 2</span>
+                                Missing Reactants (Reverse Shift)
+                            </div>
+                            <div class="p-5 flex-grow">
+                                <p class="text-sm text-slate-700 mb-3">If a reactant is missing, the reaction <strong>must shift left</strong>. Products decrease (-x) and reactants increase (+x).</p>
+                                
+                                <details class="bg-white rounded-lg border border-orange-200 overflow-hidden group mt-4">
+                                    <summary class="font-bold text-orange-900 cursor-pointer p-3 bg-orange-50 flex items-center justify-between hover:bg-orange-100 transition text-sm">
+                                        <span class="flex items-center gap-2"><i class="fas fa-file-signature text-orange-600"></i> DSE Question: Shift Left</span>
+                                        <i class="fas fa-chevron-down text-orange-600 transition-transform duration-300 group-open:-rotate-180"></i>
+                                    </summary>
+                                    <div class="p-4 text-xs text-slate-800 border-t border-orange-100 bg-slate-50">
+                                        <p class="italic mb-3 text-orange-900">"0.500 mol of PCl₃(g) and 0.500 mol of Cl₂(g) are injected into an evacuated 10.0 dm³ closed vessel. For the reaction PCl₅(g) ⇌ PCl₃(g) + Cl₂(g), the equilibrium constant K<sub>c</sub> is 0.0211 mol dm⁻³. Calculate the equilibrium concentration of PCl₅(g). <span class="float-right font-bold">(3 marks)</span>"</p>
+                                        <div class="font-mono bg-white p-3 rounded border border-orange-100">
+                                            <div class="text-slate-500 mb-1">// 1. Find Initial Concentration</div>
+                                            <div>[PCl₃] = [Cl₂] = 0.500mol / 10.0dm³ = 0.050 mol dm⁻³</div>
+                                            <div class="mt-2 text-slate-500 mb-1">// 2. Setup (Shifting Left)</div>
+                                            <div>Eq [PCl₅] = 0 + x = x</div>
+                                            <div>Eq [PCl₃] = 0.050 - x</div>
+                                            <div>Eq [Cl₂] = 0.050 - x</div>
+                                            <div class="mt-2 text-slate-500 mb-1">// 3. Solve</div>
+                                            <div>0.0211 = (0.050 - x)² / x</div>
+                                            <div>0.0211x = 0.0025 - 0.10x + x²</div>
+                                            <div>x² - 0.1211x + 0.0025 = 0</div>
+                                            <div class="font-bold text-emerald-600 mt-2">x &approx; 0.0255 mol dm⁻³ = [PCl₅]</div>
+                                        </div>
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
+
+                        <!-- Scenario 3: Small x (Ka) -->
+                        <div class="bg-white border border-teal-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+                            <div class="bg-teal-50 px-5 py-3 font-bold text-teal-900 border-b border-teal-200 flex items-center gap-2">
+                                <span class="bg-teal-200 text-teal-800 text-xs px-2 py-1 rounded">Scenario 3</span>
+                                "Small x" Approximation (Weak Acid)
+                            </div>
+                            <div class="p-5 flex-grow">
+                                <p class="text-sm text-slate-700 mb-3">Often seen in Topic 11 (Acid-Base). When K<sub>a</sub> is very small, the degree of ionization is tiny: <strong>(Initial - x) &approx; Initial</strong>.</p>
+                                
+                                <details class="bg-white rounded-lg border border-teal-200 overflow-hidden group mt-4">
+                                    <summary class="font-bold text-teal-900 cursor-pointer p-3 bg-teal-50 flex items-center justify-between hover:bg-teal-100 transition text-sm">
+                                        <span class="flex items-center gap-2"><i class="fas fa-file-signature text-teal-600"></i> DSE Question: Weak Acid K<sub>a</sub></span>
+                                        <i class="fas fa-chevron-down text-teal-600 transition-transform duration-300 group-open:-rotate-180"></i>
+                                    </summary>
+                                    <div class="p-4 text-xs text-slate-800 border-t border-teal-100 bg-slate-50">
+                                        <p class="italic mb-3 text-teal-900">"An aqueous solution of ethanoic acid (CH₃COOH) has a concentration of 0.100 mol dm⁻³. At 298 K, K<sub>a</sub> = 1.8 &times; 10⁻⁵ mol dm⁻³. Calculate the equilibrium concentration of H⁺(aq). (Assume degree of ionization is small). <span class="float-right font-bold">(3 marks)</span>"</p>
+                                        <div class="font-mono bg-white p-3 rounded border border-teal-100">
+                                            <div class="text-slate-500 mb-1">// Setup: CH₃COOH ⇌ CH₃COO⁻ + H⁺</div>
+                                            <div>Eq [CH₃COOH] = 0.100 - x &approx; 0.100</div>
+                                            <div>Eq [CH₃COO⁻] = x</div>
+                                            <div>Eq [H⁺] = x</div>
+                                            <div class="mt-2 text-slate-500 mb-1">// Solve with Approximation</div>
+                                            <div>K<sub>a</sub> = [CH₃COO⁻][H⁺] / [CH₃COOH]</div>
+                                            <div>1.8 &times; 10⁻⁵ = (x)(x) / 0.100</div>
+                                            <div>x² = 1.8 &times; 10⁻⁶</div>
+                                            <div class="font-bold text-emerald-600 mt-2">x = 1.34 &times; 10⁻³ mol dm⁻³ = [H⁺]</div>
+                                        </div>
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: LE CHATELIER SIMULATOR -->
+        <section id="simulator" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                <span class="bg-rose-100 text-rose-600 p-2 rounded-lg"><i class="fas fa-sliders-h"></i></span>
+                Le Châtelier's Principle (Haber Process)
+            </h2>
+            <div class="bg-slate-800 rounded-2xl p-6 md:p-10 shadow-xl text-white">
+                <p class="text-slate-300 mb-8 text-center max-w-2xl mx-auto">Interact with the Haber process, a vital industrial equilibrium heavily tested in HKDSE: <br><span class="font-mono text-xl font-bold text-blue-300 mt-2 block">N₂(g) + 3H₂(g) ⇌ 2NH₃(g) &nbsp; &Delta;H &lt; 0</span></p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center mb-10">
+                    <div class="text-center p-4 bg-slate-700 rounded-xl border border-slate-600">
+                        <h4 class="font-bold text-blue-300 mb-3 text-lg">Reactants & Pressure</h4>
+                        <div class="flex flex-col gap-2">
+                            <button onclick="simulateShift('add_reactant')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded shadow transition active:scale-95 text-sm font-bold w-full">Inject N₂ / H₂</button>
+                            <button onclick="simulateShift('inc_pressure')" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded shadow transition active:scale-95 text-sm font-bold w-full">Increase Pressure</button>
+                        </div>
+                    </div>
+
+                    <div class="text-center flex flex-col items-center justify-center">
+                        <div class="relative w-full h-16 flex items-center justify-center">
+                            <!-- Shift Arrows -->
+                            <div id="arrow-right" class="absolute text-4xl text-emerald-400 opacity-20 shift-arrow translate-x-0"><i class="fas fa-long-arrow-alt-right"></i></div>
+                            <div id="arrow-left" class="absolute text-4xl text-rose-400 opacity-20 shift-arrow translate-x-0"><i class="fas fa-long-arrow-alt-left"></i></div>
+                        </div>
+                        <p id="shift-text" class="text-sm font-bold text-slate-400 mt-2 uppercase tracking-wide h-6">System at Equilibrium</p>
+                    </div>
+
+                    <div class="text-center p-4 bg-slate-700 rounded-xl border border-slate-600">
+                        <h4 class="font-bold text-purple-300 mb-3 text-lg">Products & Temp</h4>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex justify-center gap-2">
+                                <button onclick="simulateShift('rem_product')" class="bg-purple-600 hover:bg-purple-500 text-white w-full py-2 rounded shadow transition active:scale-95 text-sm font-bold">Remove NH₃</button>
+                            </div>
+                            <div class="flex justify-center gap-2 mt-2">
+                                <button onclick="simulateShift('inc_temp')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-2 rounded shadow transition active:scale-95 text-xs font-bold w-1/2">Heat Up</button>
+                                <button onclick="simulateShift('dec_temp')" class="bg-teal-600 hover:bg-teal-500 text-white px-3 py-2 rounded shadow transition active:scale-95 text-xs font-bold w-1/2">Cool Down</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="explanation-box" class="bg-slate-900 border border-slate-700 p-5 rounded-lg text-sm text-slate-300 min-h-[100px] flex items-center justify-center text-center leading-relaxed">
+                    Click a button above to change the conditions and see how the equilibrium position shifts to counteract the change.
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center text-sm border-t border-slate-800 mt-12">
+        <p>&copy; 2026 HKDSE Equilibrium Mastery. Tailored for Hong Kong Chemistry Students.</p>
+    </footer>
+
+    <script>
+        function simulateShift(action) {
+            const arrowRight = document.getElementById('arrow-right');
+            const arrowLeft = document.getElementById('arrow-left');
+            const shiftText = document.getElementById('shift-text');
+            const expBox = document.getElementById('explanation-box');
+
+            // Reset animations
+            arrowRight.classList.remove('opacity-100', 'translate-x-4', 'scale-125');
+            arrowRight.classList.add('opacity-20', 'translate-x-0');
+            arrowLeft.classList.remove('opacity-100', '-translate-x-4', 'scale-125');
+            arrowLeft.classList.add('opacity-20', 'translate-x-0');
+
+            setTimeout(() => {
+                if(action === 'add_reactant') {
+                    arrowRight.classList.replace('opacity-20', 'opacity-100');
+                    arrowRight.classList.add('translate-x-4', 'scale-125');
+                    shiftText.innerText = "Equilibrium shifts to the right";
+                    shiftText.className = "text-sm font-bold text-emerald-400 mt-2 uppercase tracking-wide h-6";
+                    expBox.innerHTML = "<span class='text-white font-bold block mb-1'>Change: Concentration of N₂/H₂ increased</span> By Le Châtelier's principle, the system shifts to the right to consume the added reactants, increasing the yield of NH₃.";
+                } 
+                else if (action === 'rem_product') {
+                    arrowRight.classList.replace('opacity-20', 'opacity-100');
+                    arrowRight.classList.add('translate-x-4', 'scale-125');
+                    shiftText.innerText = "Equilibrium shifts to the right";
+                    shiftText.className = "text-sm font-bold text-emerald-400 mt-2 uppercase tracking-wide h-6";
+                    expBox.innerHTML = "<span class='text-white font-bold block mb-1'>Change: NH₃ removed</span> By Le Châtelier's principle, the system shifts to the right to replace the lost product. This is how industrial plants continuously push the reaction forward to maximize yield.";
+                }
+                else if (action === 'inc_pressure') {
+                    arrowRight.classList.replace('opacity-20', 'opacity-100');
+                    arrowRight.classList.add('translate-x-4', 'scale-125');
+                    shiftText.innerText = "Equilibrium shifts to the right";
+                    shiftText.className = "text-sm font-bold text-emerald-400 mt-2 uppercase tracking-wide h-6";
+                    expBox.innerHTML = "<span class='text-white font-bold block mb-1'>Change: Total pressure increased</span> There are 4 moles of gas on the left and 2 moles on the right. By Le Châtelier's principle, the system shifts to the right (side with fewer gaseous moles) to reduce the pressure.";
+                }
+                else if (action === 'inc_temp') {
+                    arrowLeft.classList.replace('opacity-20', 'opacity-100');
+                    arrowLeft.classList.add('-translate-x-4', 'scale-125');
+                    shiftText.innerText = "Equilibrium shifts to the left";
+                    shiftText.className = "text-sm font-bold text-rose-400 mt-2 uppercase tracking-wide h-6";
+                    expBox.innerHTML = "<span class='text-white font-bold block mb-1'>Change: Temperature increased</span> The forward reaction is exothermic (&Delta;H &lt; 0). By Le Châtelier's principle, the system shifts to the left (endothermic direction) to absorb the excess heat. <strong>Note: K_c decreases!</strong>";
+                }
+                else if (action === 'dec_temp') {
+                    arrowRight.classList.replace('opacity-20', 'opacity-100');
+                    arrowRight.classList.add('translate-x-4', 'scale-125');
+                    shiftText.innerText = "Equilibrium shifts to the right";
+                    shiftText.className = "text-sm font-bold text-emerald-400 mt-2 uppercase tracking-wide h-6";
+                    expBox.innerHTML = "<span class='text-white font-bold block mb-1'>Change: Temperature decreased</span> By Le Châtelier's principle, the system shifts to the right (exothermic direction) to release heat. <strong>Note: K_c increases!</strong> (However, in industry, temperature cannot be too low, or the rate of reaction will be too slow).";
+                }
+            }, 50);
+        }
+    </script>
+</body>
+</html>

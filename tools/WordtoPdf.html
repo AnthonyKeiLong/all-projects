@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word to PDF Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-slate-800 font-sans p-6 md:p-12">
+    <div class="max-w-4xl mx-auto space-y-8">
+        
+        <!-- Header -->
+        <div class="text-center space-y-2">
+            <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 flex items-center justify-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                Word to PDF Converter
+            </h1>
+            <p class="text-slate-500 max-w-xl mx-auto">
+                Convert your <span class="font-medium text-slate-700">.docx</span> files to PDF securely in your browser. No files are uploaded to any server.
+            </p>
+        </div>
+
+        <!-- Loading Engine Notice (Hidden initially) -->
+        <div id="engine-loader" class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4 flex items-center justify-center gap-3 hidden">
+            <svg class="w-5 h-5 animate-spin" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+            Loading conversion engine...
+        </div>
+
+        <!-- Dropzone -->
+        <div id="dropzone" class="relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-200 border-slate-300 bg-white hover:bg-slate-50">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                <div id="dropzone-icon-container" class="p-4 rounded-full mb-4 bg-slate-100 transition-colors">
+                    <svg id="dropzone-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500 transition-colors"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m16 16-4-4-4 4"></path></svg>
+                </div>
+                <p class="mb-2 text-lg font-semibold text-slate-700">Click to upload or drag and drop</p>
+                <p class="text-sm text-slate-500">Supports single or multiple .DOCX files</p>
+            </div>
+            <input id="file-input" type="file" class="hidden" multiple accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+        </div>
+
+        <!-- Informational Warning -->
+        <div class="flex items-start gap-3 bg-blue-50/50 border border-blue-100 rounded-xl p-4 text-sm text-slate-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <p><strong>Browser-based Conversion:</strong> Because this happens directly in your browser without a backend server, complex layouts, custom fonts, or advanced Word formatting may not look identical to MS Word.</p>
+        </div>
+
+        <!-- File List Container -->
+        <div id="file-list-container" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 id="queue-title" class="font-semibold text-slate-800">Conversion Queue (0 files)</h3>
+                <div class="flex gap-3">
+                    <button id="clear-all-btn" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        Clear All
+                    </button>
+                    <button id="convert-all-btn" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                        <svg id="convert-icon-settings" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <svg id="convert-icon-loader" class="hidden w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                        <span id="convert-btn-text">Convert Pending</span>
+                    </button>
+                </div>
+            </div>
+            <ul id="file-list" class="divide-y divide-slate-100">
+                <!-- File items will be injected here -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let files = [];
+        let isConverting = false;
+        let globalProgress = 0;
+
+        // DOM Elements
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const fileListContainer = document.getElementById('file-list-container');
+        const fileList = document.getElementById('file-list');
+        const queueTitle = document.getElementById('queue-title');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const convertAllBtn = document.getElementById('convert-all-btn');
+        const convertBtnText = document.getElementById('convert-btn-text');
+        const convertIconSettings = document.getElementById('convert-icon-settings');
+        const convertIconLoader = document.getElementById('convert-icon-loader');
+        
+        // Drag & Drop Styling Elements
+        const dropzoneIconContainer = document.getElementById('dropzone-icon-container');
+        const dropzoneIcon = document.getElementById('dropzone-icon');
+
+        // Verify Scripts loaded (Simple check since we are using synchronous tags)
+        window.addEventListener('load', () => {
+            if (!window.mammoth || !window.html2pdf) {
+                document.getElementById('engine-loader').classList.remove('hidden');
+            }
+        });
+
+        // Event Listeners for Drag and Drop
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('border-slate-300', 'bg-white');
+            dropzone.classList.add('border-blue-500', 'bg-blue-50');
+            dropzoneIconContainer.classList.remove('bg-slate-100');
+            dropzoneIconContainer.classList.add('bg-blue-100');
+            dropzoneIcon.classList.remove('text-slate-500');
+            dropzoneIcon.classList.add('text-blue-600');
+        });
+
+        dropzone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            resetDropzoneStyling();
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            resetDropzoneStyling();
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                processSelectedFiles(e.dataTransfer.files);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                processSelectedFiles(e.target.files);
+            }
+            e.target.value = ''; // Reset input
+        });
+
+        clearAllBtn.addEventListener('click', () => {
+            if (!isConverting) {
+                files = [];
+                render();
+            }
+        });
+
+        convertAllBtn.addEventListener('click', convertAllFiles);
+
+        function resetDropzoneStyling() {
+            dropzone.classList.add('border-slate-300', 'bg-white');
+            dropzone.classList.remove('border-blue-500', 'bg-blue-50');
+            dropzoneIconContainer.classList.add('bg-slate-100');
+            dropzoneIconContainer.classList.remove('bg-blue-100');
+            dropzoneIcon.classList.add('text-slate-500');
+            dropzoneIcon.classList.remove('text-blue-600');
+        }
+
+        function processSelectedFiles(selectedFiles) {
+            const newFiles = Array.from(selectedFiles)
+                .filter(file => file.name.toLowerCase().endsWith('.docx'))
+                .map(file => ({
+                    id: Math.random().toString(36).substring(7),
+                    file,
+                    name: file.name,
+                    size: (file.size / 1024 / 1024).toFixed(2) + ' MB',
+                    status: 'pending', // pending, converting, done, error
+                    pdfUrl: null,
+                    errorMsg: ''
+                }));
+
+            if (newFiles.length < selectedFiles.length) {
+                alert("Note: Only modern Word Documents (.docx) are supported. Older .doc files were ignored. Please resave them as .docx in Word first.");
+            }
+
+            files = [...files, ...newFiles];
+            render();
+        }
+
+        // Global functions to handle button clicks inside dynamically rendered list
+        window.removeFile = (id) => {
+            if (isConverting) {
+                const target = files.find(f => f.id === id);
+                if (target && target.status === 'converting') return; // Prevent removing while active
+            }
+            files = files.filter(f => f.id !== id);
+            render();
+        };
+
+        async function convertSingleFile(fileObj) {
+            updateFileStatus(fileObj.id, 'converting');
+            
+            try {
+                const arrayBuffer = await fileObj.file.arrayBuffer();
+                
+                // 1. Convert DOCX to HTML using mammoth
+                const result = await window.mammoth.convertToHtml({ arrayBuffer });
+                let htmlContent = result.value;
+
+                if (!htmlContent || htmlContent.trim() === '') {
+                    htmlContent = '<p><em>Document is empty or could not be read.</em></p>';
+                }
+
+                // 2. Prepare HTML wrapper for PDF rendering
+                // Using an explicit HTML string is the most reliable way for html2pdf 
+                // to render off-screen without losing dimensions.
+                const htmlString = `
+                    <div style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.6; color: #000; background: #fff; width: 100%;">
+                        <style>
+                            table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+                            td, th { border: 1px solid #ccc; padding: 6px; }
+                            img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+                            p { margin-top: 0; margin-bottom: 1em; }
+                            h1, h2, h3, h4, h5, h6 { margin-top: 1.5em; margin-bottom: 0.5em; page-break-after: avoid; }
+                        </style>
+                        ${htmlContent}
+                    </div>
+                `;
+
+                // 3. Convert HTML to PDF
+                const opt = {
+                    margin:       0.75, // Standard page margins
+                    filename:     fileObj.name.replace(/\.docx?$/i, '.pdf'),
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true, logging: false },
+                    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+
+                // Pass the string directly. html2pdf manages the temporary iframe.
+                const pdfBlob = await window.html2pdf().set(opt).from(htmlString).output('blob');
+
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+                updateFileStatus(fileObj.id, 'done', { pdfUrl });
+
+                return true;
+            } catch (error) {
+                console.error("Conversion error:", error);
+                updateFileStatus(fileObj.id, 'error', { errorMsg: error.message || 'Conversion failed' });
+                return false;
+            }
+        }
+
+        async function convertAllFiles() {
+            if (!window.mammoth || !window.html2pdf) return;
+            
+            isConverting = true;
+            const filesToConvert = files.filter(f => f.status === 'pending' || f.status === 'error');
+            let completed = 0;
+
+            render(); // Update button state
+
+            for (const fileObj of filesToConvert) {
+                await convertSingleFile(fileObj);
+                completed++;
+                globalProgress = Math.round((completed / filesToConvert.length) * 100);
+                render(); // Update UI progress
+            }
+            
+            isConverting = false;
+            globalProgress = 0;
+            render(); // Final UI state update
+        }
+
+        function updateFileStatus(id, status, extraFields = {}) {
+            files = files.map(f => f.id === id ? { ...f, status, ...extraFields } : f);
+            render();
+        }
+
+        // Main UI Render Function
+        function render() {
+            // Container visibility
+            if (files.length === 0) {
+                fileListContainer.classList.add('hidden');
+            } else {
+                fileListContainer.classList.remove('hidden');
+            }
+
+            // Update queue header
+            queueTitle.innerText = `Conversion Queue (${files.length} file${files.length === 1 ? '' : 's'})`;
+
+            const pendingCount = files.filter(f => f.status === 'pending').length;
+
+            // Clear All Button State
+            clearAllBtn.disabled = isConverting;
+
+            // Convert All Button State
+            convertAllBtn.disabled = isConverting || pendingCount === 0 || (!window.mammoth || !window.html2pdf);
+            
+            if (isConverting) {
+                convertIconSettings.classList.add('hidden');
+                convertIconLoader.classList.remove('hidden');
+                convertBtnText.innerText = `Converting... ${globalProgress}%`;
+            } else {
+                convertIconSettings.classList.remove('hidden');
+                convertIconLoader.classList.add('hidden');
+                convertBtnText.innerText = `Convert ${pendingCount > 0 ? pendingCount : ''} Pending`;
+            }
+
+            // Render list items
+            fileList.innerHTML = files.map(file => {
+                
+                let statusBadge = '';
+                if (file.status === 'pending') {
+                    statusBadge = `<span class="px-2.5 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded-full">Ready</span>`;
+                } else if (file.status === 'converting') {
+                    statusBadge = `<span class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-600 rounded-full">
+                        <svg class="w-3 h-3 animate-spin" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                        Converting
+                    </span>`;
+                } else if (file.status === 'error') {
+                    statusBadge = `<span class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-red-50 text-red-600 rounded-full">
+                        <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                        Failed
+                    </span>`;
+                } else if (file.status === 'done') {
+                    statusBadge = `<span class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-green-50 text-green-600 rounded-full">
+                        <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        Done
+                    </span>`;
+                }
+
+                let actions = '';
+                if (file.status === 'done' && file.pdfUrl) {
+                    const dlName = file.name.replace(/\.docx?$/i, '.pdf');
+                    actions = `
+                    <a href="${file.pdfUrl}" download="${dlName}" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Download PDF">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    </a>`;
+                } else {
+                    const btnDisabled = (isConverting && file.status === 'converting') ? 'disabled class="opacity-50 cursor-not-allowed' : 'class=" hover:text-red-500 hover:bg-red-50';
+                    actions = `
+                    <button onclick="window.removeFile('${file.id}')" ${btnDisabled} p-2 text-slate-400 rounded-lg transition-colors" title="Remove file">
+                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>`;
+                }
+
+                return `
+                <li class="p-4 sm:px-6 hover:bg-slate-50/50 transition-colors flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-4 flex-1 min-w-0">
+                        <div class="p-2 bg-blue-50 text-blue-600 rounded-lg shrink-0">
+                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-slate-900 truncate">${file.name}</p>
+                            <p class="text-xs text-slate-500 mt-0.5">${file.size}</p>
+                            ${file.status === 'error' ? `<p class="text-xs text-red-500 mt-1">${file.errorMsg}</p>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end shrink-0">
+                        ${statusBadge}
+                        ${actions}
+                    </div>
+                </li>
+                `;
+            }).join('');
+        }
+        
+        // Initial render to ensure buttons and lists match starting state
+        render();
+
+    </script>
+</body>
+</html>

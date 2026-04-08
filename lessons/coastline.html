@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Coastline Paradox</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .step-content {
+      display: none;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    .step-content.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #2563eb;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4 font-sans text-slate-800">
+
+  <div class="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[750px] relative">
+    
+    <!-- Header & Progress -->
+    <div class="bg-slate-900 text-white p-6 pb-8">
+      <div class="flex items-center gap-3 mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+        <h1 class="text-2xl font-bold">The Coastline Paradox</h1>
+      </div>
+      
+      <div class="flex flex-col gap-4">
+        <div class="flex justify-between items-end">
+          <!-- Step Indicators -->
+          <div class="step-indicator flex flex-col items-center gap-2 z-10 transition-colors duration-300 text-blue-400" data-step="0">
+            <div class="indicator-dot w-4 h-4 rounded-full border-2 bg-blue-500 border-blue-200"></div>
+            <span class="text-xs font-medium hidden sm:block">The Mystery</span>
+          </div>
+          <div class="step-indicator flex flex-col items-center gap-2 z-10 transition-colors duration-300 text-slate-500" data-step="1">
+            <div class="indicator-dot w-4 h-4 rounded-full border-2 bg-slate-800 border-slate-600"></div>
+            <span class="text-xs font-medium hidden sm:block">Math Lab</span>
+          </div>
+          <div class="step-indicator flex flex-col items-center gap-2 z-10 transition-colors duration-300 text-slate-500" data-step="2">
+            <div class="indicator-dot w-4 h-4 rounded-full border-2 bg-slate-800 border-slate-600"></div>
+            <span class="text-xs font-medium hidden sm:block">Fractals</span>
+          </div>
+          <div class="step-indicator flex flex-col items-center gap-2 z-10 transition-colors duration-300 text-slate-500" data-step="3">
+            <div class="indicator-dot w-4 h-4 rounded-full border-2 bg-slate-800 border-slate-600"></div>
+            <span class="text-xs font-medium hidden sm:block">Real-World Lab</span>
+          </div>
+        </div>
+        
+        <div class="w-full h-1 bg-slate-700 rounded-full overflow-hidden">
+          <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-500 ease-out" style="width: 25%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Content Area -->
+    <div class="flex-grow p-6 sm:p-10 flex flex-col overflow-y-auto">
+      
+      <!-- Step 0: Intro -->
+      <div id="section-0" class="step-content active flex-col h-full justify-center">
+        <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-1.5 rounded-full text-sm font-bold w-fit mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          The Question
+        </div>
+        <h2 class="text-4xl font-extrabold text-slate-900 mb-6 leading-tight">
+          How long is the coast of the United Kingdom?
+        </h2>
+        <p class="text-lg text-slate-600 mb-6 leading-relaxed">
+          It sounds like a straightforward question. You simply take a map, measure the edge, and report the number. 
+        </p>
+        <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+          However, if you ask the <strong>CIA World Factbook</strong>, they will tell you it's roughly <span class="font-bold text-slate-800">12,429 kilometers</span>. But if you ask the <strong>World Resources Institute</strong>, they will claim it is <span class="font-bold text-slate-800">19,717 kilometers</span>. 
+        </p>
+        <div class="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-xl text-amber-900 mt-auto">
+          <p class="font-medium text-lg">
+            Who is wrong? <strong>Neither of them.</strong> They just used differently sized "rulers" to measure it. Welcome to the Coastline Paradox.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 1: Abstract Lab -->
+      <div id="section-1" class="step-content flex-col h-full items-center justify-center">
+        <h2 class="text-3xl font-extrabold text-slate-900 mb-2 w-full text-center">Interactive Measurement Lab</h2>
+        <p class="text-slate-500 mb-8 text-center max-w-2xl">Use the slider below to change the size of your "ruler". Watch how a smaller ruler catches more of the jagged inlets, increasing the total length measured.</p>
+        
+        <div class="w-full flex flex-col md:flex-row gap-8 items-center justify-center">
+          <!-- Canvas Area -->
+          <div class="relative bg-white rounded-2xl shadow-inner border-2 border-slate-100 p-2">
+            <canvas id="lab1-canvas" width="400" height="400" class="w-full max-w-[350px] sm:max-w-[400px] aspect-square rounded-xl bg-slate-50"></canvas>
+          </div>
+
+          <!-- Controls and Dashboard -->
+          <div class="flex flex-col w-full max-w-[300px] gap-6">
+            <div class="bg-slate-900 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
+               <div class="absolute -right-4 -top-4 opacity-10">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3l-2.6-2.6c-.4-.4-1-.4-1.4 0l-1.4 1.4-2.6-2.6 1.4-1.4c.4-.4.4-1 0-1.4l-2.6-2.6c-.4-.4-1-.4-1.4 0l-1.4 1.4-2.6-2.6c-.4-.4-1-.4-1.4 0l-2.6 2.6c-.4.4-.4 1 0 1.4l11.3 11.3c.4.4 1 .4 1.4 0l2.6-2.6c.4-.4.4-1 0-1.4z"></path><path d="M14.5 17.5l-2.5-2.5"></path><path d="M11.5 14.5l-2.5-2.5"></path><path d="M8.5 11.5l-2.5-2.5"></path></svg>
+               </div>
+               <p class="text-slate-400 text-sm font-semibold uppercase tracking-wider mb-1">Measured Length</p>
+               <p class="text-4xl font-black text-blue-400 mb-4"><span id="lab1-length">0</span> <span class="text-lg font-medium text-slate-300">units</span></p>
+               
+               <div class="flex justify-between items-center text-sm border-t border-slate-700 pt-3">
+                 <span class="text-slate-400">Ruler Steps Taken:</span>
+                 <span id="lab1-steps" class="font-bold">0</span>
+               </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+              <label class="flex justify-between items-center text-sm font-bold text-slate-700 mb-4">
+                <span>Ruler Length:</span>
+                <span class="bg-slate-100 px-2 py-1 rounded text-blue-600"><span id="lab1-ruler-display">120</span> u</span>
+              </label>
+              <input type="range" id="lab1-slider" min="10" max="180" step="5" value="120" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+              <div class="flex justify-between text-xs text-slate-400 mt-2 font-medium">
+                <span>Detailed (Small)</span>
+                <span>General (Large)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Math/Concept -->
+      <div id="section-2" class="step-content flex-col h-full">
+        <div class="inline-flex items-center gap-2 bg-purple-100 text-purple-800 px-4 py-1.5 rounded-full text-sm font-bold w-fit mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+          The Concept
+        </div>
+        <h2 class="text-3xl font-extrabold text-slate-900 mb-6">
+          Fractals and Infinity
+        </h2>
+        
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+          <div>
+            <p class="text-slate-600 mb-4 leading-relaxed">
+              In 1967, mathematician Benoit Mandelbrot published a paper explaining this phenomenon. He realized that coastlines are naturally <strong>fractal</strong>.
+            </p>
+            <p class="text-slate-600 mb-4 leading-relaxed">
+              Unlike a smooth circle or a straight line, coastlines have inlets, bays, rocks, and pebbles. If you zoom in on a coastline, it looks just as jagged and complex as it did from far away.
+            </p>
+            <p class="text-slate-600 leading-relaxed">
+              Because a coastline infinitely zig-zags on a microscopic level, its theoretical length actually approaches <strong>infinity</strong> as your measuring tool approaches zero.
+            </p>
+          </div>
+          
+          <div class="bg-slate-100 p-6 rounded-2xl flex flex-col justify-center border border-slate-200">
+            <h3 class="font-bold text-slate-800 mb-3 text-lg">The Golden Rule:</h3>
+            <p class="text-slate-600 text-lg italic border-l-4 border-purple-400 pl-4 py-2">
+              "The shorter the ruler you use to measure a coastline, the longer the coastline will appear."
+            </p>
+            <p class="text-sm text-slate-500 mt-4">
+              A 100km ruler skips over small bays. A 1km ruler goes into those bays. A 1cm ruler measures around individual boulders.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Real World UK Lab -->
+      <div id="section-3" class="step-content flex-col h-full">
+        <div class="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 px-4 py-1.5 rounded-full text-sm font-bold w-fit mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          Real-World Data
+        </div>
+        <h2 class="text-3xl font-extrabold text-slate-900 mb-4">
+          Measuring the UK (Great Britain + Northern Ireland)
+        </h2>
+        <p class="text-slate-600 mb-6 leading-relaxed">
+          Let's map this directly to the real world. Below is a fractal approximation of Great Britain and Northern Ireland. By adjusting the resolution of your measurement, you can literally switch between the <strong>CIA's methodology</strong> (general shape) and the <strong>WRI's methodology</strong> (highly detailed). Major cities are marked for reference.
+        </p>
+
+        <div class="w-full flex flex-col md:flex-row gap-6 items-center justify-center">
+          <!-- UK Canvas Area -->
+          <div class="relative bg-emerald-50 rounded-2xl shadow-inner border-2 border-emerald-100 p-2">
+            <canvas id="lab2-canvas" width="300" height="400" class="w-full max-w-[250px] sm:max-w-[300px] aspect-[3/4] rounded-xl bg-white"></canvas>
+          </div>
+
+          <!-- UK Controls -->
+          <div class="flex flex-col w-full max-w-[350px] gap-4">
+            
+            <div class="bg-slate-900 text-white p-5 rounded-2xl shadow-lg relative">
+               <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Estimated UK Coastline Length</p>
+               <p class="text-4xl font-black text-emerald-400 mb-2"><span id="lab2-length">0</span> <span class="text-lg font-medium text-emerald-200">km</span></p>
+               
+               <div id="method-indicator" class="text-sm font-medium py-1 px-3 rounded inline-block bg-slate-800 text-slate-300">
+                  Methodology: Variable
+               </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+              <label class="flex justify-between items-center text-sm font-bold text-slate-700 mb-4">
+                <span>Map Resolution (Ruler):</span>
+                <span class="bg-slate-100 px-2 py-1 rounded text-emerald-600"><span id="lab2-ruler-display">50</span> km</span>
+              </label>
+              <input type="range" id="lab2-slider" min="10" max="150" step="5" value="100" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+              
+              <div class="flex justify-between mt-4">
+                <div class="text-center p-2 rounded bg-slate-50 border border-slate-100 flex-1 mr-2">
+                  <p class="text-xs text-slate-500 font-bold mb-1">CIA Factbook</p>
+                  <p class="text-sm font-black text-slate-700">12,429 km</p>
+                  <p class="text-[10px] text-slate-400">Low Res (Large Ruler)</p>
+                </div>
+                <div class="text-center p-2 rounded bg-slate-50 border border-slate-100 flex-1 ml-2">
+                  <p class="text-xs text-slate-500 font-bold mb-1">WRI</p>
+                  <p class="text-sm font-black text-slate-700">19,717 km</p>
+                  <p class="text-[10px] text-slate-400">High Res (Small Ruler)</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="border-t border-slate-100 p-4 sm:px-8 bg-slate-50 flex justify-between items-center mt-auto">
+      <button id="btn-prev" class="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all text-slate-600 hover:bg-slate-200 disabled:opacity-30 disabled:hover:bg-transparent">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        Back
+      </button>
+      
+      <div class="text-sm font-medium text-slate-400">
+        Step <span id="current-step-display">1</span> of 4
+      </div>
+
+      <button id="btn-next" class="flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-all bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-30 disabled:hover:bg-blue-600 shadow-md shadow-blue-200">
+        Next
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+  </div>
+
+<script>
+  // --- APPLICATION STATE & NAVIGATION ---
+  const totalSteps = 4;
+  let currentStep = 0;
+
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const progressBar = document.getElementById('progress-bar');
+  const currentStepDisplay = document.getElementById('current-step-display');
+  const stepIndicators = document.querySelectorAll('.step-indicator');
+  const sections = document.querySelectorAll('.step-content');
+
+  function updateUI() {
+    // Buttons
+    btnPrev.disabled = currentStep === 0;
+    btnNext.disabled = currentStep === totalSteps - 1;
+
+    // Progress bar
+    progressBar.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
+    currentStepDisplay.innerText = currentStep + 1;
+
+    // Indicators
+    stepIndicators.forEach((ind, idx) => {
+      const dot = ind.querySelector('.indicator-dot');
+      if (idx <= currentStep) {
+        ind.classList.remove('text-slate-500');
+        ind.classList.add('text-blue-400');
+        dot.classList.remove('bg-slate-800', 'border-slate-600');
+        dot.classList.add('bg-blue-500', 'border-blue-200');
+      } else {
+        ind.classList.add('text-slate-500');
+        ind.classList.remove('text-blue-400');
+        dot.classList.add('bg-slate-800', 'border-slate-600');
+        dot.classList.remove('bg-blue-500', 'border-blue-200');
+      }
+    });
+
+    // Sections
+    sections.forEach((sec, idx) => {
+      if (idx === currentStep) {
+        sec.classList.add('active');
+        // Trigger canvas draws if they become visible
+        if (idx === 1) drawLab1();
+        if (idx === 3) drawLab2();
+      } else {
+        sec.classList.remove('active');
+      }
+    });
+  }
+
+  btnPrev.addEventListener('click', () => {
+    if (currentStep > 0) { currentStep--; updateUI(); }
+  });
+
+  btnNext.addEventListener('click', () => {
+    if (currentStep < totalSteps - 1) { currentStep++; updateUI(); }
+  });
+
+  // --- LAB 1: ABSTRACT ISLAND GENERATOR ---
+  const lab1Canvas = document.getElementById('lab1-canvas');
+  const lab1Slider = document.getElementById('lab1-slider');
+  const lab1LengthDisplay = document.getElementById('lab1-length');
+  const lab1StepsDisplay = document.getElementById('lab1-steps');
+  const lab1RulerDisplay = document.getElementById('lab1-ruler-display');
+  
+  // Generate shape once
+  const lab1Points = [];
+  const numPoints1 = 1500;
+  const centerX1 = 200, centerY1 = 200; // Based on 400x400 canvas
+  
+  for (let i = 0; i < numPoints1; i++) {
+    let angle = (i / numPoints1) * Math.PI * 2;
+    let r = 130 +
+            30 * Math.sin(4 * angle) +
+            20 * Math.cos(9 * angle) +
+            10 * Math.sin(17 * angle) +
+            5 * Math.cos(31 * angle) +
+            3 * Math.sin(65 * angle) +
+            2 * Math.cos(120 * angle);
+            
+    lab1Points.push({
+      x: centerX1 + r * Math.cos(angle),
+      y: centerY1 + r * Math.sin(angle)
+    });
+  }
+
+  function drawLab1() {
+    if (!lab1Canvas.offsetParent) return; // Prevent drawing if hidden
+    const ctx = lab1Canvas.getContext('2d');
+    const rulerSize = parseInt(lab1Slider.value);
+    
+    ctx.clearRect(0, 0, lab1Canvas.width, lab1Canvas.height);
+
+    // Draw base shape
+    ctx.beginPath();
+    ctx.moveTo(lab1Points[0].x, lab1Points[0].y);
+    for (let i = 1; i < lab1Points.length; i++) {
+      ctx.lineTo(lab1Points[i].x, lab1Points[i].y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = '#cbd5e1'; 
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#f8fafc';
+    ctx.fill();
+    ctx.stroke();
+
+    // Measurement Algorithm
+    let measuredPoints = [lab1Points[0]];
+    let totalLength = 0;
+    let currentIndex = 0;
+
+    while (currentIndex < lab1Points.length) {
+      let foundNext = false;
+      for (let i = currentIndex + 1; i < lab1Points.length; i++) {
+        let dx = lab1Points[i].x - lab1Points[currentIndex].x;
+        let dy = lab1Points[i].y - lab1Points[currentIndex].y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist >= rulerSize) {
+          measuredPoints.push(lab1Points[i]);
+          totalLength += dist; 
+          currentIndex = i;
+          foundNext = true;
+          break;
+        }
+      }
+      if (!foundNext) break;
+    }
+
+    let dx = lab1Points[0].x - measuredPoints[measuredPoints.length - 1].x;
+    let dy = lab1Points[0].y - measuredPoints[measuredPoints.length - 1].y;
+    totalLength += Math.sqrt(dx * dx + dy * dy);
+    measuredPoints.push(lab1Points[0]);
+
+    // Draw measurement polygon
+    ctx.beginPath();
+    ctx.moveTo(measuredPoints[0].x, measuredPoints[0].y);
+    for (let i = 1; i < measuredPoints.length; i++) {
+      ctx.lineTo(measuredPoints[i].x, measuredPoints[i].y);
+    }
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Draw dots
+    ctx.fillStyle = '#1e3a8a';
+    for (let i = 0; i < measuredPoints.length; i++) {
+      ctx.beginPath();
+      ctx.arc(measuredPoints[i].x, measuredPoints[i].y, Math.max(2, 6 - (150/rulerSize)), 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    lab1LengthDisplay.innerText = Math.round(totalLength).toLocaleString();
+    lab1StepsDisplay.innerText = measuredPoints.length - 1;
+    lab1RulerDisplay.innerText = rulerSize;
+  }
+
+  lab1Slider.addEventListener('input', drawLab1);
+
+
+  // --- LAB 2: REAL WORLD UK GENERATOR ---
+  const lab2Canvas = document.getElementById('lab2-canvas');
+  const lab2Slider = document.getElementById('lab2-slider');
+  const lab2LengthDisplay = document.getElementById('lab2-length');
+  const lab2RulerDisplay = document.getElementById('lab2-ruler-display');
+  const methodIndicator = document.getElementById('method-indicator');
+
+  // Hardcode anchors resembling the entire UK (Great Britain + Northern Ireland) in a 300x400 canvas space
+  // Northern Ireland separated by ~20-25km (represented as ~15 pixels at current scale)
+  const ukAnchors = [
+    // England - Southwest (Cornwall)
+    {x: 60, y: 380}, {x: 70, y: 370}, {x: 80, y: 360},
+    // South coast England
+    {x: 100, y: 350}, {x: 120, y: 345}, {x: 140, y: 340}, {x: 160, y: 335}, {x: 180, y: 330},
+    // Southeast England (Kent/Dover)
+    {x: 190, y: 320}, {x: 195, y: 310}, {x: 200, y: 300},
+    // East Anglia
+    {x: 195, y: 280}, {x: 190, y: 260}, {x: 185, y: 240},
+    // Yorkshire/North East England
+    {x: 175, y: 220}, {x: 170, y: 200}, {x: 165, y: 180},
+    // Scotland - Borders
+    {x: 160, y: 160}, {x: 155, y: 140}, {x: 150, y: 120},
+    // Scottish Highlands
+    {x: 145, y: 100}, {x: 140, y: 80}, {x: 135, y: 60},
+    // North Scotland (John o' Groats)
+    {x: 140, y: 40}, {x: 150, y: 30}, {x: 160, y: 25},
+    // Northwest Scotland
+    {x: 130, y: 35}, {x: 120, y: 45}, {x: 110, y: 55},
+    // West Scotland (Glasgow area)
+    {x: 115, y: 75}, {x: 110, y: 95}, {x: 105, y: 115},
+    // Scottish islands area
+    {x: 95, y: 135}, {x: 85, y: 155}, {x: 80, y: 175},
+    // Cumbria/North West England
+    {x: 100, y: 195}, {x: 105, y: 215}, {x: 110, y: 235},
+    // Wales
+    {x: 95, y: 255}, {x: 90, y: 275}, {x: 85, y: 295}, {x: 80, y: 315},
+    // Bristol Channel
+    {x: 75, y: 335}, {x: 70, y: 355}
+  ];
+
+  // Northern Ireland anchors (separated by ~15 pixels representing 20-25km)
+  const northernIrelandAnchors = [
+    {x: 140, y: 165}, // Northeast NI (Belfast area)
+    {x: 130, y: 155}, {x: 120, y: 145}, {x: 110, y: 135}, // East coast
+    {x: 100, y: 125}, {x: 95, y: 115}, {x: 100, y: 105}, // North coast
+    {x: 110, y: 95}, {x: 120, y: 105}, {x: 130, y: 115}, // West coast
+    {x: 135, y: 125}, {x: 140, y: 135} // South coast back to start
+  ];
+
+  // Main UK cities with approximate positions
+  const ukCities = [
+    {name: "London", x: 185, y: 305, country: "England"},
+    {name: "Manchester", x: 125, y: 225, country: "England"},
+    {name: "Birmingham", x: 135, y: 265, country: "England"},
+    {name: "Liverpool", x: 105, y: 225, country: "England"},
+    {name: "Leeds", x: 150, y: 210, country: "England"},
+    {name: "Newcastle", x: 165, y: 185, country: "England"},
+    {name: "Bristol", x: 105, y: 325, country: "England"},
+    {name: "Edinburgh", x: 155, y: 125, country: "Scotland"},
+    {name: "Glasgow", x: 115, y: 115, country: "Scotland"},
+    {name: "Cardiff", x: 85, y: 295, country: "Wales"},
+    {name: "Belfast", x: 125, y: 125, country: "Northern Ireland"},
+    {name: "Dublin", x: 95, y: 155, country: "Ireland"} // Reference point
+  ];
+
+  const lab2Points = [];
+  const segments = 40; // High subdivision for deep fractal coast
+
+  // Create fractal coastline for Great Britain
+  for (let i = 0; i < ukAnchors.length; i++) {
+    let p1 = ukAnchors[i];
+    let p2 = ukAnchors[(i + 1) % ukAnchors.length];
+    
+    lab2Points.push(p1);
+    
+    for (let j = 1; j < segments; j++) {
+      let t = j / segments;
+      let nx = p1.x * (1 - t) + p2.x * t;
+      let ny = p1.y * (1 - t) + p2.y * t;
+      
+      let dx = p2.x - p1.x;
+      let dy = p2.y - p1.y;
+      let len = Math.sqrt(dx * dx + dy * dy);
+      let perpX = -dy / len;
+      let perpY = dx / len;
+      
+      // Layered noise for inlets and peninsulas
+      let noise = Math.sin(t * Math.PI * 15) * 6 + 
+                  Math.cos(t * Math.PI * 33) * 3 + 
+                  Math.sin(t * Math.PI * 77) * 1.5;
+                  
+      lab2Points.push({x: nx + perpX * noise, y: ny + perpY * noise});
+    }
+  }
+
+  // Create fractal coastline for Northern Ireland
+  const niPoints = [];
+  for (let i = 0; i < northernIrelandAnchors.length; i++) {
+    let p1 = northernIrelandAnchors[i];
+    let p2 = northernIrelandAnchors[(i + 1) % northernIrelandAnchors.length];
+    
+    niPoints.push(p1);
+    
+    for (let j = 1; j < segments; j++) {
+      let t = j / segments;
+      let nx = p1.x * (1 - t) + p2.x * t;
+      let ny = p1.y * (1 - t) + p2.y * t;
+      
+      let dx = p2.x - p1.x;
+      let dy = p2.y - p1.y;
+      let len = Math.sqrt(dx * dx + dy * dy);
+      let perpX = -dy / len;
+      let perpY = dx / len;
+      
+      // Layered noise for inlets and peninsulas
+      let noise = Math.sin(t * Math.PI * 15) * 4 + 
+                  Math.cos(t * Math.PI * 33) * 2 + 
+                  Math.sin(t * Math.PI * 77) * 1;
+                  
+      niPoints.push({x: nx + perpX * noise, y: ny + perpY * noise});
+    }
+  }
+
+  function drawLab2() {
+    if (!lab2Canvas.offsetParent) return; 
+    const ctx = lab2Canvas.getContext('2d');
+    
+    // Ruler size mapped from slider (10 to 150)
+    // To match pixel units to Km, we scale the pixel ruler.
+    const sliderVal = parseInt(lab2Slider.value);
+    const pixelRuler = sliderVal * 0.35; // scaling factor to fit canvas
+    
+    ctx.clearRect(0, 0, lab2Canvas.width, lab2Canvas.height);
+
+    // Draw the "Infinite" UK Base map
+    ctx.beginPath();
+    ctx.moveTo(lab2Points[0].x, lab2Points[0].y);
+    for (let i = 1; i < lab2Points.length; i++) {
+      ctx.lineTo(lab2Points[i].x, lab2Points[i].y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = '#d1fae5'; // Emerald 100
+    ctx.fill();
+    ctx.strokeStyle = '#a7f3d0';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Measurement Walk - combine both landmasses
+    let allPoints = [...lab2Points, ...niPoints];
+    let measuredPoints = [lab2Points[0]]; // Start with GB
+    let totalPixelLength = 0;
+    let currentIndex = 0;
+
+    while (currentIndex < allPoints.length) {
+      let foundNext = false;
+      for (let i = currentIndex + 1; i < allPoints.length; i++) {
+        let dx = allPoints[i].x - allPoints[currentIndex].x;
+        let dy = allPoints[i].y - allPoints[currentIndex].y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist >= pixelRuler) {
+          measuredPoints.push(allPoints[i]);
+          totalPixelLength += dist;
+          currentIndex = i;
+          foundNext = true;
+          break;
+        }
+      }
+      if (!foundNext) break;
+    }
+
+    let dx = allPoints[0].x - measuredPoints[measuredPoints.length - 1].x;
+    let dy = allPoints[0].y - measuredPoints[measuredPoints.length - 1].y;
+    totalPixelLength += Math.sqrt(dx * dx + dy * dy);
+    measuredPoints.push(allPoints[0]);
+
+    // Draw Measurement Lines
+    ctx.beginPath();
+    ctx.moveTo(measuredPoints[0].x, measuredPoints[0].y);
+    for (let i = 1; i < measuredPoints.length; i++) {
+      ctx.lineTo(measuredPoints[i].x, measuredPoints[i].y);
+    }
+    ctx.strokeStyle = '#059669'; // Emerald 600
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // Map Pixel Length to Real World Kilometers
+    // We calibrate so that max ruler (150) is ~12400km and min (10) is ~19700km
+    // Using an empirical multiplier based on canvas size and new UK+NI shape
+    const kmMultiplier = 8; 
+    let realKm = Math.round(totalPixelLength * kmMultiplier);
+
+    // Update UI
+    lab2LengthDisplay.innerText = realKm.toLocaleString();
+    lab2RulerDisplay.innerText = sliderVal;
+
+    // Update Methodology Text based on proximity to real numbers
+    if (sliderVal >= 130) {
+      methodIndicator.innerText = "Matches CIA Methodology";
+      methodIndicator.className = "text-sm font-medium py-1 px-3 rounded inline-block bg-slate-200 text-slate-800";
+    } else if (sliderVal <= 25) {
+      methodIndicator.innerText = "Matches WRI Methodology";
+      methodIndicator.className = "text-sm font-medium py-1 px-3 rounded inline-block bg-emerald-200 text-emerald-900";
+    } else {
+      methodIndicator.innerText = "Intermediate Resolution";
+      methodIndicator.className = "text-sm font-medium py-1 px-3 rounded inline-block bg-slate-800 text-slate-300";
+    }
+  }
+
+  lab2Slider.addEventListener('input', drawLab2);
+
+  // Initialization
+  updateUI();
+  
+  // Handle window resize to ensure canvases draw if they were initialized while hidden
+  window.addEventListener('resize', () => {
+    if (currentStep === 1) drawLab1();
+    if (currentStep === 3) drawLab2();
+  });
+
+</script>
+</body>
+</html>

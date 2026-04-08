@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Echoes of Empire: The Rise and Fall</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- D3 and TopoJSON for Interactive Mapping -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/topojson-client@3"></script>
+
+  <style>
+    .step-content {
+      display: none;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    .step-content.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* General Slider Styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #b91c1c;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      border: 2px solid white;
+      margin-top: -6px; /* Align with track */
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 8px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    
+    /* Specific Track Colors */
+    #timeline-slider::-webkit-slider-runnable-track { background: #e2e8f0; }
+    #map-timeline::-webkit-slider-runnable-track { background: #475569; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Map Styles */
+    .country {
+      stroke: #1e293b;
+      stroke-width: 0.5px;
+      transition: fill 0.6s ease-in-out;
+    }
+    .country:hover {
+      opacity: 0.8;
+      stroke: #ffffff;
+      stroke-width: 1px;
+    }
+    
+    .pin-dot {
+      cursor: pointer;
+      transition: fill 0.6s ease-in-out;
+    }
+    .pin-dot:hover {
+      stroke: #ffffff;
+      stroke-width: 1px;
+    }
+  </style>
+</head>
+<body class="bg-stone-200 flex items-center justify-center min-h-screen p-4 font-sans text-stone-800">
+
+  <div class="max-w-6xl w-full bg-stone-50 rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[850px] relative">
+    
+    <!-- Header & Progress -->
+    <div class="bg-stone-900 text-stone-100 p-6 pb-6 border-b-4 border-red-800 shrink-0">
+      <div class="flex items-center gap-3 mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+        <h1 class="text-2xl font-serif font-bold tracking-wide">Echoes of Empire</h1>
+      </div>
+      
+      <div class="w-full flex flex-col gap-5">
+        <!-- Step Indicators -->
+        <div class="flex justify-between items-center w-full px-2">
+          <div class="step-indicator flex flex-col items-center gap-2 z-10 transition-colors duration-300 text-red-400" data-step="0">
+            <span class="text-xs font-medium uppercase tracking-widest hidden sm:block">The Era</span>
+          </div>
+          <div class="step-indicator flex flex-col items-center gap-2 z-10 transition-colors duration-300 text-stone-500" data-step="1">
+            <span class="text-xs font-medium uppercase tracking-widest hidden sm:block">Map of Evolution</span>
+          </div>
+          <div class="step-indicator flex flex-col items-center gap-2 z-10 transition-colors duration-300 text-stone-500" data-step="2">
+            <span class="text-xs font-medium uppercase tracking-widest hidden sm:block">Shifting Power</span>
+          </div>
+          <div class="step-indicator flex flex-col items-center gap-2 z-10 transition-colors duration-300 text-stone-500" data-step="3">
+            <span class="text-xs font-medium uppercase tracking-widest hidden sm:block">Rise & Downfall</span>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full h-1.5 bg-stone-700 rounded-full overflow-hidden shadow-inner">
+          <div id="progress-bar" class="h-full bg-red-600 transition-all duration-500 ease-out" style="width: 25%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Content Area -->
+    <div class="flex-grow p-6 sm:p-10 flex flex-col overflow-y-auto min-h-0">
+      
+      <!-- Step 0: Intro -->
+      <div id="section-0" class="step-content active flex-col h-full justify-center max-w-3xl mx-auto">
+        <div class="inline-flex items-center gap-2 bg-stone-200 text-stone-800 px-4 py-1.5 rounded-full text-sm font-bold w-fit mb-6 uppercase tracking-wider shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          The Age of Imperialism
+        </div>
+        <h2 class="text-4xl font-extrabold text-stone-900 mb-6 leading-tight font-serif">
+          A World Carved by Europe
+        </h2>
+        <p class="text-lg text-stone-600 mb-6 leading-relaxed">
+          Over a span of 500 years, a handful of Western European nations established dominion over the vast majority of the globe. Through maritime exploration, military force, economic exploitation, and technological advantage, they built empires of unprecedented scale.
+        </p>
+        <p class="text-lg text-stone-600 mb-8 leading-relaxed">
+          Six distinct powers shaped the modern global map. The pioneers, <strong>Spain</strong> and <strong>Portugal</strong>, conquered the Americas in the 1500s. They were later eclipsed by <strong>Great Britain</strong>, with the largest empire in human history; <strong>France</strong>, dominating much of Africa and Indochina; the <strong>Netherlands</strong>, controlling the lucrative East Indies; and finally <strong>Belgium</strong>, possessing a massive, brutalized territory in Central Africa.
+        </p>
+        <div class="bg-red-50 border-l-4 border-red-700 p-6 rounded-r-xl text-red-900 mt-auto">
+          <p class="font-medium text-lg">
+            How did these European nations accumulate such immense territories across different centuries? And why did this 500-year global order collapse so rapidly in the 20th century?
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 1: Peak Evolution Lab (Interactive Map) -->
+      <div id="section-1" class="step-content flex-col h-full items-center justify-start">
+        <h2 class="text-3xl font-extrabold text-stone-900 mb-2 w-full text-center font-serif shrink-0">Map of Evolution</h2>
+        <p class="text-stone-500 mb-4 text-center max-w-4xl shrink-0 text-sm">
+          Select an empire and <strong>drag the timeline slider</strong> to watch their territory expand and contract. Key micro-states like <strong class="text-stone-700">Hong Kong</strong> have been marked with independent tracking pings.
+        </p>
+        
+        <div class="w-full flex flex-col lg:flex-row gap-6 items-stretch justify-center flex-grow min-h-0">
+          
+          <!-- Interactive Map Container -->
+          <div class="flex-grow flex flex-col min-w-0">
+            <div class="relative bg-[#0f172a] rounded-t-2xl shadow-inner border-t-4 border-l-4 border-r-4 border-stone-800 flex-grow h-[300px] lg:h-auto overflow-hidden shrink-0" id="map-container">
+              <div id="map-loading" class="absolute inset-0 flex items-center justify-center text-stone-400 font-bold tracking-widest uppercase z-10">Loading Map...</div>
+              <svg id="world-map" class="w-full h-full cursor-move absolute inset-0"></svg>
+              
+              <!-- Map Legends -->
+              <div class="absolute top-4 left-4 flex gap-3 text-xs font-bold text-stone-300 bg-black/60 px-3 py-2 rounded backdrop-blur z-10 pointer-events-none border border-stone-700">
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm bg-white border border-stone-500" id="legend-home"></div> Home</div>
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm bg-stone-500" id="legend-colony"></div> Colony</div>
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm bg-[#334155] border border-stone-600"></div> Independent</div>
+              </div>
+            </div>
+
+            <!-- Integrated Map Timeline Slider -->
+            <div class="bg-stone-900 rounded-b-2xl p-4 flex items-center gap-4 text-white shadow-lg border-b-4 border-l-4 border-r-4 border-stone-800 z-20">
+              <span class="font-bold text-xs tracking-widest uppercase text-stone-400">Year:</span>
+              <span id="map-year-display" class="font-serif text-3xl font-black text-red-400 w-20 text-center transition-colors">1920</span>
+              <input type="range" id="map-timeline" min="1490" max="2000" step="1" value="1920" class="flex-grow">
+            </div>
+          </div>
+
+          <!-- Controls and Dashboard -->
+          <div class="flex flex-col w-full lg:w-[320px] gap-2 overflow-y-auto pr-2 shrink-0 max-h-[500px]">
+            
+            <div class="bg-stone-100 p-2.5 rounded-xl border border-stone-300 shadow-sm cursor-pointer hover:bg-stone-200 transition-colors empire-btn ring-4 ring-stone-400" data-empire="gb" data-peak="1920">
+              <div class="flex justify-between items-center mb-0.5">
+                <span class="font-bold text-red-800 text-sm">Great Britain</span>
+                <span class="text-[9px] font-bold bg-red-200 text-red-800 px-1.5 py-0.5 rounded uppercase">Peak: 1920</span>
+              </div>
+              <p class="text-[11px] text-stone-600 leading-tight">Included Canada, Australia, India, vast African states, Hong Kong, and Middle Eastern mandates.</p>
+            </div>
+
+            <div class="bg-stone-100 p-2.5 rounded-xl border border-stone-300 shadow-sm cursor-pointer hover:bg-stone-200 transition-colors empire-btn" data-empire="fr" data-peak="1920">
+              <div class="flex justify-between items-center mb-0.5">
+                <span class="font-bold text-blue-800 text-sm">France</span>
+                <span class="text-[9px] font-bold bg-blue-200 text-blue-800 px-1.5 py-0.5 rounded uppercase">Peak: 1920</span>
+              </div>
+              <p class="text-[11px] text-stone-600 leading-tight">Dominant in Northwest Africa, Madagascar, and Southeast Asia (Indochina).</p>
+            </div>
+
+            <div class="bg-stone-100 p-2.5 rounded-xl border border-stone-300 shadow-sm cursor-pointer hover:bg-stone-200 transition-colors empire-btn" data-empire="es" data-peak="1790">
+              <div class="flex justify-between items-center mb-0.5">
+                <span class="font-bold text-purple-800 text-sm">Spain</span>
+                <span class="text-[9px] font-bold bg-purple-200 text-purple-800 px-1.5 py-0.5 rounded uppercase">Peak: 1790</span>
+              </div>
+              <p class="text-[11px] text-stone-600 leading-tight">Controlled almost all of Central/South America, Florida, California, and the Philippines.</p>
+            </div>
+
+            <div class="bg-stone-100 p-2.5 rounded-xl border border-stone-300 shadow-sm cursor-pointer hover:bg-stone-200 transition-colors empire-btn" data-empire="pt" data-peak="1820">
+              <div class="flex justify-between items-center mb-0.5">
+                <span class="font-bold text-teal-800 text-sm">Portugal</span>
+                <span class="text-[9px] font-bold bg-teal-200 text-teal-800 px-1.5 py-0.5 rounded uppercase">Peak: 1820</span>
+              </div>
+              <p class="text-[11px] text-stone-600 leading-tight">Held massive territory in Brazil, alongside key African states (Angola, Mozambique) and Asian outposts.</p>
+            </div>
+
+            <div class="bg-stone-100 p-2.5 rounded-xl border border-stone-300 shadow-sm cursor-pointer hover:bg-stone-200 transition-colors empire-btn" data-empire="nl" data-peak="1920">
+              <div class="flex justify-between items-center mb-0.5">
+                <span class="font-bold text-orange-700 text-sm">Netherlands</span>
+                <span class="text-[9px] font-bold bg-orange-200 text-orange-800 px-1.5 py-0.5 rounded uppercase">Peak: 1920</span>
+              </div>
+              <p class="text-[11px] text-stone-600 leading-tight">Focused on immense wealth, dominating the Indonesian archipelago and Suriname.</p>
+            </div>
+
+            <div class="bg-stone-100 p-2.5 rounded-xl border border-stone-300 shadow-sm cursor-pointer hover:bg-stone-200 transition-colors empire-btn" data-empire="be" data-peak="1920">
+              <div class="flex justify-between items-center mb-0.5">
+                <span class="font-bold text-yellow-700 text-sm">Belgium</span>
+                <span class="text-[9px] font-bold bg-yellow-200 text-yellow-800 px-1.5 py-0.5 rounded uppercase">Peak: 1920</span>
+              </div>
+              <p class="text-[11px] text-stone-600 leading-tight">Controlled a massive, resource-rich territory 76 times its size in the Congo Basin.</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Shifting Power -->
+      <div id="section-2" class="step-content flex-col h-full max-w-4xl mx-auto justify-center">
+        <div class="inline-flex items-center gap-2 bg-stone-800 text-stone-200 px-4 py-1.5 rounded-full text-sm font-bold w-fit mb-6 uppercase shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          The Tipping Points
+        </div>
+        <h2 class="text-3xl font-extrabold text-stone-900 mb-6 font-serif">
+          Centuries of Collapse
+        </h2>
+        
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+          <div>
+            <p class="text-stone-700 mb-4 leading-relaxed">
+              Decolonization was not a single event, but occurred in waves across different centuries. The first major wave hit the older empires: <strong>Spain</strong> and <strong>Portugal</strong>. Inspired by the American and French Revolutions, Latin America successfully fought for independence in the early 1800s, crippling the Iberian empires.
+            </p>
+            <p class="text-stone-700 mb-4 leading-relaxed border-l-4 border-red-700 pl-4 bg-stone-100 py-2">
+              However, for Britain, France, Belgium, and the Netherlands, their empires only continued to grow, peaking around 1920 after absorbing German and Ottoman territories post-WWI.
+            </p>
+            <p class="text-stone-700 leading-relaxed font-semibold">
+              The ultimate catalyst was <strong>World War II</strong>. France, Belgium, and the Netherlands were conquered. Great Britain was bankrupted. The myth of European invincibility was shattered globally, triggering an unstoppable wave of nationalism across Africa and Asia.
+            </p>
+          </div>
+          
+          <div class="bg-stone-200 p-6 rounded-2xl flex flex-col justify-center border border-stone-300 shadow-inner">
+            <h3 class="font-bold text-stone-800 mb-4 text-lg border-b border-stone-300 pb-2">The 20th Century Shift</h3>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3">
+                <span class="text-red-700 font-bold mt-1">1.</span>
+                <span class="text-stone-700 text-sm"><strong>Financial Ruin:</strong> Maintaining vast global militaries to suppress rebellions became economically impossible for war-torn Europe post-1945.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-red-700 font-bold mt-1">2.</span>
+                <span class="text-stone-700 text-sm"><strong>Rise of Superpowers:</strong> The USA and USSR emerged as the new global hegemons, both holding strong anti-colonial ideologies.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-red-700 font-bold mt-1">3.</span>
+                <span class="text-stone-700 text-sm"><strong>Ideological Shift:</strong> Millions of colonial subjects fought to liberate Europe in WWII; returning home, they demanded the same freedom.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Rise and Downfall Timeline -->
+      <div id="section-3" class="step-content flex-col h-full items-center justify-start">
+        <div class="inline-flex items-center gap-2 bg-red-100 text-red-900 px-4 py-1.5 rounded-full text-sm font-bold w-fit mb-3 shadow-sm shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          Rise & Collapse Data
+        </div>
+        <h2 class="text-3xl font-extrabold text-stone-900 mb-2 font-serif w-full text-center shrink-0">
+          500 Years of Evolution
+        </h2>
+        <p class="text-stone-600 mb-6 leading-relaxed text-center max-w-2xl text-sm shrink-0">
+          Drag the slider to travel from the Age of Discovery through to the late 20th century. Note how Spain and Portugal peak early and crash, while Britain and France accumulate territory until their spectacular collapse post-1945.
+        </p>
+
+        <div class="w-full flex flex-col gap-4 items-center justify-center max-w-5xl mx-auto flex-grow min-h-0">
+          
+          <!-- Slider Control -->
+          <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-md w-full relative z-10 shrink-0">
+            <div class="flex justify-between items-end mb-2">
+              <span class="text-stone-500 font-bold uppercase text-xs tracking-wider">Year</span>
+              <span id="year-display" class="text-4xl font-black text-red-800 font-serif">1500</span>
+            </div>
+            <input type="range" id="timeline-slider" min="1500" max="1980" step="1" value="1500" class="w-full">
+            
+            <div class="flex justify-between text-[10px] text-stone-400 mt-2 font-bold uppercase tracking-widest px-1">
+              <span>1500</span>
+              <span>1600</span>
+              <span>1700</span>
+              <span>1800</span>
+              <span class="text-stone-700 font-extrabold">1900</span>
+              <span>1980</span>
+            </div>
+          </div>
+
+          <!-- Chart Area -->
+          <div class="relative bg-white rounded-2xl shadow-inner border border-stone-200 p-4 pt-16 sm:p-6 sm:pt-20 w-full h-[250px] sm:h-[300px] flex items-end justify-between gap-1 sm:gap-4 overflow-hidden">
+            
+            <!-- Dynamic Event Text -->
+            <div class="absolute top-4 left-4 right-4 flex flex-col gap-1 z-20 pointer-events-none">
+              <p class="text-[10px] sm:text-xs font-semibold text-stone-500 uppercase tracking-widest">Historical Context</p>
+              <p id="event-display" class="text-xs sm:text-sm text-stone-800 italic border-l-4 border-red-500 pl-2 bg-white/80 backdrop-blur rounded py-1 pr-1 max-w-3xl">The Age of Discovery begins. Spain and Portugal divide the newly discovered non-European world.</p>
+            </div>
+
+            <!-- Spain Bar -->
+            <div class="flex flex-col items-center justify-end h-full w-1/6 z-10 gap-1 group">
+              <span id="val-es" class="text-[10px] sm:text-xs font-bold text-stone-500 group-hover:text-purple-700 transition-colors">2.0M</span>
+              <div id="bar-es" class="w-full bg-purple-600 rounded-t-sm transition-all duration-300 shadow" style="height: 1%;"></div>
+              <span class="text-[10px] sm:text-xs font-bold text-stone-800 uppercase">Esp</span>
+            </div>
+            <!-- Portugal Bar -->
+            <div class="flex flex-col items-center justify-end h-full w-1/6 z-10 gap-1 group">
+              <span id="val-pt" class="text-[10px] sm:text-xs font-bold text-stone-500 group-hover:text-teal-700 transition-colors">0.5M</span>
+              <div id="bar-pt" class="w-full bg-teal-600 rounded-t-sm transition-all duration-300 shadow" style="height: 1%;"></div>
+              <span class="text-[10px] sm:text-xs font-bold text-stone-800 uppercase">Prt</span>
+            </div>
+            <!-- GB Bar -->
+            <div class="flex flex-col items-center justify-end h-full w-1/6 z-10 gap-1 group">
+              <span id="val-gb" class="text-[10px] sm:text-xs font-bold text-stone-500 group-hover:text-red-700 transition-colors">0.0M</span>
+              <div id="bar-gb" class="w-full bg-red-700 rounded-t-sm transition-all duration-300 shadow" style="height: 1%;"></div>
+              <span class="text-[10px] sm:text-xs font-bold text-stone-800 uppercase">Gbr</span>
+            </div>
+            <!-- France Bar -->
+            <div class="flex flex-col items-center justify-end h-full w-1/6 z-10 gap-1 group">
+              <span id="val-fr" class="text-[10px] sm:text-xs font-bold text-stone-500 group-hover:text-blue-700 transition-colors">0.0M</span>
+              <div id="bar-fr" class="w-full bg-blue-700 rounded-t-sm transition-all duration-300 shadow" style="height: 1%;"></div>
+              <span class="text-[10px] sm:text-xs font-bold text-stone-800 uppercase">Fra</span>
+            </div>
+            <!-- Netherlands Bar -->
+            <div class="flex flex-col items-center justify-end h-full w-1/6 z-10 gap-1 group">
+              <span id="val-nl" class="text-[10px] sm:text-xs font-bold text-stone-500 group-hover:text-orange-600 transition-colors">0.0M</span>
+              <div id="bar-nl" class="w-full bg-orange-500 rounded-t-sm transition-all duration-300 shadow" style="height: 1%;"></div>
+              <span class="text-[10px] sm:text-xs font-bold text-stone-800 uppercase">Nld</span>
+            </div>
+            <!-- Belgium Bar -->
+            <div class="flex flex-col items-center justify-end h-full w-1/6 z-10 gap-1 group">
+              <span id="val-be" class="text-[10px] sm:text-xs font-bold text-stone-500 group-hover:text-yellow-600 transition-colors">0.0M</span>
+              <div id="bar-be" class="w-full bg-yellow-500 rounded-t-sm transition-all duration-300 shadow" style="height: 1%;"></div>
+              <span class="text-[10px] sm:text-xs font-bold text-stone-800 uppercase">Bel</span>
+            </div>
+
+            <!-- Y Axis Label -->
+            <div class="absolute -left-3 sm:-left-4 top-1/2 -translate-y-1/2 -rotate-90 text-[8px] sm:text-[10px] uppercase font-bold text-stone-400 tracking-widest whitespace-nowrap">
+              Controlled Territory (Sq Km)
+            </div>
+
+            <!-- Grid Lines -->
+            <div class="absolute inset-0 pointer-events-none p-4 sm:p-6 flex flex-col justify-between z-0">
+               <div class="w-full border-t border-stone-200 mt-20"></div>
+               <div class="w-full border-t border-stone-200"></div>
+               <div class="w-full border-t border-stone-200"></div>
+               <div class="w-full border-t border-stone-200"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="border-t border-stone-300 p-4 sm:px-8 bg-stone-200 flex justify-between items-center mt-auto shrink-0">
+      <button id="btn-prev" class="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all text-stone-600 hover:bg-stone-300 disabled:opacity-30 disabled:hover:bg-transparent">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        Back
+      </button>
+      
+      <div class="text-sm font-bold tracking-widest uppercase text-stone-500">
+        Chapter <span id="current-step-display">1</span> / 4
+      </div>
+
+      <button id="btn-next" class="flex items-center gap-2 px-6 py-2 rounded-lg font-bold tracking-wide transition-all bg-stone-900 text-white hover:bg-black disabled:opacity-30 disabled:hover:bg-stone-900 shadow-md">
+        Next
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+  </div>
+
+<script>
+  // --- APPLICATION STATE & NAVIGATION ---
+  const totalSteps = 4;
+  let currentStep = 0;
+
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const progressBar = document.getElementById('progress-bar');
+  const currentStepDisplay = document.getElementById('current-step-display');
+  const stepIndicators = document.querySelectorAll('.step-indicator');
+  const sections = document.querySelectorAll('.step-content');
+
+  function updateUI() {
+    btnPrev.disabled = currentStep === 0;
+    btnNext.disabled = currentStep === totalSteps - 1;
+    progressBar.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
+    currentStepDisplay.innerText = currentStep + 1;
+
+    stepIndicators.forEach((ind, idx) => {
+      if (idx <= currentStep) {
+        ind.classList.remove('text-stone-500'); ind.classList.add('text-red-400');
+      } else {
+        ind.classList.add('text-stone-500'); ind.classList.remove('text-red-400');
+      }
+    });
+
+    sections.forEach((sec, idx) => {
+      if (idx === currentStep) {
+        sec.classList.add('active');
+        if (idx === 1 && !mapInitialized) initD3Map(); 
+        if (idx === 3) updateTimeline();
+      } else {
+        sec.classList.remove('active');
+      }
+    });
+  }
+
+  btnPrev.addEventListener('click', () => { if (currentStep > 0) { currentStep--; updateUI(); } });
+  btnNext.addEventListener('click', () => { if (currentStep < totalSteps - 1) { currentStep++; updateUI(); } });
+
+
+  // --- LAB 1: INTERACTIVE D3 WORLD MAP WITH TIMELINE ---
+  let mapInitialized = false;
+  let worldData = null;
+  let currentActiveEmpire = 'gb';
+  
+  const mapTimeline = document.getElementById('map-timeline');
+  const mapYearDisplay = document.getElementById('map-year-display');
+  const empireBtns = document.querySelectorAll('.empire-btn');
+
+  // n = name, s = start year (acquisition), e = end year (independence)
+  const empireTerritories = {
+    'gb': { 
+      home: "United Kingdom", homeColor: '#fca5a5', colonyColor: '#991b1b',
+      colonies: [
+        { n: "United States of America", s: 1607, e: 1783 },
+        { n: "Canada", s: 1763, e: 1931 }, 
+        { n: "Australia", s: 1788, e: 1901 },
+        { n: "India", s: 1757, e: 1947 },
+        { n: "Pakistan", s: 1757, e: 1947 },
+        { n: "Bangladesh", s: 1757, e: 1947 },
+        { n: "South Africa", s: 1806, e: 1910 },
+        { n: "Egypt", s: 1882, e: 1922 },
+        { n: "Sudan", s: 1899, e: 1956 },
+        { n: "Kenya", s: 1895, e: 1963 },
+        { n: "Uganda", s: 1894, e: 1962 },
+        { n: "United Republic of Tanzania", s: 1919, e: 1961 },
+        { n: "Tanzania", s: 1919, e: 1961 },
+        { n: "Zambia", s: 1889, e: 1964 },
+        { n: "Zimbabwe", s: 1890, e: 1980 },
+        { n: "Botswana", s: 1885, e: 1966 },
+        { n: "Namibia", s: 1915, e: 1990 },
+        { n: "Nigeria", s: 1885, e: 1960 },
+        { n: "Ghana", s: 1874, e: 1957 },
+        { n: "Sierra Leone", s: 1808, e: 1961 },
+        { n: "Guyana", s: 1814, e: 1966 },
+        { n: "Myanmar", s: 1824, e: 1948 },
+        { n: "Malaysia", s: 1824, e: 1957 },
+        { n: "Papua New Guinea", s: 1884, e: 1975 },
+        { n: "New Zealand", s: 1840, e: 1907 },
+        { n: "Oman", s: 1891, e: 1971 },
+        { n: "Yemen", s: 1839, e: 1967 },
+        { n: "Ireland", s: 1536, e: 1922 },
+        { n: "Somalia", s: 1884, e: 1960 },
+        { n: "Sri Lanka", s: 1815, e: 1948 },
+        { n: "Malawi", s: 1891, e: 1964 },
+        { n: "Hong Kong", s: 1841, e: 1997 },
+        { n: "Fiji", s: 1874, e: 1970 },
+        { n: "Jamaica", s: 1655, e: 1962 },
+        { n: "Bahamas", s: 1718, e: 1973 },
+        { n: "Trinidad", s: 1797, e: 1962 },
+        { n: "Belize", s: 1862, e: 1981 },
+        { n: "Cyprus", s: 1878, e: 1960 },
+        { n: "Kuwait", s: 1899, e: 1961 },
+        { n: "Qatar", s: 1916, e: 1971 },
+        { n: "United Arab Emirates", s: 1892, e: 1971 },
+        { n: "Singapore", s: 1819, e: 1963 },
+        { n: "Brunei", s: 1888, e: 1984 },
+        { n: "Lesotho", s: 1868, e: 1966 },
+        { n: "Swaziland", s: 1902, e: 1968 },
+        { n: "Gambia", s: 1821, e: 1965 },
+        { n: "Mauritius", s: 1810, e: 1968 },
+        { n: "Iraq", s: 1920, e: 1932 },
+        { n: "Jordan", s: 1921, e: 1946 },
+        { n: "Israel", s: 1920, e: 1948 },
+        { n: "Palestine", s: 1920, e: 1948 }
+      ] 
+    },
+    'fr': { 
+      home: "France", homeColor: '#93c5fd', colonyColor: '#1e40af',
+      colonies: [
+        { n: "Algeria", s: 1830, e: 1962 },
+        { n: "Morocco", s: 1912, e: 1956 },
+        { n: "Tunisia", s: 1881, e: 1956 },
+        { n: "Mali", s: 1892, e: 1960 },
+        { n: "Niger", s: 1900, e: 1960 },
+        { n: "Chad", s: 1900, e: 1960 },
+        { n: "Mauritania", s: 1903, e: 1960 },
+        { n: "Senegal", s: 1659, e: 1960 },
+        { n: "Guinea", s: 1890, e: 1958 },
+        { n: "Côte d'Ivoire", s: 1893, e: 1960 },
+        { n: "Burkina Faso", s: 1896, e: 1960 },
+        { n: "Benin", s: 1894, e: 1960 },
+        { n: "Central African Rep.", s: 1894, e: 1960 },
+        { n: "Gabon", s: 1885, e: 1960 },
+        { n: "Congo", s: 1880, e: 1960 }, 
+        { n: "Madagascar", s: 1897, e: 1960 },
+        { n: "Vietnam", s: 1887, e: 1954 },
+        { n: "Laos", s: 1893, e: 1953 },
+        { n: "Cambodia", s: 1863, e: 1953 },
+        { n: "Syria", s: 1920, e: 1946 },
+        { n: "Lebanon", s: 1920, e: 1943 },
+        { n: "Djibouti", s: 1896, e: 1977 },
+        { n: "Haiti", s: 1659, e: 1804 },
+        { n: "Canada", s: 1608, e: 1763 },
+        { n: "United States of America", s: 1682, e: 1803 } // Represents New France / Louisiana Territory roughly
+      ] 
+    },
+    'es': {
+      home: "Spain", homeColor: '#d8b4fe', colonyColor: '#7e22ce',
+      colonies: [
+        { n: "Mexico", s: 1521, e: 1821 },
+        { n: "Colombia", s: 1525, e: 1819 },
+        { n: "Argentina", s: 1536, e: 1816 },
+        { n: "Peru", s: 1532, e: 1824 },
+        { n: "Venezuela", s: 1522, e: 1811 },
+        { n: "Chile", s: 1541, e: 1818 },
+        { n: "Ecuador", s: 1534, e: 1822 },
+        { n: "Bolivia", s: 1538, e: 1825 },
+        { n: "Paraguay", s: 1537, e: 1811 },
+        { n: "Uruguay", s: 1624, e: 1828 },
+        { n: "Cuba", s: 1511, e: 1898 },
+        { n: "Dominican Rep.", s: 1492, e: 1865 },
+        { n: "Philippines", s: 1565, e: 1898 },
+        { n: "Equatorial Guinea", s: 1778, e: 1968 },
+        { n: "Western Sahara", s: 1884, e: 1975 },
+        { n: "Guatemala", s: 1524, e: 1821 },
+        { n: "Honduras", s: 1524, e: 1821 },
+        { n: "El Salvador", s: 1524, e: 1821 },
+        { n: "Nicaragua", s: 1524, e: 1821 },
+        { n: "Costa Rica", s: 1524, e: 1821 },
+        { n: "Panama", s: 1538, e: 1821 }
+      ]
+    },
+    'pt': {
+      home: "Portugal", homeColor: '#5eead4', colonyColor: '#0f766e',
+      colonies: [
+        { n: "Brazil", s: 1500, e: 1822 },
+        { n: "Angola", s: 1575, e: 1975 },
+        { n: "Mozambique", s: 1498, e: 1975 },
+        { n: "Guinea-Bissau", s: 1474, e: 1974 },
+        { n: "Cape Verde", s: 1462, e: 1975 },
+        { n: "São Tomé", s: 1470, e: 1975 },
+        { n: "Timor-Leste", s: 1520, e: 1975 },
+        { n: "Macao", s: 1557, e: 1999 },
+        { n: "Goa", s: 1510, e: 1961 } 
+      ]
+    },
+    'be': { 
+      home: "Belgium", homeColor: '#fde047', colonyColor: '#a16207',
+      colonies: [
+        { n: "Dem. Rep. Congo", s: 1885, e: 1960 },
+        { n: "Rwanda", s: 1916, e: 1962 }, 
+        { n: "Burundi", s: 1916, e: 1962 }
+      ] 
+    },
+    'nl': { 
+      home: "Netherlands", homeColor: '#fdba74', colonyColor: '#c2410c',
+      colonies: [
+        { n: "Indonesia", s: 1602, e: 1949 },
+        { n: "Suriname", s: 1667, e: 1975 },
+        { n: "Guyana", s: 1616, e: 1814 }, 
+        { n: "South Africa", s: 1652, e: 1806 } 
+      ] 
+    }
+  };
+
+  // Custom independent point-locations for territories too small on TopoJSON mapping
+  const customPinLocations = [
+    { name: "Hong Kong", coords: [114.1694, 22.3193] },
+    { name: "Macao", coords: [113.5439, 22.1987] },
+    { name: "Singapore", coords: [103.8198, 1.3521] }
+  ];
+
+  function initD3Map() {
+    mapInitialized = true;
+    const svg = d3.select("#world-map");
+    const container = document.getElementById("map-container");
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    const projection = d3.geoMercator()
+        .scale((width / 6.5))
+        .translate([width / 2, height / 1.5]);
+
+    const path = d3.geoPath().projection(projection);
+    const g = svg.append("g");
+
+    d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(topology => {
+      document.getElementById('map-loading').style.display = 'none';
+      worldData = topojson.feature(topology, topology.objects.countries).features;
+
+      // Draw standard country polygons
+      g.selectAll("path")
+       .data(worldData)
+       .enter()
+       .append("path")
+       .attr("class", "country")
+       .attr("d", path)
+       .attr("id", d => d.properties.name)
+       .attr("fill", "#334155"); 
+       
+      // Append custom ping markers for city-states / micro-territories
+      const pins = g.selectAll(".pin-group")
+        .data(customPinLocations)
+        .enter()
+        .append("g")
+        .attr("class", "pin-group")
+        .attr("transform", d => `translate(${projection(d.coords)[0]}, ${projection(d.coords)[1]})`);
+
+      // 1. Radar Ping Animation Ring
+      const rings = pins.append("circle")
+        .attr("class", "pin-ring")
+        .attr("r", 2.5)
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 0.75)
+        .attr("fill", "none");
+        
+      rings.append("animate")
+        .attr("attributeName", "r")
+        .attr("values", "2.5; 8")
+        .attr("dur", "2s")
+        .attr("repeatCount", "indefinite");
+        
+      rings.append("animate")
+        .attr("attributeName", "opacity")
+        .attr("values", "1; 0")
+        .attr("dur", "2s")
+        .attr("repeatCount", "indefinite");
+
+      // 2. Solid Inner Dot
+      pins.append("circle")
+        .attr("class", "pin-dot")
+        .attr("r", 2.5)
+        .attr("stroke", "#1e293b")
+        .attr("stroke-width", 0.5)
+        .attr("fill", "#334155")
+        .append("title")
+        .text(d => d.name);
+
+      // Handle Zoom (Keep pins a constant visible size during zoom)
+      const zoom = d3.zoom()
+          .scaleExtent([1, 10])
+          .on("zoom", (event) => { 
+              g.attr("transform", event.transform); 
+              g.selectAll(".pin-group")
+               .attr("transform", d => `translate(${projection(d.coords)[0]}, ${projection(d.coords)[1]}) scale(${1 / event.transform.k})`);
+          });
+      svg.call(zoom);
+
+      updateMapColors();
+    }).catch(err => {
+      document.getElementById('map-loading').innerText = 'Failed to load map data.';
+    });
+  }
+
+  // Generalized color resolution
+  function getTerritoryColor(name, empire, currentYear) {
+      if (name === empire.home) return empire.homeColor;
+      
+      let matchedColony = empire.colonies.find(c => name.includes(c.n) || c.n.includes(name));
+      if (matchedColony) {
+        if (currentYear >= matchedColony.s && currentYear < matchedColony.e) {
+          return empire.colonyColor;
+        }
+      }
+      return "#334155"; // Independent / Background
+  }
+
+  function updateMapColors() {
+    if(!worldData) return;
+    const empire = empireTerritories[currentActiveEmpire];
+    const currentYear = parseInt(mapTimeline.value);
+    
+    // UI Label Update
+    mapYearDisplay.style.color = empire.homeColor;
+    mapYearDisplay.innerText = currentYear;
+    document.getElementById('legend-home').style.backgroundColor = empire.homeColor;
+    document.getElementById('legend-colony').style.backgroundColor = empire.colonyColor;
+
+    // Update standard polygon landmasses
+    d3.selectAll(".country").attr("fill", d => getTerritoryColor(d.properties.name, empire, currentYear));
+    
+    // Update custom independent ping dots
+    d3.selectAll(".pin-dot").attr("fill", d => getTerritoryColor(d.name, empire, currentYear));
+    
+    // Update the color of the radar rings (fade to gray if independent, bright if a colony)
+    d3.selectAll(".pin-ring").attr("stroke", d => {
+        const color = getTerritoryColor(d.name, empire, currentYear);
+        return color === "#334155" ? "#94a3b8" : color;
+    });
+  }
+
+  // Handle map slider interactions
+  mapTimeline.addEventListener('input', updateMapColors);
+
+  // Handle Empire Selection
+  empireBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      empireBtns.forEach(b => {
+        b.classList.remove('ring-4', 'ring-stone-400', 'bg-stone-100');
+        b.classList.add('bg-stone-100', 'border-stone-300');
+      });
+      btn.classList.add('ring-4', 'ring-stone-400');
+      
+      currentActiveEmpire = btn.getAttribute('data-empire');
+      mapTimeline.value = parseInt(btn.getAttribute('data-peak'));
+      
+      updateMapColors();
+    });
+  });
+
+
+  // --- LAB 3: OVERALL VOLUME TIMELINE (1500 - 1980) ---
+  const slider = document.getElementById('timeline-slider');
+  const yearDisplay = document.getElementById('year-display');
+  const eventDisplay = document.getElementById('event-display');
+  
+  const barGB = document.getElementById('bar-gb'); const valGB = document.getElementById('val-gb');
+  const barFR = document.getElementById('bar-fr'); const valFR = document.getElementById('val-fr');
+  const barES = document.getElementById('bar-es'); const valES = document.getElementById('val-es');
+  const barPT = document.getElementById('bar-pt'); const valPT = document.getElementById('val-pt');
+  const barBE = document.getElementById('bar-be'); const valBE = document.getElementById('val-be');
+  const barNL = document.getElementById('bar-nl'); const valNL = document.getElementById('val-nl');
+
+  const timelineData = {
+    'gb': [
+      { y: 1500, v: 0.0 }, { y: 1600, v: 0.1 }, { y: 1700, v: 3.5 }, { y: 1770, v: 4.5 }, { y: 1783, v: 1.5 }, 
+      { y: 1850, v: 15.0 }, { y: 1900, v: 30.0 }, { y: 1920, v: 35.5 }, { y: 1945, v: 35.5 }, { y: 1947, v: 31.0 }, 
+      { y: 1960, v: 26.0 }, { y: 1980, v: 0.5 }
+    ],
+    'fr': [
+      { y: 1500, v: 0.0 }, { y: 1600, v: 0.1 }, { y: 1700, v: 2.5 }, { y: 1763, v: 0.2 }, { y: 1830, v: 0.5 }, 
+      { y: 1880, v: 3.0 }, { y: 1920, v: 11.5 }, { y: 1945, v: 11.5 }, { y: 1954, v: 10.5 }, { y: 1960, v: 2.5 }, 
+      { y: 1980, v: 0.1 }
+    ],
+    'es': [
+      { y: 1500, v: 2.0 }, { y: 1600, v: 7.0 }, { y: 1700, v: 12.0 }, { y: 1790, v: 13.7 }, { y: 1810, v: 13.7 }, 
+      { y: 1830, v: 0.4 }, { y: 1898, v: 0.4 }, { y: 1900, v: 0.3 }, { y: 1945, v: 0.3 }, { y: 1980, v: 0.0 }
+    ],
+    'pt': [
+      { y: 1500, v: 0.5 }, { y: 1600, v: 2.0 }, { y: 1700, v: 5.0 }, { y: 1800, v: 10.4 }, { y: 1822, v: 10.4 }, 
+      { y: 1830, v: 2.0 }, { y: 1900, v: 2.4 }, { y: 1945, v: 2.4 }, { y: 1974, v: 2.4 }, { y: 1975, v: 0.0 }, { y: 1980, v: 0.0 }
+    ],
+    'be': [
+      { y: 1500, v: 0.0 }, { y: 1880, v: 0.0 }, { y: 1885, v: 2.34 }, { y: 1960, v: 0.05 }, { y: 1980, v: 0.03 }
+    ],
+    'nl': [
+      { y: 1500, v: 0.0 }, { y: 1600, v: 0.2 }, { y: 1700, v: 1.5 }, { y: 1800, v: 1.5 }, { y: 1920, v: 2.0 }, 
+      { y: 1945, v: 2.0 }, { y: 1949, v: 0.1 }, { y: 1980, v: 0.04 }
+    ]
+  };
+
+  const historicalEvents = [
+    { y: 1500, text: "Treaty of Tordesillas (1494). Spain and Portugal dominate global exploration, dividing the 'New World'." },
+    { y: 1600, text: "Spain rules a massive American empire. Britain, France, and the Netherlands form East India companies." },
+    { y: 1700, text: "Extensive colonization of the Americas (Thirteen Colonies, New France, Brazil, New Spain)." },
+    { y: 1783, text: "American Revolution ends. Britain loses the Thirteen Colonies, shifting its focus eastward to India." },
+    { y: 1810, text: "The Iberian Collapse begins. Inspired by earlier revolutions, Latin American nations fight for independence." },
+    { y: 1830, text: "Spain and Portugal have lost almost all American territories. Britain ascends as the sole superpower." },
+    { y: 1884, text: "The 'Scramble for Africa' begins at the Berlin Conference. European powers divide the continent." },
+    { y: 1920, text: "Peak Empire: Following WWI, Britain and France reach maximum extent, absorbing Ottoman/German lands." },
+    { y: 1945, text: "WWII ends. The European powers are financially ruined. The myth of European invincibility is broken." },
+    { y: 1947, text: "The Crown Jewel is lost: India and Pakistan gain independence from Great Britain." },
+    { y: 1954, text: "France suffers a catastrophic military defeat at Dien Bien Phu, withdrawing from Indochina." },
+    { y: 1960, text: "The 'Year of Africa': 17 African nations gain independence, collapsing French/Belgian control." },
+    { y: 1974, text: "The Carnation Revolution in Portugal ends the last European colonial empire in Africa (Angola, Mozambique)." },
+    { y: 1980, text: "Decolonization is largely complete. The 500-year era of the global European empire comes to an end." }
+  ];
+
+  function interpolateValue(arr, curYear) {
+    let lower = arr[0], upper = arr[arr.length - 1];
+    for (let i = 0; i < arr.length - 1; i++) {
+      if (curYear >= arr[i].y && curYear <= arr[i+1].y) { lower = arr[i]; upper = arr[i+1]; break; }
+    }
+    if (curYear <= lower.y) return lower.v;
+    if (curYear >= upper.y) return upper.v;
+    const range = upper.y - lower.y;
+    const percent = (curYear - lower.y) / range;
+    return lower.v - ((lower.v - upper.v) * percent);
+  }
+
+  function getEventText(year) {
+    let closestEvent = historicalEvents[0].text;
+    let maxFound = 0;
+    for (let ev of historicalEvents) {
+      if (year >= ev.y && ev.y >= maxFound) { maxFound = ev.y; closestEvent = ev.text; }
+    }
+    return closestEvent;
+  }
+
+  function updateTimeline() {
+    const year = parseInt(slider.value);
+    yearDisplay.innerText = year;
+    eventDisplay.innerText = getEventText(year);
+
+    const gbV = interpolateValue(timelineData.gb, year);
+    const frV = interpolateValue(timelineData.fr, year);
+    const esV = interpolateValue(timelineData.es, year);
+    const ptV = interpolateValue(timelineData.pt, year);
+    const beV = interpolateValue(timelineData.be, year);
+    const nlV = interpolateValue(timelineData.nl, year);
+
+    valGB.innerText = gbV < 0.1 ? (gbV === 0 ? "0M" : "<0.1M") : gbV.toFixed(1) + "M";
+    valFR.innerText = frV < 0.1 ? (frV === 0 ? "0M" : "<0.1M") : frV.toFixed(1) + "M";
+    valES.innerText = esV < 0.1 ? (esV === 0 ? "0M" : "<0.1M") : esV.toFixed(1) + "M";
+    valPT.innerText = ptV < 0.1 ? (ptV === 0 ? "0M" : "<0.1M") : ptV.toFixed(1) + "M";
+    valBE.innerText = beV < 0.1 ? (beV === 0 ? "0M" : "<0.1M") : beV.toFixed(1) + "M";
+    valNL.innerText = nlV < 0.1 ? (nlV === 0 ? "0M" : "<0.1M") : nlV.toFixed(1) + "M";
+
+    barGB.style.height = `${Math.max(1, (gbV / 35.5) * 95)}%`;
+    barFR.style.height = `${Math.max(1, (frV / 35.5) * 95)}%`;
+    barES.style.height = `${Math.max(1, (esV / 35.5) * 95)}%`;
+    barPT.style.height = `${Math.max(1, (ptV / 35.5) * 95)}%`;
+    barBE.style.height = `${Math.max(1, (beV / 35.5) * 95)}%`;
+    barNL.style.height = `${Math.max(1, (nlV / 35.5) * 95)}%`;
+  }
+
+  slider.addEventListener('input', updateTimeline);
+
+  // Initialization
+  updateUI();
+</script>
+</body>
+</html>

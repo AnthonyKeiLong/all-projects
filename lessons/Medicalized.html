@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Great Debate: Medicalizing Sadness</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .perspective-card { transition: all 0.3s ease; }
+        .perspective-card:hover { transform: translateY(-4px); }
+
+        /* Custom highlight for scientific/difficult words */
+        .highlight-term {
+            border-bottom: 2px dotted #8b5cf6; /* Violet-500 */
+            font-weight: 700;
+            color: #0f172a; /* Slate-900 */
+            cursor: help;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 10;
+        }
+        .highlight-term:hover {
+            background-color: #ede9fe; /* Violet-50 */
+            border-radius: 2px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-violet-200">
+
+    <!-- Global Tooltip Element -->
+    <div id="global-tooltip" class="fixed hidden z-50 bg-slate-900 text-white text-sm rounded-lg shadow-2xl p-4 max-w-xs pointer-events-none transition-opacity duration-200 opacity-0 border border-slate-700"></div>
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white p-5 shadow-lg flex justify-between items-center z-10 shrink-0 border-b-4 border-violet-500">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white">The Medicalization of Sadness</h1>
+            <p class="text-slate-400 text-sm md:text-base mt-1">Clinical labels vs. normalizing the pain of growing up.</p>
+        </div>
+        <div class="hidden md:block">
+            <span class="bg-violet-900/50 text-violet-300 px-4 py-2 rounded-full border border-violet-700/50 text-sm font-medium">
+                Clinical vs. Developmental Psychology
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden max-w-7xl w-full mx-auto bg-slate-50 shadow-2xl">
+        
+        <!-- Sidebar Navigation -->
+        <div class="w-full md:w-1/3 lg:w-1/4 border-r border-slate-200 overflow-y-auto relative bg-white flex flex-col">
+            <div class="p-5 border-b border-slate-100 bg-slate-50">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Explore Scenarios</h2>
+            </div>
+            <div class="flex-1 overflow-y-auto p-3" id="nav-container">
+                <!-- Navigation items injected by JS -->
+            </div>
+            <div class="p-4 bg-slate-100 text-xs text-slate-500 text-center border-t border-slate-200">
+                💡 <strong>Tip:</strong> Hover over dotted words to view psychological definitions.
+            </div>
+        </div>
+
+        <!-- Main Display Area -->
+        <div class="w-full md:w-2/3 lg:w-3/4 flex flex-col relative overflow-y-auto bg-slate-50/50">
+            <div id="content-display" class="p-6 md:p-10 w-full h-full">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- DICTIONARY FOR SCIENTIFIC/COMPLEX TERMS ---
+        const glossary = {
+            "Medicalization": "The process by which non-medical problems (like grief, everyday stress, or normal adolescent awkwardness) become defined and treated as medical problems or illnesses.",
+            "Pathologize": "To treat a normal psychological or physical condition as if it were a disease or clinical disorder.",
+            "Therapy-speak": "The use of prescriptive psychological terminology (like 'toxic', 'gaslighting', 'dissociating') in everyday conversation, often incorrectly or out of its intended clinical context.",
+            "Clinical Diagnosis": "A formal identification of a mental health disorder by a qualified professional, based on specific, prolonged criteria found in manuals like the DSM-5.",
+            "Emotional Spectrum": "The full, natural range of human emotions. Experiencing deep sadness, anger, or acute anxiety in response to life events is part of a healthy emotional spectrum, not necessarily a disorder.",
+            "Self-Diagnosis": "The process of identifying medical or psychiatric conditions in oneself, often driven by social media algorithms. This can lead to hyper-fixation and the adoption of a 'sick role'.",
+            "Dissociation": "A severe clinical detachment from reality, often linked to severe trauma. In 'therapy-speak', teens often misuse this term to describe simply zoning out or being distracted.",
+            "Resilience": "The psychological capacity to adapt to stress and adversity. Over-medicalizing normal pain can stunt the development of resilience by convincing teens they are uniquely fragile."
+        };
+
+        // Helper function to wrap words in the interactive tooltip class
+        function term(phrase, dictionaryKey) {
+            return `<span class="highlight-term" data-term="${dictionaryKey}">${phrase}</span>`;
+        }
+
+        // --- LESSON DATA ---
+        const scenariosData = [
+            {
+                id: "intro",
+                isIntro: true,
+                title: "The Vocabulary Paradox",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+                content: `
+                    <div class="max-w-3xl mx-auto text-center fade-in pt-8">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-violet-100 text-violet-600 mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-6">Are we treating normal growing pains as a disease?</h2>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-6 text-left">
+                            Today's teenagers have an unprecedented vocabulary for mental health. This is a massive victory for breaking stigmas. However, mental health professionals are increasingly worried about the ${term("Medicalization", "Medicalization")} of everyday sadness.
+                        </p>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-10 text-left">
+                            When teens experience normal, deeply uncomfortable parts of the ${term("Emotional Spectrum", "Emotional Spectrum")}—like heartbreak, academic stress, or social rejection—they are frequently using ${term("Therapy-speak", "Therapy-speak")} to ${term("Pathologize", "Pathologize")} their feelings. A bad day becomes "clinical depression." Nervousness becomes an "anxiety disorder." 
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mb-10">
+                            <div class="bg-white p-6 rounded-xl border border-rose-100 shadow-sm border-t-4 border-t-rose-400">
+                                <h3 class="font-bold text-rose-800 mb-2">The Danger of Over-Labeling</h3>
+                                <p class="text-sm text-slate-600">When we immediately label normal stress as a psychiatric disorder, we convince teenagers that they are broken, fragile, and incapable of handling life without medical intervention. It fuels a dangerous trend of ${term("Self-Diagnosis", "Self-Diagnosis")} via social media.</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl border border-violet-100 shadow-sm border-t-4 border-t-violet-400">
+                                <h3 class="font-bold text-violet-800 mb-2">Normalizing the Pain</h3>
+                                <p class="text-sm text-slate-600">The alternative is teaching teens that pain, fear, and sadness are universal human experiences. By normalizing these feelings, we help them build natural ${term("Resilience", "Resilience")} instead of retreating into a clinical label.</p>
+                            </div>
+                        </div>
+
+                        <button onclick="selectScenario(1)" class="px-8 py-4 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 flex items-center gap-2 mx-auto">
+                            Explore Real-World Scenarios
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </button>
+                    </div>
+                `
+            },
+            {
+                id: "scenario-1",
+                title: "The Public Speaking Panic",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>`,
+                context: "A 15-year-old is terrified of giving a 10-minute presentation in front of the class. They feel nauseous, their heart is racing, and they declare they cannot do it because they 'have severe social anxiety.'",
+                approaches: [
+                    {
+                        type: "Dismissive (Old School)",
+                        color: "slate",
+                        advice: `"Stop making excuses and being dramatic. Everyone has to do it. Just get up there and get it over with."`,
+                        impact: "Ignores the genuine physical discomfort the teen is feeling. Increases shame and fear without offering any actual coping mechanisms."
+                    },
+                    {
+                        type: "Over-Medicalizing",
+                        color: "rose",
+                        advice: `"It sounds like this is triggering a panic disorder. We should talk to the school about getting you a medical exemption so you don't have to present."`,
+                        impact: "Validates the ${term('Self-Diagnosis', 'Self-Diagnosis')}. By removing the stressor entirely, it confirms to the teen that they are too fragile to handle public speaking, worsening the anxiety long-term."
+                    },
+                    {
+                        type: "Normalizing (Balanced)",
+                        color: "violet",
+                        advice: `"It makes total sense that you feel sick—public speaking is terrifying for almost everyone! Your body is having a normal stress response. You don't have a disorder, you're just doing something brave. Let's practice deep breathing together."`,
+                        impact: "Validates the severe discomfort without ${term('Pathologizing', 'Pathologizing')} it. Teaches the teen that high stress is normal and survivable, building true ${term('Resilience', 'Resilience')}."
+                    }
+                ]
+            },
+            {
+                id: "scenario-2",
+                title: "The Devastating Breakup",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 5 9.04 9.53a1.1 1.1 0 0 0 .15 1.4l5.3 4.9"/></svg>`,
+                context: "A teenager experiences their first major romantic breakup. For two weeks, they stay in bed, cry constantly, lose their appetite, and say they are 'clinically depressed.'",
+                approaches: [
+                    {
+                        type: "Dismissive (Old School)",
+                        color: "slate",
+                        advice: `"It's just puppy love. You're young, there are plenty of fish in the sea. You'll be fine by next week, stop wallowing."`,
+                        impact: "Minimizes a profound emotional milestone. The teenager learns to hide their grief because the adults around them don't respect the depth of their feelings."
+                    },
+                    {
+                        type: "Over-Medicalizing",
+                        color: "rose",
+                        advice: `"You're showing all the signs of major depressive disorder. We need to get you to a psychiatrist right away to look into medication and intensive therapy."`,
+                        impact: "Confuses acute, normal grief with a ${term('Clinical Diagnosis', 'Clinical Diagnosis')}. Treats a deeply human experience (heartbreak) as a medical emergency to be 'cured'."
+                    },
+                    {
+                        type: "Normalizing (Balanced)",
+                        color: "violet",
+                        advice: `"You are experiencing severe heartbreak, and it genuinely mimics the symptoms of depression because it hurts so much. It is entirely normal to feel this devastated. Take the weekend to rest and cry, but on Monday, we need to get you back to your routine."`,
+                        impact: "Honors the extreme pain as a valid part of the ${term('Emotional Spectrum', 'Emotional Spectrum')}. Provides comfort while maintaining structure to prevent a normal grieving period from spiraling."
+                    }
+                ]
+            },
+            {
+                id: "scenario-3",
+                title: "Zoning Out in Conflict",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 14.14 14.14"/></svg>`,
+                context: "During a loud argument with their parents about grades, the teenager stares blankly at the wall and stops responding. Later, they say they were 'dissociating due to trauma.'",
+                approaches: [
+                    {
+                        type: "Dismissive (Old School)",
+                        color: "slate",
+                        advice: `"Don't you ignore me when I'm speaking to you! Look at me! You're just being disrespectful and tuning me out."`,
+                        impact: "Escalates the conflict. The teenager is likely overwhelmed, and yelling at them for shutting down will only make them retreat further."
+                    },
+                    {
+                        type: "Over-Medicalizing",
+                        color: "rose",
+                        advice: `"Oh no, I'm so sorry, we've traumatized you. If you are dissociating, we need to stop all academic pressure immediately and seek trauma counseling."`,
+                        impact: "Accepts inaccurate ${term('Therapy-speak', 'Therapy-speak')}. True ${term('Dissociation', 'Dissociation')} is a severe psychiatric symptom. The teen learns they can use clinical buzzwords to completely avoid accountability."
+                    },
+                    {
+                        type: "Normalizing (Balanced)",
+                        color: "violet",
+                        advice: `"I can see you're feeling incredibly overwhelmed right now and you're shutting down. That's a normal response to feeling stressed. Let's take a 15-minute pause to cool off, but we do need to finish this conversation later."`,
+                        impact: "Accurately identifies the behavior (shutting down/overwhelm) without adopting extreme medical labels. De-escalates the tension while still maintaining accountability."
+                    }
+                ]
+            }
+        ];
+
+        let currentIndex = 0;
+
+        // Render the left-side navigation bar
+        function renderNavigation() {
+            const container = document.getElementById('nav-container');
+            container.innerHTML = '';
+            
+            scenariosData.forEach((item, index) => {
+                const btn = document.createElement('button');
+                const isActive = index === currentIndex;
+                
+                btn.className = `w-full text-left p-4 mb-2 rounded-xl flex items-center gap-3 transition-all ${
+                    isActive 
+                    ? 'bg-slate-900 text-white shadow-md' 
+                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 hover:border-slate-300'
+                }`;
+                
+                btn.onclick = () => selectScenario(index);
+                
+                btn.innerHTML = `
+                    <div class="${isActive ? 'text-violet-400' : 'text-slate-400'} flex-shrink-0">
+                        ${item.icon}
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm ${isActive ? 'text-white' : 'text-slate-800'}">${item.title}</div>
+                        ${!item.isIntro ? `<div class="text-xs mt-0.5 opacity-70">Scenario ${index}</div>` : ''}
+                    </div>
+                `;
+                
+                container.appendChild(btn);
+            });
+        }
+
+        // Handle switching between scenarios
+        function selectScenario(index) {
+            currentIndex = index;
+            renderNavigation();
+            
+            const item = scenariosData[index];
+            const display = document.getElementById('content-display');
+            
+            // If it's the intro page, render the static HTML
+            if (item.isIntro) {
+                display.innerHTML = item.content;
+                return;
+            }
+            
+            // Otherwise, build the dynamic Scenario page HTML
+            // Using a slightly different color palette: Slate (Dismissive), Rose (Over-medicalizing), Violet (Balanced)
+            const colors = {
+                slate: { bg: 'bg-slate-100', border: 'border-slate-300', text: 'text-slate-800', badge: 'bg-slate-200 text-slate-700' },
+                rose: { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-800', badge: 'bg-rose-100 text-rose-700' },
+                violet: { bg: 'bg-violet-50', border: 'border-violet-200', text: 'text-violet-900', badge: 'bg-violet-100 text-violet-700' }
+            };
+
+            let approachesHtml = '';
+            item.approaches.forEach(app => {
+                const c = colors[app.color];
+                approachesHtml += `
+                    <div class="${c.bg} border ${c.border} rounded-2xl p-6 perspective-card relative overflow-hidden flex flex-col h-full">
+                        <div class="absolute top-0 left-0 w-1.5 h-full ${c.badge.split(' ')[0]}"></div>
+                        <div class="flex flex-col mb-4">
+                            <span class="text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-full ${c.badge} self-start mb-2">Approach</span>
+                            <h3 class="font-bold text-lg ${c.text}">${app.type}</h3>
+                        </div>
+                        <div class="mb-4 flex-grow">
+                            <h4 class="text-xs uppercase font-bold text-slate-400 mb-1 tracking-wider">What they say:</h4>
+                            <p class="italic text-slate-700 font-medium">"${app.advice.replace(/"/g, '')}"</p>
+                        </div>
+                        <div class="pt-4 border-t border-black/5 mt-auto">
+                            <h4 class="text-xs uppercase font-bold text-slate-400 mb-1 tracking-wider">Psychological Impact:</h4>
+                            <p class="text-sm text-slate-600 leading-relaxed">${app.impact}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            display.innerHTML = `
+                <div class="max-w-4xl mx-auto fade-in pb-10">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-full uppercase tracking-wide mb-4">
+                        Scenario ${index}
+                    </div>
+                    
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">${item.title}</h2>
+                    
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 mb-8 shadow-sm">
+                        <h3 class="flex items-center gap-2 text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            The Situation
+                        </h3>
+                        <p class="text-lg text-slate-700 font-medium leading-relaxed">${item.context}</p>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-slate-800 mb-6">How should an adult respond?</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                        ${approachesHtml}
+                    </div>
+
+                    <div class="mt-12 pt-6 border-t border-slate-200 flex justify-between">
+                        ${index > 0 
+                            ? `<button onclick="selectScenario(${index - 1})" class="text-slate-500 hover:text-slate-800 font-medium flex items-center gap-2 px-4 py-2 hover:bg-slate-200 rounded-lg transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Previous</button>` 
+                            : `<div></div>`
+                        }
+                        
+                        ${index < scenariosData.length - 1 
+                            ? `<button onclick="selectScenario(${index + 1})" class="bg-slate-900 text-white hover:bg-slate-800 font-medium flex items-center gap-2 px-5 py-2 rounded-lg transition-colors shadow-md">Next Scenario <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>` 
+                            : `<button onclick="selectScenario(0)" class="text-violet-600 hover:text-violet-800 font-medium flex items-center gap-2 px-4 py-2 hover:bg-violet-50 rounded-lg transition-colors">Back to Intro <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>`
+                        }
+                    </div>
+                </div>
+            `;
+
+            // Auto-scroll to top on mobile view
+            if (window.innerWidth < 768) {
+                document.getElementById('content-display').scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // --- TOOLTIP LOGIC ---
+        const tooltip = document.getElementById('global-tooltip');
+
+        // Handle Mouse Hover (Desktop)
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.classList.contains('highlight-term')) {
+                const termKey = e.target.getAttribute('data-term');
+                const definition = glossary[termKey];
+                
+                tooltip.innerHTML = `<strong class="block mb-1 text-violet-300 font-bold uppercase tracking-wider text-xs">${termKey}</strong><span class="leading-relaxed block">${definition}</span>`;
+                tooltip.classList.remove('hidden');
+                
+                // Slight delay to allow CSS transition to kick in smoothly
+                requestAnimationFrame(() => tooltip.classList.remove('opacity-0'));
+            }
+        });
+
+        // Make the tooltip follow the mouse
+        document.addEventListener('mousemove', (e) => {
+            if (!tooltip.classList.contains('hidden')) {
+                let x = e.clientX + 15;
+                let y = e.clientY + 20;
+                
+                // Prevent the tooltip from going off the right side of the screen
+                const rect = tooltip.getBoundingClientRect();
+                if (x + rect.width > window.innerWidth) {
+                    x = e.clientX - rect.width - 15;
+                }
+                
+                // Prevent the tooltip from going off the bottom of the screen
+                if (y + rect.height > window.innerHeight) {
+                    y = e.clientY - rect.height - 15;
+                }
+                
+                tooltip.style.left = x + 'px';
+                tooltip.style.top = y + 'px';
+            }
+        });
+
+        // Hide the tooltip when the mouse leaves the word
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.classList.contains('highlight-term')) {
+                tooltip.classList.add('opacity-0');
+                setTimeout(() => tooltip.classList.add('hidden'), 200);
+            }
+        });
+
+        // Initialize Application
+        window.onload = () => {
+            renderNavigation();
+            selectScenario(0);
+        };
+    </script>
+</body>
+</html>

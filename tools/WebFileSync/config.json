@@ -1,0 +1,19 @@
+{
+  "source_folder": "C:/Users/anthony/Downloads/MIF2e_ChapQuiz_1A01_e",
+  "target_folder": "T:/Subject/math/Question Banks/\u6559\u80b2\u51fa\u7248\u793e/Junior/Maths in Focus/Assessment Resources/Chapter Quiz/1A1 Basic Computation",
+  "file_extensions": [],
+  "regex_patterns": [],
+  "timestamp_tolerance_seconds": 120,
+  "max_concurrency": 4,
+  "dry_run": false,
+  "preserve_timestamps": true,
+  "preserve_permissions": true,
+  "mapping_file": "",
+  "log_to_file": false,
+  "log_file": "foldersync.log",
+  "verbose": false,
+  "debug": false,
+  "backup_dir_name": ".foldersync_backups",
+  "include_hidden": false,
+  "recursive": true
+}

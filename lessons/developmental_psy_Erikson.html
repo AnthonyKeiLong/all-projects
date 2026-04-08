@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erikson's Stages of Psychosocial Development</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 23px;
+            top: 20px;
+            bottom: 20px;
+            width: 2px;
+            background-color: #e2e8f0;
+            z-index: 0;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-indigo-200">
+
+    <!-- Header -->
+    <header class="bg-indigo-700 text-white p-5 shadow-md flex justify-between items-center z-10 shrink-0">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Erikson's Psychosocial Theory</h1>
+            <p class="text-indigo-200 text-sm md:text-base mt-1">Interactive guide to the 8 stages of human development.</p>
+        </div>
+        <div class="hidden md:block">
+            <span class="bg-indigo-800/50 px-4 py-2 rounded-full border border-indigo-600 text-sm font-medium">
+                Developmental Psychology
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden max-w-7xl w-full mx-auto bg-white shadow-xl shadow-slate-200/50">
+        
+        <!-- Sidebar Navigation (Timeline) -->
+        <div class="w-full md:w-1/3 lg:w-1/4 border-r border-slate-200 overflow-y-auto relative bg-slate-50 p-4">
+            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6 ml-2">Stages of Life</h2>
+            
+            <div class="relative" id="timeline-container">
+                <div class="timeline-line"></div>
+                <!-- Timeline items will be injected here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Main Display Area -->
+        <div class="w-full md:w-2/3 lg:w-3/4 flex flex-col bg-white relative overflow-y-auto">
+            
+            <div id="content-display" class="p-6 md:p-10 lg:p-12 max-w-4xl mx-auto w-full h-full">
+                <!-- Initial Welcome Screen -->
+                <div class="flex flex-col items-center justify-center h-full text-center fade-in">
+                    <div class="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center mb-6 text-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4">Welcome to the Theory of Psychosocial Development</h2>
+                    <p class="text-slate-600 text-lg max-w-2xl mb-8 leading-relaxed">
+                        Erik Erikson believed that personality develops in a predetermined order through eight stages of psychosocial development, from infancy to adulthood. During each stage, a person experiences a psychosocial crisis which could have a positive or negative outcome for personality development.
+                    </p>
+                    <button onclick="selectStage(0)" class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/30">
+                        Start Lesson: Stage 1
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Data containing all the detailed content for Erikson's 8 stages
+        const stagesData = [
+            {
+                id: 1,
+                title: "Trust vs. Mistrust",
+                ageRange: "Infancy (0 - 1.5 years)",
+                virtue: "Hope",
+                existentialQuestion: "Can I trust the world?",
+                description: "The first stage is centered around the infant's basic needs being met by the parents or caregivers. Because an infant is utterly dependent, developing trust is based on the dependability and quality of the child's caregivers.",
+                success: "If a caregiver is consistent and responsive to the baby's needs (feeding, comforting), the infant learns that the world is a safe, predictable place. They develop the virtue of <strong>hope</strong>.",
+                failure: "If caregivers are rejecting, inconsistent, or emotionally unavailable, the infant develops a sense of mistrust, suspicion, and anxiety about their environment.",
+                example: "<strong>Scenario:</strong> A baby cries in the middle of the night.<br><strong>Positive Outcome:</strong> A parent wakes up, gently picks up the baby, and feeds them. The baby learns they are cared for.<br><strong>Negative Outcome:</strong> The baby is consistently left to cry for hours without comfort, leading them to feel the world is unreliable."
+            },
+            {
+                id: 2,
+                title: "Autonomy vs. Shame & Doubt",
+                ageRange: "Early Childhood (1.5 - 3 years)",
+                virtue: "Will",
+                existentialQuestion: "Is it okay to be me?",
+                description: "Children begin exploring their surroundings and realizing they have personal control over physical skills and a sense of independence (toilet training, choosing toys/clothes).",
+                success: "When parents allow children to explore and make safe, guided choices, children develop a sense of autonomy and the virtue of <strong>will</strong>. They feel confident and secure in their abilities.",
+                failure: "If children are overly criticized, heavily controlled, or not given the opportunity to assert themselves, they begin to feel inadequate in their ability to survive, lacking self-esteem.",
+                example: "<strong>Scenario:</strong> A toddler wants to dress themselves.<br><strong>Positive Outcome:</strong> The parent lets the child put on their own (perhaps mismatched) clothes, praising their effort.<br><strong>Negative Outcome:</strong> The parent scolds the child for being too slow and forcefully dresses them, instilling doubt in the child's capabilities."
+            },
+            {
+                id: 3,
+                title: "Initiative vs. Guilt",
+                ageRange: "Preschool (3 - 5 years)",
+                virtue: "Purpose",
+                existentialQuestion: "Is it okay for me to do, move, and act?",
+                description: "Children begin to assert their power and control over the world through directing play and other social interaction. They are highly active, curious, and ask many questions.",
+                success: "Children who are successful at this stage feel capable and able to lead others, developing a sense of <strong>purpose</strong>. They feel comfortable taking initiative to plan activities.",
+                failure: "If this tendency is squelched through excessive criticism or control, children develop a sense of guilt. They may feel like a nuisance and remain followers, lacking self-initiative.",
+                example: "<strong>Scenario:</strong> A child wants to build a complex fort out of living room cushions.<br><strong>Positive Outcome:</strong> The parent provides the cushions and praises the child's creativity.<br><strong>Negative Outcome:</strong> The parent yells at the child for making a mess and tells them to sit still, making the child feel guilty for their natural curiosity."
+            },
+            {
+                id: 4,
+                title: "Industry vs. Inferiority",
+                ageRange: "School Age (5 - 12 years)",
+                virtue: "Competence",
+                existentialQuestion: "Can I make it in the world of people and things?",
+                description: "Children enter school and the peer group gains greater significance. They learn to read, write, and do math. They want to accomplish more complex skills and be recognized for them.",
+                success: "If children are encouraged and reinforced for their initiative, they begin to feel industrious and confident in their ability to achieve goals, gaining the virtue of <strong>competence</strong>.",
+                failure: "If children struggle compared to peers and are mocked or receive no encouragement from teachers/parents, they develop a feeling of inferiority, doubting their abilities.",
+                example: "<strong>Scenario:</strong> A student is struggling with a new math concept.<br><strong>Positive Outcome:</strong> The teacher provides extra help, and the student eventually solves it, feeling a sense of mastery and pride.<br><strong>Negative Outcome:</strong> The teacher ignores the student, and classmates make fun of them. The student gives up, feeling they are just 'stupid'."
+            },
+            {
+                id: 5,
+                title: "Identity vs. Role Confusion",
+                ageRange: "Adolescence (12 - 18 years)",
+                virtue: "Fidelity",
+                existentialQuestion: "Who am I and what can I be?",
+                description: "This is a major transition from childhood to adulthood. Teens search for a sense of self and personal identity through an intense exploration of personal values, beliefs, and goals.",
+                success: "Those who receive proper encouragement and reinforcement through personal exploration will emerge with a strong sense of self, independence, and the virtue of <strong>fidelity</strong> (loyalty to oneself and others).",
+                failure: "Those who remain unsure of their beliefs and desires will feel insecure and confused about themselves and the future. They may drift from job to job or relationship to relationship.",
+                example: "<strong>Scenario:</strong> A high schooler is figuring out what to do after graduation.<br><strong>Positive Outcome:</strong> They explore different clubs, talk to mentors, and discover a passion for environmental science, giving them a clear career path.<br><strong>Negative Outcome:</strong> Their parents force them to pursue pre-med against their will. The teen feels trapped and fundamentally unsure of who they actually are."
+            },
+            {
+                id: 6,
+                title: "Intimacy vs. Isolation",
+                ageRange: "Young Adulthood (18 - 40 years)",
+                virtue: "Love",
+                existentialQuestion: "Can I love?",
+                description: "The major conflict centers on forming intimate, loving relationships with other people. We begin to share ourselves more intimately with others, exploring relationships leading toward longer-term commitments.",
+                success: "Successfully navigating this stage results in happy relationships and a sense of commitment, safety, and care within a relationship, leading to the virtue of <strong>love</strong>.",
+                failure: "Avoiding intimacy, fearing commitment, and relationships can lead to isolation, loneliness, and sometimes depression.",
+                example: "<strong>Scenario:</strong> A person in their late 20s meets someone they care about deeply.<br><strong>Positive Outcome:</strong> They communicate openly, make compromises, and commit to a long-term, supportive relationship.<br><strong>Negative Outcome:</strong> Fearful of getting hurt based on past experiences (or lack of identity from Stage 5), they push the person away, preferring to remain safely alone."
+            },
+            {
+                id: 7,
+                title: "Generativity vs. Stagnation",
+                ageRange: "Middle Adulthood (40 - 65 years)",
+                virtue: "Care",
+                existentialQuestion: "Can I make my life count?",
+                description: "People experience a need to create or nurture things that will outlast them, often having mentees or creating positive changes that will benefit other people. We give back to society through raising children, being productive at work, and becoming involved in community activities.",
+                success: "Success leads to feelings of usefulness and accomplishment, developing the virtue of <strong>care</strong>.",
+                failure: "Failure results in shallow involvement in the world. By failing to find a way to contribute, individuals may feel disconnected, unproductive, and stagnant.",
+                example: "<strong>Scenario:</strong> A 50-year-old manager at a company.<br><strong>Positive Outcome:</strong> They take time to mentor young new hires, passing on their knowledge, and volunteer at a local charity, feeling their life has broad purpose.<br><strong>Negative Outcome:</strong> They focus entirely on their own comfort and status, refusing to help younger colleagues, eventually feeling that life is empty and monotonous."
+            },
+            {
+                id: 8,
+                title: "Ego Integrity vs. Despair",
+                ageRange: "Maturity (65+ years)",
+                virtue: "Wisdom",
+                existentialQuestion: "Is it okay to have been me?",
+                description: "As we grow older and become senior citizens, we tend to slow down our productivity and explore life as a retired person. It is during this time that we contemplate our accomplishments and can develop integrity if we see ourselves as leading a successful life.",
+                success: "If we view our lives as productive and feel proud of our accomplishments, we develop a sense of integrity and the virtue of <strong>wisdom</strong>. We are able to look back with closure and accept death without fear.",
+                failure: "If we look back on life and feel we did not achieve our goals, we experience dissatisfaction, regret, bitterness, and despair.",
+                example: "<strong>Scenario:</strong> A 75-year-old reflecting on their life.<br><strong>Positive Outcome:</strong> They look at their family, their past career, and the experiences they had with satisfaction, feeling that they did the best they could. They are at peace.<br><strong>Negative Outcome:</strong> They dwell obsessively on missed opportunities, failed relationships, and past mistakes, feeling overwhelming dread that it's too late to change anything."
+            }
+        ];
+
+        let currentStageIndex = null;
+
+        // Initialize the timeline on the left sidebar
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            
+            stagesData.forEach((stage, index) => {
+                const item = document.createElement('div');
+                item.className = 'relative flex items-center mb-8 cursor-pointer group z-10';
+                item.onclick = () => selectStage(index);
+                
+                item.innerHTML = `
+                    <div id="timeline-dot-${index}" class="w-12 h-12 rounded-full border-4 border-white bg-slate-200 text-slate-500 font-bold flex items-center justify-center shadow-sm transition-all duration-300 group-hover:bg-indigo-100 group-hover:text-indigo-600 shrink-0">
+                        ${index + 1}
+                    </div>
+                    <div class="ml-4 flex flex-col">
+                        <span id="timeline-title-${index}" class="text-sm font-bold text-slate-700 group-hover:text-indigo-700 transition-colors">${stage.title}</span>
+                        <span class="text-xs text-slate-500">${stage.ageRange.split('(')[0].trim()}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Handle user clicking a stage
+        function selectStage(index) {
+            // Update UI styling for timeline
+            if (currentStageIndex !== null) {
+                // Reset previous active dot
+                const prevDot = document.getElementById(`timeline-dot-${currentStageIndex}`);
+                const prevTitle = document.getElementById(`timeline-title-${currentStageIndex}`);
+                if(prevDot) {
+                    prevDot.classList.remove('bg-indigo-600', 'text-white', 'scale-110');
+                    prevDot.classList.add('bg-slate-200', 'text-slate-500');
+                    prevTitle.classList.remove('text-indigo-700');
+                    prevTitle.classList.add('text-slate-700');
+                }
+            }
+
+            // Set new active dot
+            currentStageIndex = index;
+            const activeDot = document.getElementById(`timeline-dot-${index}`);
+            const activeTitle = document.getElementById(`timeline-title-${index}`);
+            
+            if(activeDot) {
+                activeDot.classList.remove('bg-slate-200', 'text-slate-500', 'group-hover:bg-indigo-100');
+                activeDot.classList.add('bg-indigo-600', 'text-white', 'scale-110');
+                activeTitle.classList.remove('text-slate-700');
+                activeTitle.classList.add('text-indigo-700');
+            }
+
+            // Update Main Content Area
+            const stage = stagesData[index];
+            const display = document.getElementById('content-display');
+            
+            // Generate HTML for the stage details
+            display.innerHTML = `
+                <div class="fade-in pb-10">
+                    <div class="flex flex-wrap items-center gap-3 mb-2">
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-full uppercase tracking-wide">Stage ${stage.id}</span>
+                        <span class="text-slate-500 font-medium text-sm flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            ${stage.ageRange}
+                        </span>
+                    </div>
+                    
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-6">${stage.title}</h2>
+                    
+                    <!-- Core Info Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 border-l-4 border-l-indigo-500">
+                            <h3 class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Key Virtue Developed</h3>
+                            <p class="text-xl font-bold text-indigo-700">${stage.virtue}</p>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 border-l-4 border-l-amber-500">
+                            <h3 class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Existential Question</h3>
+                            <p class="text-xl font-medium text-amber-700 italic">"${stage.existentialQuestion}"</p>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <h3 class="text-lg font-bold text-slate-800 border-b pb-2 mb-3">Overview</h3>
+                    <p class="text-slate-600 leading-relaxed mb-8">${stage.description}</p>
+
+                    <!-- Success vs Failure -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-emerald-50 rounded-xl p-5 border border-emerald-100">
+                            <div class="flex items-center gap-2 mb-3 text-emerald-700 font-bold">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                Success (Positive Resolution)
+                            </div>
+                            <p class="text-emerald-800 text-sm leading-relaxed">${stage.success}</p>
+                        </div>
+                        
+                        <div class="bg-rose-50 rounded-xl p-5 border border-rose-100">
+                            <div class="flex items-center gap-2 mb-3 text-rose-700 font-bold">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                                Failure (Negative Resolution)
+                            </div>
+                            <p class="text-rose-800 text-sm leading-relaxed">${stage.failure}</p>
+                        </div>
+                    </div>
+
+                    <!-- Real World Example -->
+                    <div class="bg-white border-2 border-slate-100 shadow-sm rounded-xl p-6 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                            Real World Example
+                        </h3>
+                        <p class="text-slate-600 text-sm leading-relaxed space-y-2">
+                            ${stage.example}
+                        </p>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="flex justify-between mt-10 pt-6 border-t border-slate-100">
+                        ${index > 0 
+                            ? `<button onclick="selectStage(${index - 1})" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-2 px-4 py-2 hover:bg-indigo-50 rounded-lg transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Previous Stage</button>` 
+                            : `<div></div>` // Empty div to maintain flex spacing
+                        }
+                        
+                        ${index < stagesData.length - 1 
+                            ? `<button onclick="selectStage(${index + 1})" class="bg-indigo-600 text-white hover:bg-indigo-700 font-medium flex items-center gap-2 px-5 py-2 rounded-lg transition-colors shadow-md">Next Stage <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>` 
+                            : `<button onclick="selectStage(0)" class="text-slate-500 hover:text-slate-800 font-medium flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-lg transition-colors">Restart Lesson <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></button>`
+                        }
+                    </div>
+                </div>
+            `;
+            
+            // Auto-scroll to top of content on mobile
+            if (window.innerWidth < 768) {
+                document.getElementById('content-display').scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Initialize the app on load
+        window.onload = renderTimeline;
+    </script>
+</body>
+</html>

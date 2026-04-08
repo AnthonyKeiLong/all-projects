@@ -1,0 +1,18 @@
+{
+  "source_folder": "C:/MySourceFolder",
+  "target_folder": "C:/MyTargetFolder",
+  "file_extensions": [],
+  "regex_patterns": [],
+  "timestamp_tolerance_seconds": 120,
+  "max_concurrency": 4,
+  "dry_run": false,
+  "preserve_timestamps": true,
+  "preserve_permissions": true,
+  "recursive": true,
+  "include_hidden": false,
+  "log_to_file": false,
+  "log_file": "foldersync.log",
+  "verbose": false,
+  "debug": false,
+  "backup_dir_name": ".foldersync_backups"
+}

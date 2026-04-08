@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Seating & Groups</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        /* Editable Field Placeholder Styles */
+        [contenteditable]:empty::before {
+            content: attr(data-placeholder);
+            color: #cbd5e1; /* slate-300 */
+            pointer-events: none;
+            display: block; /* For Firefox */
+        }
+
+        /* Print Styles: Hide UI, show only the outputs */
+        @media print {
+            body { background: white; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .seat-grid { gap: 4px !important; }
+            .seat { border: 2px solid #cbd5e1 !important; break-inside: avoid; }
+            .group-card { break-inside: avoid; border: 1px solid #e2e8f0; page-break-inside: avoid; }
+            #main-container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
+            [contenteditable]:empty::before { display: none !important; } /* Hide empty placeholders on print */
+        }
+
+        /* PDF Export Styles (Mirrors Print Styles for html2pdf) */
+        body.pdf-exporting { background: white; }
+        .pdf-exporting .no-print { display: none !important; }
+        .pdf-exporting .print-only { display: block !important; }
+        .pdf-exporting .seat-grid { gap: 4px !important; }
+        .pdf-exporting .seat { border: 2px solid #cbd5e1 !important; break-inside: avoid; }
+        .pdf-exporting .group-card { break-inside: avoid; border: 1px solid #e2e8f0; page-break-inside: avoid; }
+        .pdf-exporting #main-container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
+        .pdf-exporting [contenteditable]:empty::before { display: none !important; } /* Hide empty placeholders on export */
+
+        .seat.drag-over {
+            border: 2px dashed #4f46e5;
+            background-color: #e0e7ff;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-12">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="bg-indigo-600 text-white p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
+                </div>
+                <h1 class="text-xl font-bold text-slate-900 tracking-tight">Smart Seating & Groups</h1>
+            </div>
+            <div class="text-sm text-slate-500 font-medium hidden sm:block">Plan assignments with ease</div>
+        </div>
+    </header>
+
+    <div id="main-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <div class="lg:col-span-1 space-y-4 no-print">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-end mb-2">
+                    <label class="block text-sm font-bold text-slate-700">Class List</label>
+                    <button onclick="window.loadDemoClass()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded border border-indigo-200">
+                        Load Demo
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Format: "Number Name" (e.g. 1 John)</p>
+                <textarea id="class-list-input" rows="15" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none" placeholder="1 Alice&#10;2 Bob&#10;3 Charlie..." oninput="window.parseInput()"></textarea>
+                <div id="student-count" class="mt-2 text-sm font-semibold text-indigo-600 text-right">0 Students</div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+            
+            <div class="flex border-b border-slate-200 bg-slate-50 no-print">
+                <button id="tab-groups" onclick="window.switchTab('groups')" class="flex-1 py-4 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 bg-white transition-colors">
+                    Group Maker
+                </button>
+                <button id="tab-seating" onclick="window.switchTab('seating')" class="flex-1 py-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-colors">
+                    Seating Plan
+                </button>
+            </div>
+
+            <div class="p-6 flex-1">
+                
+                <div class="hidden print-only mb-6 text-center">
+                    <h2 id="print-title" class="text-2xl font-bold text-slate-900">Class Output</h2>
+                </div>
+
+                <!-- Group Maker View -->
+                <div id="view-groups" class="space-y-6">
+                    
+                    <!-- Event Details Section (New) -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 no-print">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="text-indigo-500" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="8" rx="2"></rect><path d="M3 14h18"></path><path d="M8 18h8"></path></svg>
+                            <h3 class="text-sm font-bold text-slate-800">Event Details (Optional)</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Event Name</label>
+                                <input type="text" id="event-name" placeholder="e.g., Oral Exams" class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Default Time Span</label>
+                                <input type="text" id="event-time" placeholder="e.g., 09:00 - 12:00" class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Default Location</label>
+                                <input type="text" id="event-location" placeholder="e.g., Main Hall" class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm">
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-3 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            You can customize the time and location for individual groups by clicking on them after generation.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap items-end gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm no-print">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Number of Groups</label>
+                            <input type="number" id="group-count" min="2" max="20" value="4" class="w-24 border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <button onclick="window.generateGroups()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"></path><path d="M8 3H3v5"></path><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"></path><path d="m15 9 6-6"></path></svg>
+                            Shuffle & Generate
+                        </button>
+                        <div class="flex-1"></div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="window.copyGroups()" id="copy-groups-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                Copy Text
+                            </button>
+                            <button onclick="window.exportToPDF('groups')" id="export-groups-btn" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                Export to PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="groups-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <div class="col-span-full text-center py-12 text-slate-400 no-print border-2 border-dashed border-slate-200 rounded-xl">
+                            Load students and click Generate to see groups.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seating Plan View -->
+                <div id="view-seating" class="hidden space-y-6">
+                    <div class="flex flex-wrap items-end gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 no-print">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Columns (Width)</label>
+                            <input type="number" id="seat-cols" min="2" max="12" value="6" class="w-24 border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Rows (Depth)</label>
+                            <input type="number" id="seat-rows" min="2" max="10" value="5" class="w-24 border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <button onclick="window.generateSeating()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"></path><path d="M8 3H3v5"></path><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"></path><path d="m15 9 6-6"></path></svg>
+                            Randomize Seats
+                        </button>
+                        <div class="flex-1"></div>
+                        <button onclick="window.exportToPDF('seating')" id="export-seating-btn" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Export to PDF
+                        </button>
+                    </div>
+
+                    <div class="w-full flex justify-center mb-2">
+                        <div class="bg-slate-200 border-2 border-slate-300 text-slate-600 font-bold text-sm py-2 px-12 rounded-lg shadow-sm">
+                            FRONT OF CLASS (Teacher)
+                        </div>
+                    </div>
+
+                    <div id="seating-container" class="seat-grid grid gap-3 mx-auto w-full max-w-4xl">
+                        <div class="col-span-full text-center py-12 text-slate-400 no-print border-2 border-dashed border-slate-200 rounded-xl">
+                            Load students and click Randomize to build the classroom.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let students = [];
+        let currentGroups = []; // Now stores objects: { id, location, time, students: [] }
+        let currentSeating = []; 
+        let draggedSeatIndex = null;
+
+        // DOM Elements
+        const inputEl = document.getElementById('class-list-input');
+        const countEl = document.getElementById('student-count');
+        
+        const tabGroupsBtn = document.getElementById('tab-groups');
+        const tabSeatingBtn = document.getElementById('tab-seating');
+        const viewGroups = document.getElementById('view-groups');
+        const viewSeating = document.getElementById('view-seating');
+        
+        const groupsContainer = document.getElementById('groups-container');
+        const seatingContainer = document.getElementById('seating-container');
+        const printTitle = document.getElementById('print-title');
+
+        // ==========================================
+        // Input & Parsing
+        // ==========================================
+        window.loadDemoClass = () => {
+            const demoData = `1 Alice Smith\n2 Bob Johnson\n3 Charlie Williams\n4 Diana Brown\n5 Ethan Jones\n6 Fiona Garcia\n7 George Martinez\n8 Hannah Rodriguez\n9 Ian Lee\n10 Julia Perez\n11 Kevin White\n12 Liam Harris\n13 Mia Clark\n14 Noah Lewis\n15 Olivia Robinson\n16 Peter Walker\n17 Quinn Hall\n18 Rachel Allen\n19 Samuel Young\n20 Taylor King\n21 Uma Davis\n22 Victor Evans\n23 Wendy Foster\n24 Xavier Green`;
+            inputEl.value = demoData;
+            
+            // Auto-fill some demo event data too
+            document.getElementById('event-name').value = "Fall Term Oral Exams";
+            document.getElementById('event-time').value = "09:00 - 10:30";
+            document.getElementById('event-location').value = "Language Lab A";
+            
+            window.parseInput();
+        };
+
+        window.parseInput = () => {
+            const text = inputEl.value;
+            const lines = text.split('\n');
+            students = [];
+
+            lines.forEach(line => {
+                const match = line.match(/^(\d+)\s+(.+)$/);
+                if (match) {
+                    students.push({
+                        no: match[1],
+                        name: match[2].trim()
+                    });
+                }
+            });
+
+            countEl.innerText = `${students.length} Student${students.length !== 1 ? 's' : ''}`;
+        };
+
+        const shuffleArray = (array) => {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        };
+
+        // ==========================================
+        // Group Maker Logic
+        // ==========================================
+        window.generateGroups = () => {
+            if (students.length === 0) {
+                alert("Please add students to the list first.");
+                return;
+            }
+
+            const numGroups = parseInt(document.getElementById('group-count').value, 10);
+            if (numGroups < 1) return;
+
+            const defaultTime = document.getElementById('event-time').value.trim();
+            const defaultLocation = document.getElementById('event-location').value.trim();
+
+            const shuffled = shuffleArray(students);
+            
+            // Initialize group objects
+            currentGroups = Array.from({ length: numGroups }, (_, i) => ({
+                id: i + 1,
+                time: defaultTime,
+                location: defaultLocation,
+                students: []
+            }));
+
+            // Distribute students evenly
+            shuffled.forEach((student, index) => {
+                currentGroups[index % numGroups].students.push(student);
+            });
+
+            renderGroups();
+        };
+
+        const renderGroups = () => {
+            groupsContainer.innerHTML = '';
+            
+            currentGroups.forEach((group, index) => {
+                const card = document.createElement('div');
+                card.className = 'group-card bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col';
+                
+                let listHTML = group.students.map(s => 
+                    `<li class="py-1.5 flex gap-2 items-center border-b border-slate-50 last:border-0">
+                        <span class="text-xs font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">#${s.no}</span>
+                        <span class="text-sm font-medium text-slate-700">${s.name}</span>
+                    </li>`
+                ).join('');
+
+                card.innerHTML = `
+                    <div class="bg-indigo-50 border-b border-indigo-100 px-4 py-2 flex justify-between items-center">
+                        <h3 class="font-bold text-indigo-900 text-sm">Group ${group.id}</h3>
+                        <span class="text-xs font-semibold text-indigo-500 bg-white px-2 py-0.5 rounded-full border border-indigo-200">${group.students.length}</span>
+                    </div>
+                    
+                    <div class="bg-slate-50 px-3 py-2 border-b border-slate-100 space-y-1.5">
+                        <div class="flex items-start gap-1.5 text-xs text-slate-600">
+                            <svg class="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <span contenteditable="true" 
+                                  data-placeholder="Set time..."
+                                  onblur="window.updateGroupData(${index}, 'time', this.innerText)"
+                                  class="outline-none border-b border-transparent focus:border-indigo-300 hover:bg-slate-200/60 px-1 -ml-1 rounded transition-colors w-full break-all whitespace-pre-wrap">${group.time}</span>
+                        </div>
+                        <div class="flex items-start gap-1.5 text-xs text-slate-600">
+                            <svg class="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span contenteditable="true" 
+                                  data-placeholder="Set location..."
+                                  onblur="window.updateGroupData(${index}, 'location', this.innerText)"
+                                  class="outline-none border-b border-transparent focus:border-indigo-300 hover:bg-slate-200/60 px-1 -ml-1 rounded transition-colors w-full break-all whitespace-pre-wrap">${group.location}</span>
+                        </div>
+                    </div>
+
+                    <ul class="p-3 flex-1 bg-white">
+                        ${listHTML}
+                    </ul>
+                `;
+                groupsContainer.appendChild(card);
+            });
+        };
+
+        // Data updater for the editable spans
+        window.updateGroupData = (index, field, value) => {
+            currentGroups[index][field] = value.trim();
+        };
+
+        window.copyGroups = () => {
+            if (currentGroups.length === 0) return;
+            
+            const eventName = document.getElementById('event-name').value.trim();
+            let textToCopy = eventName ? `${eventName} - Groups\n\n` : "Class Groups:\n\n";
+            
+            currentGroups.forEach((group) => {
+                textToCopy += `--- Group ${group.id} ---\n`;
+                if (group.time) textToCopy += `Time: ${group.time}\n`;
+                if (group.location) textToCopy += `Location: ${group.location}\n`;
+                
+                group.students.forEach(s => {
+                    textToCopy += `${s.no}. ${s.name}\n`;
+                });
+                textToCopy += `\n`;
+            });
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const btn = document.getElementById('copy-groups-btn');
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = `Copied!`;
+                btn.classList.add('bg-green-100', 'text-green-800');
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.classList.remove('bg-green-100', 'text-green-800');
+                }, 2000);
+            });
+        };
+
+        // ==========================================
+        // Seating Plan Logic
+        // ==========================================
+        window.generateSeating = () => {
+            if (students.length === 0) {
+                alert("Please add students to the list first.");
+                return;
+            }
+
+            const cols = parseInt(document.getElementById('seat-cols').value, 10);
+            const rows = parseInt(document.getElementById('seat-rows').value, 10);
+            const totalSeats = cols * rows;
+
+            if (students.length > totalSeats) {
+                alert(`Not enough seats! You have ${students.length} students but only ${totalSeats} seats. Increase rows or columns.`);
+                return;
+            }
+
+            seatingContainer.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+
+            const shuffled = shuffleArray(students);
+            currentSeating = [];
+
+            for (let i = 0; i < totalSeats; i++) {
+                if (i < shuffled.length) {
+                    currentSeating.push(shuffled[i]);
+                } else {
+                    currentSeating.push(null); 
+                }
+            }
+            renderSeating();
+        };
+
+        const renderSeating = () => {
+            seatingContainer.innerHTML = '';
+
+            currentSeating.forEach((student, index) => {
+                const seatDiv = document.createElement('div');
+                seatDiv.className = 'seat h-20 rounded-xl flex flex-col items-center justify-center p-2 transition-all duration-200 shadow-sm relative group cursor-grab active:cursor-grabbing';
+                seatDiv.draggable = true;
+                seatDiv.dataset.index = index;
+
+                if (student) {
+                    seatDiv.classList.add('bg-white', 'border-2', 'border-slate-200', 'hover:border-indigo-400');
+                    seatDiv.innerHTML = `
+                        <span class="text-slate-400 font-mono text-[10px] sm:text-xs mb-0.5 absolute top-1 left-2">#${student.no}</span>
+                        <span class="text-slate-800 text-center w-full truncate px-1 font-bold text-xs sm:text-sm mt-2">${student.name}</span>
+                    `;
+                } else {
+                    seatDiv.classList.add('bg-slate-50', 'border-2', 'border-dashed', 'border-slate-200', 'opacity-60');
+                    seatDiv.innerHTML = `<span class="text-slate-300 text-xs font-semibold">Empty</span>`;
+                }
+
+                seatDiv.addEventListener('dragstart', handleDragStart);
+                seatDiv.addEventListener('dragover', handleDragOver);
+                seatDiv.addEventListener('dragleave', handleDragLeave);
+                seatDiv.addEventListener('drop', handleDrop);
+                seatDiv.addEventListener('dragend', handleDragEnd);
+
+                seatingContainer.appendChild(seatDiv);
+            });
+        };
+
+        function handleDragStart(e) {
+            draggedSeatIndex = this.dataset.index;
+            e.dataTransfer.effectAllowed = 'move';
+            setTimeout(() => this.classList.add('opacity-50'), 0);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault(); 
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.stopPropagation();
+            this.classList.remove('drag-over');
+            
+            const targetIndex = this.dataset.index;
+            if (draggedSeatIndex !== null && draggedSeatIndex !== targetIndex) {
+                const temp = currentSeating[draggedSeatIndex];
+                currentSeating[draggedSeatIndex] = currentSeating[targetIndex];
+                currentSeating[targetIndex] = temp;
+                renderSeating();
+            }
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('opacity-50');
+            document.querySelectorAll('.seat').forEach(s => s.classList.remove('drag-over'));
+            draggedSeatIndex = null;
+        }
+
+        // ==========================================
+        // UI & Tab Management
+        // ==========================================
+        window.switchTab = (tabId) => {
+            if (tabId === 'groups') {
+                tabGroupsBtn.className = "flex-1 py-4 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 bg-white transition-colors";
+                tabSeatingBtn.className = "flex-1 py-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-colors bg-slate-50";
+                viewGroups.classList.remove('hidden');
+                viewSeating.classList.add('hidden');
+            } else {
+                tabSeatingBtn.className = "flex-1 py-4 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 bg-white transition-colors";
+                tabGroupsBtn.className = "flex-1 py-4 text-sm font-bold text-slate-500 hover:text-slate-700 border-b-2 border-transparent transition-colors bg-slate-50";
+                viewSeating.classList.remove('hidden');
+                viewGroups.classList.add('hidden');
+            }
+        };
+
+        window.exportToPDF = async (exportType) => {
+            const isGroups = exportType === 'groups';
+            const btnId = isGroups ? 'export-groups-btn' : 'export-seating-btn';
+            const exportBtn = document.getElementById(btnId);
+            const originalText = exportBtn.innerHTML;
+            const eventName = document.getElementById('event-name').value.trim();
+            
+            exportBtn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating...`;
+            exportBtn.disabled = true;
+
+            // Set dynamic title for PDF based on Event Name and mode
+            if (isGroups) {
+                printTitle.innerText = eventName ? eventName : 'Class Groups';
+            } else {
+                printTitle.innerText = eventName ? `${eventName} - Seating Plan` : 'Seating Plan';
+            }
+            
+            document.body.classList.add('pdf-exporting');
+            const element = document.querySelector('.p-6.flex-1');
+            
+            let pdfOrientation = 'portrait';
+            if (!isGroups) {
+                const cols = parseInt(document.getElementById('seat-cols').value, 10) || 6;
+                const rows = parseInt(document.getElementById('seat-rows').value, 10) || 5;
+                pdfOrientation = cols > rows ? 'landscape' : 'portrait';
+            }
+
+            const safeName = eventName ? eventName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'classroom';
+            const suggestedName = isGroups ? `${safeName}_groups.pdf` : `${safeName}_seating.pdf`;
+
+            const opt = {
+                margin:       0.5,
+                filename:     suggestedName,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: pdfOrientation }
+            };
+
+            try {
+                if (window.showSaveFilePicker) {
+                    const worker = html2pdf().set(opt).from(element);
+                    await worker.toPdf().get('pdf').then(async (pdf) => {
+                        const blob = pdf.output('blob');
+                        try {
+                            const fileHandle = await window.showSaveFilePicker({
+                                suggestedName: suggestedName,
+                                types: [{ description: 'PDF Document', accept: {'application/pdf': ['.pdf']} }],
+                            });
+                            const writable = await fileHandle.createWritable();
+                            await writable.write(blob);
+                            await writable.close();
+                        } catch (err) {
+                            if (err.name !== 'AbortError') console.error("Save File Picker Error:", err);
+                        }
+                    });
+                } else {
+                    await html2pdf().set(opt).from(element).save();
+                }
+            } catch (err) {
+                console.error("PDF Export Error:", err);
+                alert("An error occurred while generating the PDF.");
+            } finally {
+                document.body.classList.remove('pdf-exporting');
+                exportBtn.innerHTML = originalText;
+                exportBtn.disabled = false;
+            }
+        };
+
+        // Init
+        window.parseInput();
+
+    </script>
+</body>
+</html>

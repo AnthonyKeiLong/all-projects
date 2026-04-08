@@ -1,0 +1,3068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Interactive Project Planner</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #edf4ea;
+			--page: rgba(250, 254, 249, 0.9);
+			--panel: rgba(255, 255, 255, 0.84);
+			--card: rgba(255, 255, 255, 0.72);
+			--ink: #1c2921;
+			--muted: #5c6b61;
+			--line: rgba(50, 86, 63, 0.12);
+			--accent: #26705b;
+			--accent-strong: #184f41;
+			--accent-soft: rgba(38, 112, 91, 0.1);
+			--gold: #d3912d;
+			--rose: #bf5c4b;
+			--sky: #3d6f8a;
+			--shadow: 0 24px 70px rgba(33, 74, 48, 0.14);
+			--radius-xl: 28px;
+			--radius-lg: 22px;
+			--radius-md: 16px;
+			--radius-sm: 12px;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html {
+			scroll-behavior: smooth;
+		}
+
+		body {
+			margin: 0;
+			min-height: 100vh;
+			font-family: 'Sora', sans-serif;
+			color: var(--ink);
+			background:
+				radial-gradient(circle at top left, rgba(211, 145, 45, 0.16), transparent 26%),
+				radial-gradient(circle at 88% 12%, rgba(61, 111, 138, 0.14), transparent 24%),
+				linear-gradient(180deg, #eef5ec 0%, #f7fbf5 48%, #e7f0e8 100%);
+		}
+
+		body::before,
+		body::after {
+			content: "";
+			position: fixed;
+			pointer-events: none;
+			z-index: 0;
+			border-radius: 50%;
+			filter: blur(8px);
+		}
+
+		body::before {
+			width: 320px;
+			height: 320px;
+			left: -120px;
+			top: 26%;
+			background: rgba(191, 92, 75, 0.12);
+		}
+
+		body::after {
+			width: 360px;
+			height: 360px;
+			right: -120px;
+			bottom: 8%;
+			background: rgba(38, 112, 91, 0.1);
+		}
+
+		a {
+			color: inherit;
+		}
+
+		.shell {
+			position: relative;
+			z-index: 1;
+			width: min(1340px, calc(100% - 32px));
+			margin: 24px auto 46px;
+		}
+
+		.hero {
+			border-radius: 34px;
+			padding: 30px;
+			border: 1px solid rgba(255, 255, 255, 0.64);
+			background:
+				linear-gradient(135deg, rgba(250, 255, 249, 0.88), rgba(240, 250, 245, 0.84)),
+				linear-gradient(125deg, rgba(38, 112, 91, 0.08), rgba(211, 145, 45, 0.06));
+			box-shadow: var(--shadow);
+			overflow: hidden;
+		}
+
+		.hero-grid {
+			display: grid;
+			grid-template-columns: 1.15fr 0.85fr;
+			gap: 22px;
+			align-items: end;
+		}
+
+		.eyebrow {
+			display: inline-flex;
+			align-items: center;
+			gap: 10px;
+			padding: 8px 14px;
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.72);
+			border: 1px solid rgba(28, 41, 33, 0.08);
+			color: var(--accent);
+			font-size: 0.78rem;
+			letter-spacing: 0.14em;
+			text-transform: uppercase;
+			font-weight: 700;
+		}
+
+		h1,
+		h2,
+		h3,
+		h4 {
+			margin: 0;
+		}
+
+		h1 {
+			margin-top: 16px;
+			max-width: 12ch;
+			font-family: 'Fraunces', serif;
+			font-size: clamp(2.4rem, 4vw, 4.6rem);
+			line-height: 0.96;
+			letter-spacing: -0.04em;
+		}
+
+		.hero p {
+			max-width: 65ch;
+			margin: 16px 0 0;
+			line-height: 1.7;
+			color: var(--muted);
+		}
+
+		.hero-stats {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 12px;
+		}
+
+		.stat-card {
+			padding: 18px;
+			border-radius: 20px;
+			background: rgba(255, 255, 255, 0.68);
+			border: 1px solid rgba(38, 112, 91, 0.1);
+			backdrop-filter: blur(14px);
+		}
+
+		.stat-label {
+			color: var(--muted);
+			font-size: 0.74rem;
+			text-transform: uppercase;
+			letter-spacing: 0.12em;
+			font-weight: 700;
+			margin-bottom: 10px;
+		}
+
+		.stat-value {
+			font-size: 1.7rem;
+			font-weight: 800;
+			font-family: 'Fraunces', serif;
+		}
+
+		.layout {
+			display: grid;
+			grid-template-columns: minmax(0, 1.08fr) minmax(390px, 0.92fr);
+			gap: 24px;
+			margin-top: 24px;
+		}
+
+		.panel,
+		.preview {
+			border-radius: var(--radius-xl);
+			border: 1px solid rgba(255, 255, 255, 0.64);
+			background: var(--page);
+			box-shadow: var(--shadow);
+			backdrop-filter: blur(16px);
+		}
+
+		.panel {
+			padding: 26px;
+		}
+
+		.preview {
+			position: sticky;
+			top: 18px;
+			align-self: start;
+			padding: 24px;
+		}
+
+		.section {
+			background: var(--panel);
+			border: 1px solid var(--line);
+			border-radius: var(--radius-lg);
+			padding: 22px;
+		}
+
+		.section + .section {
+			margin-top: 18px;
+		}
+
+		.section-head {
+			display: flex;
+			justify-content: space-between;
+			gap: 12px;
+			align-items: start;
+			margin-bottom: 18px;
+		}
+
+		.kicker {
+			display: inline-block;
+			margin-bottom: 8px;
+			color: var(--accent);
+			text-transform: uppercase;
+			letter-spacing: 0.12em;
+			font-size: 0.74rem;
+			font-weight: 700;
+		}
+
+		.section p,
+		.mini-note {
+			margin: 0;
+			line-height: 1.62;
+			color: var(--muted);
+		}
+
+		.field-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 14px;
+		}
+
+		.field-grid.three {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+
+		.field,
+		.field-block {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+		}
+
+		.field-label {
+			font-size: 0.82rem;
+			letter-spacing: 0.05em;
+			text-transform: uppercase;
+			font-weight: 700;
+		}
+
+		input[type="text"],
+		input[type="number"],
+		textarea,
+		select {
+			width: 100%;
+			border-radius: 14px;
+			border: 1px solid rgba(50, 86, 63, 0.16);
+			background: rgba(255, 255, 255, 0.9);
+			padding: 14px;
+			font: inherit;
+			color: var(--ink);
+			transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+		}
+
+		textarea {
+			min-height: 110px;
+			resize: vertical;
+		}
+
+		input:focus,
+		textarea:focus,
+		select:focus {
+			outline: none;
+			border-color: rgba(38, 112, 91, 0.45);
+			box-shadow: 0 0 0 4px rgba(38, 112, 91, 0.12);
+		}
+
+		.mode-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 12px;
+		}
+
+		.mode-card,
+		.suggestion-card,
+		.resource-card {
+			border-radius: 18px;
+			border: 1px solid rgba(50, 86, 63, 0.14);
+			background: var(--card);
+			padding: 16px;
+			transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+		}
+
+		.mode-card {
+			cursor: pointer;
+			text-align: left;
+		}
+
+		.mode-card:hover,
+		.mode-card:focus-visible,
+		.suggestion-card:hover,
+		.resource-card:hover {
+			transform: translateY(-2px);
+			border-color: rgba(38, 112, 91, 0.34);
+			box-shadow: 0 14px 24px rgba(33, 74, 48, 0.08);
+			outline: none;
+		}
+
+		.mode-card.active {
+			background: linear-gradient(135deg, rgba(38, 112, 91, 0.14), rgba(61, 111, 138, 0.1));
+			border-color: rgba(38, 112, 91, 0.5);
+		}
+
+		.mode-card p,
+		.suggestion-card p,
+		.resource-card p {
+			margin-top: 8px;
+			color: var(--muted);
+			font-size: 0.93rem;
+			line-height: 1.58;
+		}
+
+		.pill-grid,
+		.tag-list,
+		.resource-grid,
+		.suggestion-grid {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+
+		.pill {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 10px 12px;
+			border-radius: 999px;
+			border: 1px solid rgba(50, 86, 63, 0.14);
+			background: rgba(255, 255, 255, 0.8);
+			cursor: pointer;
+			transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+		}
+
+		.pill:hover {
+			transform: translateY(-1px);
+		}
+
+		.pill.active {
+			background: rgba(38, 112, 91, 0.1);
+			border-color: rgba(38, 112, 91, 0.4);
+		}
+
+		.pill input {
+			margin: 0;
+			width: 16px;
+			height: 16px;
+			accent-color: var(--accent);
+		}
+
+		.inline-entry {
+			display: flex;
+			gap: 10px;
+			margin-top: 14px;
+		}
+
+		button {
+			font: inherit;
+		}
+
+		.primary,
+		.ghost,
+		.soft,
+		.chip-button,
+		.link-button {
+			border: none;
+			border-radius: 999px;
+			cursor: pointer;
+			transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+		}
+
+		.primary,
+		.ghost,
+		.soft,
+		.chip-button {
+			padding: 12px 18px;
+			font-weight: 700;
+		}
+
+		.primary {
+			background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+			color: white;
+			box-shadow: 0 12px 24px rgba(24, 79, 65, 0.24);
+		}
+
+		.ghost {
+			background: rgba(255, 255, 255, 0.82);
+			color: var(--ink);
+			border: 1px solid rgba(50, 86, 63, 0.14);
+		}
+
+		.soft {
+			background: rgba(211, 145, 45, 0.14);
+			color: #8a5a16;
+		}
+
+		.chip-button {
+			background: var(--accent-soft);
+			color: var(--accent-strong);
+		}
+
+		.link-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 10px 14px;
+			background: rgba(38, 112, 91, 0.1);
+			color: var(--accent-strong);
+			font-weight: 700;
+			text-decoration: none;
+		}
+
+		.primary:hover,
+		.ghost:hover,
+		.soft:hover,
+		.chip-button:hover,
+		.link-button:hover {
+			transform: translateY(-1px);
+		}
+
+		.tag {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 10px 12px;
+			border-radius: 999px;
+			background: rgba(61, 111, 138, 0.1);
+			color: var(--sky);
+			font-size: 0.92rem;
+			font-weight: 600;
+		}
+
+		.tag button {
+			width: 22px;
+			height: 22px;
+			border: none;
+			border-radius: 50%;
+			background: rgba(61, 111, 138, 0.14);
+			color: var(--sky);
+			cursor: pointer;
+		}
+
+		.action-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin-top: 18px;
+		}
+
+		.preview-head {
+			display: flex;
+			justify-content: space-between;
+			gap: 14px;
+			align-items: center;
+			margin-bottom: 18px;
+		}
+
+		.status-pill {
+			padding: 10px 14px;
+			border-radius: 999px;
+			background: rgba(38, 112, 91, 0.12);
+			color: var(--accent-strong);
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+			font-size: 0.78rem;
+			font-weight: 700;
+			white-space: nowrap;
+		}
+
+		.preview-block {
+			margin-top: 18px;
+			padding-top: 18px;
+			border-top: 1px solid var(--line);
+		}
+
+		.summary-box {
+			padding: 18px;
+			border-radius: 18px;
+			border: 1px solid rgba(38, 112, 91, 0.12);
+			background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(38,112,91,0.06));
+		}
+
+		.summary-box p {
+			margin: 10px 0 0;
+			color: var(--muted);
+			line-height: 1.66;
+		}
+
+		.concept-outline {
+			list-style: none;
+			padding: 0;
+			margin: 14px 0 0;
+		}
+
+		.concept-outline li {
+			display: grid;
+			grid-template-columns: 30px minmax(0, 1fr);
+			gap: 12px;
+			padding: 10px 0;
+			border-bottom: 1px solid rgba(50, 86, 63, 0.08);
+		}
+
+		.concept-outline li:last-child {
+			border-bottom: none;
+		}
+
+		.concept-outline strong {
+			display: block;
+			margin-bottom: 4px;
+		}
+
+		.mini-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 12px;
+			margin-top: 12px;
+		}
+
+		.mini-card {
+			padding: 14px;
+			border-radius: 16px;
+			border: 1px solid rgba(50, 86, 63, 0.12);
+			background: rgba(255, 255, 255, 0.82);
+		}
+
+		.mini-card span,
+		.resource-meta,
+		.suggestion-meta {
+			display: block;
+			margin-bottom: 8px;
+			color: var(--muted);
+			font-size: 0.76rem;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			font-weight: 700;
+		}
+
+		.bullet-list,
+		.timeline,
+		.resource-list {
+			list-style: none;
+			padding: 0;
+			margin: 12px 0 0;
+		}
+
+		.bullet-list li,
+		.timeline li,
+		.resource-list li {
+			display: flex;
+			gap: 12px;
+			align-items: flex-start;
+			padding: 11px 0;
+			border-bottom: 1px solid rgba(50, 86, 63, 0.1);
+			line-height: 1.55;
+			color: var(--muted);
+		}
+
+		.bullet-list li:last-child,
+		.timeline li:last-child,
+		.resource-list li:last-child {
+			border-bottom: none;
+		}
+
+		.list-mark {
+			flex: 0 0 28px;
+			height: 28px;
+			border-radius: 50%;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			background: rgba(38, 112, 91, 0.12);
+			color: var(--accent-strong);
+			font-weight: 800;
+			font-size: 0.9rem;
+			margin-top: 1px;
+		}
+
+		.timeline-label {
+			display: block;
+			color: var(--ink);
+			font-weight: 700;
+			margin-bottom: 4px;
+		}
+
+		.suggestion-grid,
+		.resource-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 12px;
+		}
+
+		.resource-card h4,
+		.suggestion-card h4 {
+			font-size: 1rem;
+		}
+
+		.resource-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+			margin-top: 14px;
+		}
+
+		.footer-note {
+			margin-top: 18px;
+			padding-top: 18px;
+			border-top: 1px solid var(--line);
+			color: var(--muted);
+			line-height: 1.64;
+			font-size: 0.94rem;
+		}
+
+		@media (max-width: 1120px) {
+			.hero-grid,
+			.layout {
+				grid-template-columns: 1fr;
+			}
+
+			.preview {
+				position: relative;
+				top: 0;
+			}
+		}
+
+		@media (max-width: 760px) {
+			.shell {
+				width: min(100% - 20px, 1340px);
+				margin-top: 14px;
+			}
+
+			.hero,
+			.panel,
+			.preview {
+				padding: 18px;
+				border-radius: 24px;
+			}
+
+			h1 {
+				max-width: none;
+			}
+
+			.field-grid,
+			.field-grid.three,
+			.mode-grid,
+			.hero-stats,
+			.mini-grid,
+			.suggestion-grid,
+			.resource-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.inline-entry,
+			.preview-head {
+				flex-direction: column;
+				align-items: stretch;
+			}
+		}
+
+		@keyframes fadeUp {
+			from {
+				opacity: 0;
+				transform: translateY(14px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.hero,
+		.panel,
+		.preview,
+		.section {
+			animation: fadeUp 0.5s ease both;
+		}
+	</style>
+</head>
+<body>
+	<main class="shell">
+		<section class="hero">
+			<div class="hero-grid">
+				<div>
+					<div class="eyebrow">Custom project design studio</div>
+					<h1>Interactive Project Planner</h1>
+					<p>
+						Build a tailored project plan, shape the presentation style, decide what content should be included,
+						choose the final formats and outcomes, and get topic-aware suggestions for what to research and where
+						to look for reliable information.
+					</p>
+				</div>
+				<div class="hero-stats">
+					<article class="stat-card">
+						<div class="stat-label">Presentation Modes</div>
+						<div class="stat-value" id="modeCount">6</div>
+					</article>
+					<article class="stat-card">
+						<div class="stat-label">Starter Content Tracks</div>
+						<div class="stat-value" id="contentCount">8</div>
+					</article>
+					<article class="stat-card">
+						<div class="stat-label">Research Source Types</div>
+						<div class="stat-value" id="resourceCount">6</div>
+					</article>
+				</div>
+			</div>
+		</section>
+
+		<section class="layout">
+			<div class="panel">
+				<section class="section">
+					<div class="section-head">
+						<div>
+							<span class="kicker">Project setup</span>
+							<h2>Define the project frame</h2>
+						</div>
+					</div>
+					<div class="field-grid three">
+						<label class="field">
+							<span class="field-label">Project topic</span>
+							<input id="topicInput" type="text" value="">
+						</label>
+						<label class="field">
+							<span class="field-label">Subject area</span>
+							<select id="subjectSelect">
+								<option value="health" selected>Health and social issues</option>
+								<option value="science">Science</option>
+								<option value="history">History</option>
+								<option value="environment">Environment</option>
+								<option value="technology">Technology</option>
+								<option value="business">Business and economics</option>
+								<option value="literature">Literature and language</option>
+								<option value="general">General interdisciplinary</option>
+							</select>
+						</label>
+						<label class="field">
+							<span class="field-label">Planner language</span>
+							<select id="languageSelect">
+								<option value="en" selected>English</option>
+								<option value="zh-TW">中文（繁體）</option>
+								<option value="zh-HK">中文（香港）</option>
+							</select>
+							<button id="languageSwitchButton" class="chip-button" type="button" style="margin-top: 10px; width: 100%;">Switch language</button>
+						</label>
+					</div>
+					<div class="field-grid three" style="margin-top: 14px;">
+						<label class="field">
+							<span class="field-label">Audience</span>
+							<select id="audienceSelect">
+								<option value="classmates" selected>Classmates</option>
+								<option value="teachers">Teachers</option>
+								<option value="younger students">Younger students</option>
+								<option value="parents and caregivers">Parents and caregivers</option>
+								<option value="community audience">Community audience</option>
+								<option value="mixed audience">Mixed audience</option>
+							</select>
+						</label>
+						<label class="field">
+							<span class="field-label">Project length</span>
+							<select id="durationSelect">
+								<option value="1">1 week</option>
+								<option value="2">2 weeks</option>
+								<option value="3" selected>3 weeks</option>
+								<option value="4">4 weeks</option>
+								<option value="5">5 weeks</option>
+								<option value="6">6 weeks</option>
+							</select>
+						</label>
+						<label class="field">
+							<span class="field-label">Team size</span>
+							<input id="teamSizeInput" type="number" min="1" max="12" value="4">
+						</label>
+					</div>
+					<div class="field-grid" style="margin-top: 14px;">
+						<label class="field">
+							<span class="field-label">Project title</span>
+							<input id="titleInput" type="text" value="">
+							<span class="field-label" style="margin-top: 10px; display: block;">Suggested title style</span>
+							<select id="titleStyleSelect" style="margin-top: 8px;">
+								<option value="formal">Formal academic</option>
+								<option value="school">School presentation friendly</option>
+								<option value="awareness">Public-awareness / support-oriented</option>
+							</select>
+							<div class="tag-list" id="titleSuggestionList" style="margin-top: 10px;"></div>
+						</label>
+						<label class="field">
+							<span class="field-label">Presentation time</span>
+							<select id="presentationTimeSelect">
+								<option value="5-7 minutes">5-7 minutes</option>
+								<option value="8-10 minutes" selected>8-10 minutes</option>
+								<option value="12-15 minutes">12-15 minutes</option>
+								<option value="15-20 minutes">15-20 minutes</option>
+								<option value="Flexible / exhibition">Flexible / exhibition</option>
+							</select>
+						</label>
+					</div>
+					<label class="field" style="margin-top: 14px;">
+						<span class="field-label">Teacher brief or special requirement</span>
+						<textarea id="briefInput" placeholder="Add class instructions, assessment expectations, or local context."></textarea>
+					</label>
+				</section>
+
+				<section class="section">
+					<div class="section-head">
+						<div>
+							<span class="kicker">Presentation mode</span>
+							<h2>Tailor how the project will be delivered</h2>
+						</div>
+					</div>
+					<div class="mode-grid" id="modeGrid"></div>
+					<label class="field" style="margin-top: 14px;">
+						<span class="field-label">Custom presentation angle</span>
+						<input id="customModeInput" type="text" placeholder="Example: Student-led campaign with live poll and myth-busting segment">
+					</label>
+				</section>
+
+				<section class="section">
+					<div class="section-head">
+						<div>
+							<span class="kicker">Content builder</span>
+							<h2>Choose the contents and final outputs</h2>
+						</div>
+					</div>
+					<div class="field-grid">
+						<div class="field-block">
+							<span class="field-label">Core content sections</span>
+							<div class="pill-grid" id="contentGrid"></div>
+							<div class="inline-entry">
+								<input id="customContentInput" type="text" placeholder="Add a custom content section">
+								<button id="addContentButton" class="chip-button" type="button">Add section</button>
+							</div>
+							<div class="tag-list" id="customContentTags"></div>
+						</div>
+						<div class="field-block">
+							<span class="field-label">Formats and outcomes</span>
+							<div class="pill-grid" id="formatGrid"></div>
+							<div class="inline-entry">
+								<input id="customFormatInput" type="text" placeholder="Add a custom format">
+								<button id="addFormatButton" class="chip-button" type="button">Add format</button>
+							</div>
+							<div class="tag-list" id="customFormatTags"></div>
+
+							<div class="pill-grid" id="outcomeGrid" style="margin-top: 14px;"></div>
+							<div class="inline-entry">
+								<input id="customOutcomeInput" type="text" placeholder="Add a custom outcome">
+								<button id="addOutcomeButton" class="chip-button" type="button">Add outcome</button>
+							</div>
+							<div class="tag-list" id="customOutcomeTags"></div>
+						</div>
+					</div>
+				</section>
+
+				<section class="section">
+					<div class="section-head">
+						<div>
+							<span class="kicker">Guided exploration</span>
+							<h2>Explore what to include and what to research</h2>
+							<p class="mini-note">These suggestions update from the project topic, subject area, and selected content.</p>
+						</div>
+					</div>
+					<div class="suggestion-grid" id="suggestionGrid"></div>
+					<div class="preview-block">
+						<h3>Search prompts for research</h3>
+						<ul class="bullet-list" id="searchPromptList"></ul>
+					</div>
+				</section>
+
+				<section class="section">
+					<div class="section-head">
+						<div>
+							<span class="kicker">Resource finder</span>
+							<h2>Open credible resource searches</h2>
+							<p class="mini-note">Each card builds a search based on your topic so the project can start with viable sources.</p>
+						</div>
+					</div>
+					<div class="resource-grid" id="resourceGrid"></div>
+					<div class="action-row">
+						<button class="primary" id="demoButton" type="button">Load demo plan</button>
+						<button class="ghost" id="resetButton" type="button">Reset planner</button>
+					</div>
+				</section>
+			</div>
+
+			<aside class="preview">
+				<div class="preview-head">
+					<div>
+						<span class="kicker">Generated brief</span>
+						<h2 id="previewTitle"></h2>
+						<p class="mini-note" id="previewSubtitle"></p>
+					</div>
+					<div class="status-pill" id="statusPill"></div>
+				</div>
+
+				<div class="summary-box">
+					<h3>Project concept</h3>
+					<p id="summaryText"></p>
+					<ul class="concept-outline" id="conceptOutlineList"></ul>
+					<div class="mini-grid">
+						<div class="mini-card">
+							<span>Essential question</span>
+							<strong id="essentialQuestion"></strong>
+						</div>
+						<div class="mini-card">
+							<span>Main deliverable</span>
+							<strong id="primaryDeliverable"></strong>
+						</div>
+					</div>
+				</div>
+
+				<div class="preview-block">
+					<h3>Recommended structure</h3>
+					<ul class="bullet-list" id="structureList"></ul>
+				</div>
+
+				<div class="preview-block">
+					<h3>Timeline</h3>
+					<ul class="timeline" id="timelineList"></ul>
+				</div>
+
+				<div class="preview-block">
+					<h3>Success outcomes</h3>
+					<ul class="bullet-list" id="outcomeList"></ul>
+				</div>
+
+				<div class="preview-block">
+					<h3>Research starter list</h3>
+					<ul class="resource-list" id="researchStarterList"></ul>
+				</div>
+
+				<div class="action-row">
+					<button class="primary" id="copyButton" type="button">Copy brief</button>
+					<button class="soft" id="downloadTextButton" type="button">Download text</button>
+					<button class="soft" id="downloadBilingualButton" type="button">Download bilingual</button>
+					<button class="ghost" id="downloadJsonButton" type="button">Download JSON</button>
+					<button class="ghost" id="printButton" type="button">Print</button>
+				</div>
+
+				<div class="footer-note" id="footerNote"></div>
+			</aside>
+		</section>
+	</main>
+
+	<script>
+		const modes = [
+			{
+				id: 'campaign',
+				label: 'Awareness campaign',
+				status: 'Campaign mode',
+				description: 'Good for persuasive messaging, visual takeaways, and action-focused learning.',
+				tone: 'clear, persuasive, and audience-focused',
+				structure: ['Start with a strong hook or surprising fact', 'Explain the issue clearly with evidence', 'Break down key causes or contributing factors', 'Show real-world impact and possible responses', 'Close with an action step or takeaway'],
+				formats: ['Slide deck', 'Poster series', 'Infographic']
+			},
+			{
+				id: 'documentary',
+				label: 'Mini documentary',
+				status: 'Documentary mode',
+				description: 'Good for storytelling, interviews, narration, and case-based explanation.',
+				tone: 'reflective, evidence-based, and narrative-driven',
+				structure: ['Open with a case, story, or scenario', 'Give the background and definitions', 'Present evidence and expert viewpoints', 'Show consequences, complexity, and response options', 'End with reflection and a clear conclusion'],
+				formats: ['Video segment', 'Narrated slides', 'Research handout']
+			},
+			{
+				id: 'workshop',
+				label: 'Interactive workshop',
+				status: 'Workshop mode',
+				description: 'Good for activities, audience participation, discussion, and reflection.',
+				tone: 'practical, collaborative, and discussion-led',
+				structure: ['Open with a warm-up question or poll', 'Teach the key ideas in short chunks', 'Run an activity, scenario, or myth-check task', 'Guide reflection or decision-making', 'End with a recap and next-step prompt'],
+				formats: ['Worksheet', 'Facilitator slides', 'Exit ticket']
+			},
+			{
+				id: 'panel',
+				label: 'Debate or panel',
+				status: 'Panel mode',
+				description: 'Good for comparing viewpoints, analyzing evidence, and evaluating responses.',
+				tone: 'balanced, analytical, and argument-driven',
+				structure: ['Define the issue and frame the central question', 'Present contrasting perspectives or options', 'Compare evidence, strengths, and limitations', 'Evaluate what response is most convincing', 'Finish with a reasoned conclusion'],
+				formats: ['Panel script', 'Evidence cards', 'Policy brief']
+			},
+			{
+				id: 'report',
+				label: 'Research showcase',
+				status: 'Research mode',
+				description: 'Good for formal academic projects with structured sections and citation.',
+				tone: 'formal, precise, and academically structured',
+				structure: ['Introduce the topic and research question', 'Review background and key concepts', 'Analyze evidence in thematic sections', 'Compare findings and interpretations', 'Present recommendations or conclusions'],
+				formats: ['Written report', 'Slides', 'Annotated bibliography']
+			},
+			{
+				id: 'exhibit',
+				label: 'Exhibition booth',
+				status: 'Exhibition mode',
+				description: 'Good for display-based projects, stations, and audience browsing.',
+				tone: 'visual, concise, and curiosity-driven',
+				structure: ['Create a central theme or headline', 'Break the topic into clear stations or panels', 'Use visuals, data, and short explanations', 'Include one interactive or reflective feature', 'Finish with a takeaway or resource list'],
+				formats: ['Display board', 'QR resource sheet', 'Interactive station']
+			}
+		];
+
+		const subjectPresets = {
+			health: {
+				content: ['Definitions and key terms', 'Causes and risk factors', 'Effects on health and wellbeing', 'Social impact', 'Prevention strategies', 'Support, treatment, and recovery'],
+				questions: ['What factors increase risk?', 'How does the issue affect health, relationships, or decision-making?', 'What prevention or support responses are most effective?'],
+				keywords: ['statistics', 'risk factors', 'prevention', 'case study', 'support services'],
+				resources: [
+					{ name: 'WHO', note: 'Global health guidance and reports', domain: 'who.int' },
+					{ name: 'CDC', note: 'Public health data and explainers', domain: 'cdc.gov' },
+					{ name: 'NIH', note: 'Research-backed health information', domain: 'nih.gov' },
+					{ name: 'Google Scholar', note: 'Academic articles and citations', type: 'scholar' },
+					{ name: 'PubMed', note: 'Medical abstracts and journal indexing', type: 'pubmed' },
+					{ name: 'UN reports', note: 'Global policy and social context', domain: 'un.org' }
+				]
+			},
+			science: {
+				content: ['Background science', 'Processes or mechanisms', 'Evidence and experiments', 'Data interpretation', 'Applications and impact', 'Limitations or unanswered questions'],
+				questions: ['What scientific process or mechanism explains the topic?', 'What evidence supports the main claim?', 'What are the practical applications or implications?'],
+				keywords: ['mechanism', 'experiment', 'data', 'model', 'evidence'],
+				resources: [
+					{ name: 'NASA / NOAA / major agencies', note: 'Official scientific resources', domain: 'gov' },
+					{ name: 'Nature Education', note: 'Accessible science explanations', domain: 'nature.com' },
+					{ name: 'Google Scholar', note: 'Research articles and citations', type: 'scholar' },
+					{ name: 'Science News', note: 'Readable science reporting', domain: 'sciencenews.org' },
+					{ name: 'Britannica', note: 'Reliable background summaries', domain: 'britannica.com' },
+					{ name: 'University sources', note: 'Lecture notes and research pages', domain: 'edu' }
+				]
+			},
+			history: {
+				content: ['Historical context', 'Key events and turning points', 'Important figures and perspectives', 'Causes and consequences', 'Primary source interpretation', 'Legacy and relevance today'],
+				questions: ['What events shaped the topic?', 'Which perspectives are most important to compare?', 'What legacy does the topic leave behind?'],
+				keywords: ['timeline', 'primary source', 'historical context', 'causes', 'consequences'],
+				resources: [
+					{ name: 'National archives', note: 'Primary documents and records', domain: 'archives.gov' },
+					{ name: 'Library of Congress', note: 'Source collections and media', domain: 'loc.gov' },
+					{ name: 'Britannica', note: 'Structured overview articles', domain: 'britannica.com' },
+					{ name: 'Google Scholar', note: 'Academic history papers', type: 'scholar' },
+					{ name: 'Museum sources', note: 'Curated exhibits and context', domain: 'museum' },
+					{ name: 'University history departments', note: 'Lectures and reading lists', domain: 'edu' }
+				]
+			},
+			environment: {
+				content: ['Problem definition', 'Causes and drivers', 'Environmental effects', 'Human impact', 'Current responses', 'Future solutions'],
+				questions: ['What drives the problem?', 'Who or what is affected most?', 'Which responses are realistic and effective?'],
+				keywords: ['causes', 'data', 'impact', 'policy', 'solutions'],
+				resources: [
+					{ name: 'UNEP', note: 'Global environmental reports', domain: 'unep.org' },
+					{ name: 'EPA', note: 'Policy and science resources', domain: 'epa.gov' },
+					{ name: 'NASA climate', note: 'Visuals and scientific explainers', domain: 'climate.nasa.gov' },
+					{ name: 'Google Scholar', note: 'Research-based evidence', type: 'scholar' },
+					{ name: 'IPCC-style sources', note: 'Assessment reports and summaries', domain: 'ipcc.ch' },
+					{ name: 'National Geographic', note: 'Accessible multimedia context', domain: 'nationalgeographic.com' }
+				]
+			},
+			technology: {
+				content: ['What the technology is', 'How it works', 'Key benefits', 'Risks and limitations', 'Ethics and society', 'Future developments'],
+				questions: ['How does the technology work?', 'What problem does it solve?', 'What tradeoffs or ethical concerns matter most?'],
+				keywords: ['how it works', 'case study', 'applications', 'ethics', 'future trends'],
+				resources: [
+					{ name: 'Official documentation', note: 'Direct technical information', domain: 'org' },
+					{ name: 'Google Scholar', note: 'Technical papers and citations', type: 'scholar' },
+					{ name: 'MIT / Stanford / university sources', note: 'Research and explainers', domain: 'edu' },
+					{ name: 'IEEE-style sources', note: 'Engineering perspectives', domain: 'ieee.org' },
+					{ name: 'Government digital agencies', note: 'Policy and regulation context', domain: 'gov' },
+					{ name: 'Industry reports', note: 'Practical examples and market use', domain: 'com' }
+				]
+			},
+			business: {
+				content: ['Industry or market background', 'Main stakeholders', 'Costs and benefits', 'Strategy and decision-making', 'Risks and challenges', 'Recommendations'],
+				questions: ['What is the problem or opportunity?', 'Who benefits or loses?', 'Which strategy appears strongest and why?'],
+				keywords: ['market analysis', 'case study', 'stakeholders', 'strategy', 'trends'],
+				resources: [
+					{ name: 'World Bank / OECD', note: 'Economic data and reports', domain: 'org' },
+					{ name: 'Government statistics', note: 'Reliable local data', domain: 'gov' },
+					{ name: 'Google Scholar', note: 'Business and economics papers', type: 'scholar' },
+					{ name: 'Company annual reports', note: 'Primary organizational data', domain: 'com' },
+					{ name: 'Reuters / major news', note: 'Current market reporting', domain: 'reuters.com' },
+					{ name: 'University business schools', note: 'Research and case notes', domain: 'edu' }
+				]
+			},
+			literature: {
+				content: ['Context and background', 'Main themes', 'Characters or voices', 'Language and techniques', 'Interpretation and meaning', 'Contemporary relevance'],
+				questions: ['What themes should be prioritized?', 'How do language choices shape meaning?', 'Why does this text still matter?'],
+				keywords: ['theme analysis', 'literary techniques', 'context', 'interpretation', 'critical essay'],
+				resources: [
+					{ name: 'Britannica', note: 'Background summaries', domain: 'britannica.com' },
+					{ name: 'Google Scholar', note: 'Literary criticism and journal articles', type: 'scholar' },
+					{ name: 'Poetry Foundation / text archives', note: 'Primary texts and commentary', domain: 'org' },
+					{ name: 'Library resources', note: 'Reference and contextual material', domain: 'library' },
+					{ name: 'University literature departments', note: 'Lecture notes and analysis', domain: 'edu' },
+					{ name: 'Publisher or author pages', note: 'Author background and editions', domain: 'com' }
+				]
+			},
+			general: {
+				content: ['Definitions and overview', 'Background context', 'Main arguments or evidence', 'Different perspectives', 'Current relevance', 'Recommended conclusion or action'],
+				questions: ['What does the audience need to understand first?', 'Which evidence is strongest?', 'What should the audience think or do after the project?'],
+				keywords: ['overview', 'evidence', 'case study', 'perspectives', 'current issues'],
+				resources: [
+					{ name: 'Google Scholar', note: 'Academic starting point', type: 'scholar' },
+					{ name: 'Britannica', note: 'Reliable background overview', domain: 'britannica.com' },
+					{ name: 'Government sources', note: 'Data and official policy', domain: 'gov' },
+					{ name: 'United Nations', note: 'Global context and reports', domain: 'un.org' },
+					{ name: 'University pages', note: 'Accessible expert material', domain: 'edu' },
+					{ name: 'Library databases', note: 'Credible secondary sources', domain: 'library' }
+				]
+			}
+		};
+
+		const formatOptions = ['Slide deck', 'Poster', 'Infographic', 'Video', 'Written report', 'Interactive worksheet'];
+		const outcomeOptions = [
+			'Teach the audience clearly',
+			'Correct common misconceptions',
+			'Show real evidence and examples',
+			'Encourage discussion and reflection',
+			'Provide practical actions or recommendations',
+			'Develop strong teamwork and research skills'
+		];
+
+		const defaultState = {
+			language: 'en',
+			topic: '',
+			subject: 'health',
+			audience: 'classmates',
+			duration: 3,
+			teamSize: 4,
+			title: '',
+			titleStyle: 'formal',
+			presentationTime: '8-10 minutes',
+			brief: '',
+			modeId: 'campaign',
+			customMode: '',
+			selectedContent: [],
+			selectedFormats: [],
+			selectedOutcomes: [],
+			customContent: [],
+			customFormats: [],
+			customOutcomes: []
+		};
+
+		const state = structuredClone(defaultState);
+
+		const elements = {
+			languageSelect: document.getElementById('languageSelect'),
+			topicInput: document.getElementById('topicInput'),
+			subjectSelect: document.getElementById('subjectSelect'),
+			audienceSelect: document.getElementById('audienceSelect'),
+			durationSelect: document.getElementById('durationSelect'),
+			teamSizeInput: document.getElementById('teamSizeInput'),
+			titleInput: document.getElementById('titleInput'),
+			titleStyleSelect: document.getElementById('titleStyleSelect'),
+			titleSuggestionList: document.getElementById('titleSuggestionList'),
+			presentationTimeSelect: document.getElementById('presentationTimeSelect'),
+			briefInput: document.getElementById('briefInput'),
+			customModeInput: document.getElementById('customModeInput'),
+			modeGrid: document.getElementById('modeGrid'),
+			contentGrid: document.getElementById('contentGrid'),
+			formatGrid: document.getElementById('formatGrid'),
+			outcomeGrid: document.getElementById('outcomeGrid'),
+			customContentInput: document.getElementById('customContentInput'),
+			customFormatInput: document.getElementById('customFormatInput'),
+			customOutcomeInput: document.getElementById('customOutcomeInput'),
+			customContentTags: document.getElementById('customContentTags'),
+			customFormatTags: document.getElementById('customFormatTags'),
+			customOutcomeTags: document.getElementById('customOutcomeTags'),
+			suggestionGrid: document.getElementById('suggestionGrid'),
+			searchPromptList: document.getElementById('searchPromptList'),
+			resourceGrid: document.getElementById('resourceGrid'),
+			previewTitle: document.getElementById('previewTitle'),
+			previewSubtitle: document.getElementById('previewSubtitle'),
+			summaryText: document.getElementById('summaryText'),
+			conceptOutlineList: document.getElementById('conceptOutlineList'),
+			essentialQuestion: document.getElementById('essentialQuestion'),
+			primaryDeliverable: document.getElementById('primaryDeliverable'),
+			structureList: document.getElementById('structureList'),
+			timelineList: document.getElementById('timelineList'),
+			outcomeList: document.getElementById('outcomeList'),
+			researchStarterList: document.getElementById('researchStarterList'),
+			footerNote: document.getElementById('footerNote'),
+			statusPill: document.getElementById('statusPill'),
+			modeCount: document.getElementById('modeCount'),
+			contentCount: document.getElementById('contentCount'),
+			resourceCount: document.getElementById('resourceCount'),
+			demoButton: document.getElementById('demoButton'),
+			resetButton: document.getElementById('resetButton'),
+			addContentButton: document.getElementById('addContentButton'),
+			addFormatButton: document.getElementById('addFormatButton'),
+			addOutcomeButton: document.getElementById('addOutcomeButton'),
+			copyButton: document.getElementById('copyButton'),
+			downloadTextButton: document.getElementById('downloadTextButton'),
+			downloadBilingualButton: document.getElementById('downloadBilingualButton'),
+			downloadJsonButton: document.getElementById('downloadJsonButton'),
+			printButton: document.getElementById('printButton'),
+			languageSwitchButton: document.getElementById('languageSwitchButton')
+		};
+
+		const getMode = () => modes.find((mode) => mode.id === state.modeId) || modes[0];
+		const getSubjectPreset = () => subjectPresets[state.subject] || subjectPresets.general;
+		const isZh = (language = state.language) => /^zh-/i.test(language);
+		const isZhHk = (language = state.language) => language === 'zh-HK';
+		const hasChineseCharacters = (value = '') => /[\u3400-\u9fff\uf900-\ufaff]/.test(value);
+		const hasEnglishLetters = (value = '') => /[A-Za-z]/.test(value);
+		const useChineseKeywords = () => isZh() || hasChineseCharacters(state.topic);
+		const getUiLanguage = (language = state.language) => uiText[language] ? language : 'en';
+
+		const uiText = {
+			en: {
+				documentTitle: 'Interactive Project Planner',
+				eyebrow: 'Custom project design studio',
+				heroTitle: 'Interactive Project Planner',
+				heroBody: 'Build a tailored project plan, shape the presentation style, decide what content should be included, choose the final formats and outcomes, and get topic-aware suggestions for what to research and where to look for reliable information.',
+				statModes: 'Presentation Modes',
+				statContent: 'Starter Content Tracks',
+				statResources: 'Research Source Types',
+				projectSetup: 'Project setup',
+				defineFrame: 'Define the project frame',
+				projectTopic: 'Project topic',
+				subjectArea: 'Subject area',
+				plannerLanguage: 'Planner language',
+				switchLanguage: 'Switch language',
+				audience: 'Audience',
+				projectLength: 'Project length',
+				teamSize: 'Team size',
+				projectTitle: 'Project title',
+				titleStyle: 'Suggested title style',
+				suggestedTitles: 'Suggested titles',
+				titleStyleFormal: 'Formal academic',
+				titleStyleSchool: 'School presentation friendly',
+				titleStyleAwareness: 'Public-awareness / support-oriented',
+				presentationTime: 'Presentation time',
+				teacherBrief: 'Teacher brief or special requirement',
+				presentationMode: 'Presentation mode',
+				tailorDelivery: 'Tailor how the project will be delivered',
+				customAngle: 'Custom presentation angle',
+				contentBuilder: 'Content builder',
+				chooseContents: 'Choose the contents and final outputs',
+				coreContent: 'Core content sections',
+				formatsOutcomes: 'Formats and outcomes',
+				addSection: 'Add section',
+				addFormat: 'Add format',
+				addOutcome: 'Add outcome',
+				guidedExploration: 'Guided exploration',
+				exploreResearch: 'Explore what to include and what to research',
+				exploreNote: 'These suggestions update from the project topic, subject area, and selected content.',
+				searchPrompts: 'Search prompts for research',
+				resourceFinder: 'Resource finder',
+				resourceHeading: 'Open credible resource searches',
+				resourceNote: 'Each card builds a search based on your topic so the project can start with viable sources, including Chinese academic searches when you work in a Chinese mode or topic.',
+				loadDemo: 'Load demo plan',
+				reset: 'Reset planner',
+				generatedBrief: 'Generated brief',
+				projectConcept: 'Project concept',
+				essentialQuestion: 'Essential question',
+				mainDeliverable: 'Main deliverable',
+				recommendedStructure: 'Recommended structure',
+				timeline: 'Timeline',
+				successOutcomes: 'Success outcomes',
+				researchStarterList: 'Research starter list',
+				copyBrief: 'Copy brief',
+				downloadText: 'Download text',
+				downloadBilingual: 'Download bilingual',
+				downloadJson: 'Download JSON',
+				print: 'Print',
+				addCustomContentPlaceholder: 'Add a custom content section',
+				addCustomFormatPlaceholder: 'Add a custom format',
+				addCustomOutcomePlaceholder: 'Add a custom outcome',
+				customModePlaceholder: 'Example: Student-led campaign with live poll and myth-busting segment',
+				briefPlaceholder: 'Add class instructions, assessment expectations, or local context.',
+				copied: 'Copied',
+				copyAction: 'Copy brief',
+				enterDetails: 'Enter some project details first.',
+				clipboardBlocked: 'Clipboard access was blocked. Use Download text instead.',
+				resourceSource: 'Research source',
+				openSourceSearch: 'Open source search',
+				openEvidenceSearch: 'Open evidence search',
+				bilingualExportTitle: 'Bilingual export',
+				bilingualExportDivider: 'Traditional Chinese version',
+				weekPlan: 'week plan',
+				teamMember: 'team member',
+				teamMembers: 'team members',
+				projectNoteFallback: 'Project note: Keep the work evidence-based, audience-aware, and well structured.'
+			},
+			'zh-TW': {
+				documentTitle: '互動式專題規劃器',
+				eyebrow: '自訂專題設計工作台',
+				heroTitle: '互動式專題規劃器',
+				heroBody: '建立可自訂的專題計畫，調整呈現方式、決定要包含的內容、選擇成果形式與目標，並依主題自動獲得研究方向與可用資訊來源。',
+				statModes: '呈現模式',
+				statContent: '內容起始模組',
+				statResources: '研究來源類型',
+				projectSetup: '專題設定',
+				defineFrame: '設定專題架構',
+				projectTopic: '專題主題',
+				subjectArea: '學科領域',
+				plannerLanguage: '規劃器語言',
+				switchLanguage: '切換語言',
+				audience: '對象',
+				projectLength: '專題時長',
+				teamSize: '組員人數',
+				projectTitle: '專題標題',
+				titleStyle: '建議標題風格',
+				suggestedTitles: '建議標題',
+				titleStyleFormal: '正式學術風格',
+				titleStyleSchool: '學校簡報風格',
+				titleStyleAwareness: '公共宣導 / 支援導向',
+				presentationTime: '發表時間',
+				teacherBrief: '老師要求或補充說明',
+				presentationMode: '呈現模式',
+				tailorDelivery: '調整專題的呈現方式',
+				customAngle: '自訂呈現角度',
+				contentBuilder: '內容規劃',
+				chooseContents: '選擇內容與成果形式',
+				coreContent: '核心內容區塊',
+				formatsOutcomes: '成果形式與目標',
+				addSection: '加入內容',
+				addFormat: '加入形式',
+				addOutcome: '加入目標',
+				guidedExploration: '引導探索',
+				exploreResearch: '探索應納入的內容與研究方向',
+				exploreNote: '這些建議會依主題、學科領域與已選內容自動更新。',
+				searchPrompts: '研究搜尋提示',
+				resourceFinder: '資源搜尋',
+				resourceHeading: '開啟可信的研究資源搜尋',
+				resourceNote: '每張卡片都會依你的主題建立搜尋，並優先納入中國、台灣與香港的相關中文學術資源。',
+				loadDemo: '載入示範專題',
+				reset: '重設規劃器',
+				generatedBrief: '自動產生簡報摘要',
+				projectConcept: '專題概念',
+				essentialQuestion: '核心問題',
+				mainDeliverable: '主要成果',
+				recommendedStructure: '建議結構',
+				timeline: '時程安排',
+				successOutcomes: '預期成果',
+				researchStarterList: '研究起始資源',
+				copyBrief: '複製摘要',
+				downloadText: '下載文字檔',
+				downloadBilingual: '下載雙語檔',
+				downloadJson: '下載 JSON',
+				print: '列印',
+				addCustomContentPlaceholder: '加入自訂內容區塊',
+				addCustomFormatPlaceholder: '加入自訂成果形式',
+				addCustomOutcomePlaceholder: '加入自訂目標',
+				customModePlaceholder: '例如：學生主導的宣導活動，包含即時投票與迷思破解環節',
+				briefPlaceholder: '輸入課堂要求、評分標準或在地脈絡。',
+				copied: '已複製',
+				copyAction: '複製摘要',
+				enterDetails: '請先輸入一些專題內容。',
+				clipboardBlocked: '無法使用剪貼簿，請改用下載文字檔。',
+				resourceSource: '研究來源',
+				openSourceSearch: '開啟來源搜尋',
+				openEvidenceSearch: '開啟論文搜尋',
+				bilingualExportTitle: '雙語匯出',
+				bilingualExportDivider: '中文版本',
+				weekPlan: '週計畫',
+				teamMember: '位組員',
+				teamMembers: '位組員',
+				projectNoteFallback: '專題提醒：請保持內容有根據、符合對象需求，並具備清楚結構。'
+			},
+			'zh-HK': {
+				documentTitle: '互動式專題規劃器',
+				eyebrow: '自訂專題設計工作台',
+				heroTitle: '互動式專題規劃器',
+				heroBody: '建立可自訂的專題計劃，調整呈現方式、決定要包含的內容、選擇成果形式與目標，並按主題自動獲得研究方向與可用資訊來源。',
+				statModes: '呈現模式',
+				statContent: '內容起始模組',
+				statResources: '研究來源類型',
+				projectSetup: '專題設定',
+				defineFrame: '設定專題架構',
+				projectTopic: '專題主題',
+				subjectArea: '學科領域',
+				plannerLanguage: '規劃器語言',
+				switchLanguage: '切換語言',
+				audience: '對象',
+				projectLength: '專題時長',
+				teamSize: '組員人數',
+				projectTitle: '專題標題',
+				titleStyle: '建議標題風格',
+				suggestedTitles: '建議標題',
+				titleStyleFormal: '正式學術風格',
+				titleStyleSchool: '學校簡報風格',
+				titleStyleAwareness: '公共宣導 / 支援導向',
+				presentationTime: '匯報時間',
+				teacherBrief: '老師要求或補充說明',
+				presentationMode: '呈現模式',
+				tailorDelivery: '調整專題的呈現方式',
+				customAngle: '自訂呈現角度',
+				contentBuilder: '內容規劃',
+				chooseContents: '選擇內容與成果形式',
+				coreContent: '核心內容區塊',
+				formatsOutcomes: '成果形式與目標',
+				addSection: '加入內容',
+				addFormat: '加入形式',
+				addOutcome: '加入目標',
+				guidedExploration: '引導探索',
+				exploreResearch: '探索應納入的內容與研究方向',
+				exploreNote: '這些建議會按主題、學科領域與已選內容自動更新。',
+				searchPrompts: '研究搜尋提示',
+				resourceFinder: '資源搜尋',
+				resourceHeading: '開啟可信的研究資源搜尋',
+				resourceNote: '每張卡片都會按你的主題建立搜尋，並優先納入中國、台灣與香港的相關中文學術資源。',
+				loadDemo: '載入示範專題',
+				reset: '重設規劃器',
+				generatedBrief: '自動產生簡報摘要',
+				projectConcept: '專題概念',
+				essentialQuestion: '核心問題',
+				mainDeliverable: '主要成果',
+				recommendedStructure: '建議結構',
+				timeline: '時間安排',
+				successOutcomes: '預期成果',
+				researchStarterList: '研究起始資源',
+				copyBrief: '複製摘要',
+				downloadText: '下載文字檔',
+				downloadBilingual: '下載雙語檔',
+				downloadJson: '下載 JSON',
+				print: '列印',
+				addCustomContentPlaceholder: '加入自訂內容區塊',
+				addCustomFormatPlaceholder: '加入自訂成果形式',
+				addCustomOutcomePlaceholder: '加入自訂目標',
+				customModePlaceholder: '例如：學生主導的宣導活動，包含即時投票與迷思破解環節',
+				briefPlaceholder: '輸入課堂要求、評分標準或本地脈絡。',
+				copied: '已複製',
+				copyAction: '複製摘要',
+				enterDetails: '請先輸入一些專題內容。',
+				clipboardBlocked: '無法使用剪貼簿，請改用下載文字檔。',
+				resourceSource: '研究來源',
+				openSourceSearch: '開啟來源搜尋',
+				openEvidenceSearch: '開啟論文搜尋',
+				bilingualExportTitle: '雙語匯出',
+				bilingualExportDivider: '中文版本',
+				weekPlan: '週計劃',
+				teamMember: '位組員',
+				teamMembers: '位組員',
+				projectNoteFallback: '專題提醒：請保持內容有根據、符合對象需要，並具備清楚結構。'
+			}
+		};
+
+		const t = (key, language = state.language) => uiText[getUiLanguage(language)][key] || uiText.en[key] || key;
+
+		const getLocaleValue = (record, language = state.language) => record?.[language] || record?.['zh-TW'];
+
+		const localizedValues = {
+			subject: {
+				health: { 'zh-TW': '健康與社會議題' },
+				science: { 'zh-TW': '科學' },
+				history: { 'zh-TW': '歷史' },
+				environment: { 'zh-TW': '環境' },
+				technology: { 'zh-TW': '科技' },
+				business: { 'zh-TW': '商業與經濟' },
+				literature: { 'zh-TW': '文學與語文' },
+				general: { 'zh-TW': '跨領域綜合' }
+			},
+			audience: {
+				classmates: { 'zh-TW': '同學' },
+				teachers: { 'zh-TW': '老師' },
+				younger_students: { 'zh-TW': '年紀較小的學生' },
+				parents_and_caregivers: { 'zh-TW': '家長與照顧者' },
+				community_audience: { 'zh-TW': '社區大眾' },
+				mixed_audience: { 'zh-TW': '混合對象' }
+			},
+			presentationTime: {
+				'5-7 minutes': { 'zh-TW': '5-7 分鐘' },
+				'8-10 minutes': { 'zh-TW': '8-10 分鐘' },
+				'12-15 minutes': { 'zh-TW': '12-15 分鐘' },
+				'15-20 minutes': { 'zh-TW': '15-20 分鐘' },
+				'Flexible / exhibition': { 'zh-TW': '彈性 / 展示型' }
+			},
+			mode: {
+				campaign: { 'zh-TW': { label: '宣導企劃', status: '宣導模式', description: '適合說服性訊息、視覺重點與行動導向的學習。' } },
+				documentary: { 'zh-TW': { label: '微紀錄片', status: '紀錄片模式', description: '適合敘事、訪談、旁白與案例式說明。' } },
+				workshop: { 'zh-TW': { label: '互動工作坊', status: '工作坊模式', description: '適合活動、討論、參與式學習與反思。' } },
+				panel: { 'zh-TW': { label: '辯論或座談', status: '座談模式', description: '適合比較觀點、分析證據與評估回應。' } },
+				report: { 'zh-TW': { label: '研究發表', status: '研究模式', description: '適合正式學術專題、條理清楚的研究與引用。' } },
+				exhibit: { 'zh-TW': { label: '展覽攤位', status: '展覽模式', description: '適合展示型專題、主題站與觀眾自行瀏覽。' } }
+			}
+		};
+
+		const zhDisplayText = {
+			'Health and social issues': '健康與社會議題',
+			'Science': '科學',
+			'History': '歷史',
+			'Environment': '環境',
+			'Technology': '科技',
+			'Business and economics': '商業與經濟',
+			'Literature and language': '文學與語文',
+			'General interdisciplinary': '跨領域綜合',
+			'Classmates': '同學',
+			'Teachers': '老師',
+			'Younger students': '年紀較小的學生',
+			'Parents and caregivers': '家長與照顧者',
+			'Community audience': '社區大眾',
+			'Mixed audience': '混合對象',
+			'Slide deck': '投影片簡報',
+			'Poster': '海報',
+			'Infographic': '資訊圖表',
+			'Video': '影片',
+			'Written report': '書面報告',
+			'Interactive worksheet': '互動學習單',
+			'Teach the audience clearly': '清楚教會觀眾重點',
+			'Correct common misconceptions': '澄清常見迷思',
+			'Show real evidence and examples': '呈現真實證據與案例',
+			'Encourage discussion and reflection': '促進討論與反思',
+			'Provide practical actions or recommendations': '提供具體行動或建議',
+			'Develop strong teamwork and research skills': '培養合作與研究能力',
+			'Definitions and key terms': '定義與關鍵術語',
+			'Causes and risk factors': '成因與風險因素',
+			'Effects on health and wellbeing': '對健康與福祉的影響',
+			'Social impact': '社會影響',
+			'Prevention strategies': '預防策略',
+			'Support, treatment, and recovery': '支持、治療與復原',
+			'Background science': '科學背景',
+			'Processes or mechanisms': '過程或機制',
+			'Evidence and experiments': '證據與實驗',
+			'Data interpretation': '數據解讀',
+			'Applications and impact': '應用與影響',
+			'Limitations or unanswered questions': '限制或未解問題',
+			'Historical context': '歷史背景',
+			'Key events and turning points': '關鍵事件與轉折點',
+			'Important figures and perspectives': '重要人物與觀點',
+			'Causes and consequences': '成因與後果',
+			'Primary source interpretation': '第一手史料解讀',
+			'Legacy and relevance today': '歷史遺產與當代意義',
+			'Problem definition': '問題定義',
+			'Causes and drivers': '成因與驅動因素',
+			'Environmental effects': '環境影響',
+			'Human impact': '對人類的影響',
+			'Current responses': '目前回應',
+			'Future solutions': '未來解方',
+			'What the technology is': '科技是什麼',
+			'How it works': '運作原理',
+			'Key benefits': '主要優點',
+			'Risks and limitations': '風險與限制',
+			'Ethics and society': '倫理與社會影響',
+			'Future developments': '未來發展',
+			'Industry or market background': '產業或市場背景',
+			'Main stakeholders': '主要利害關係人',
+			'Costs and benefits': '成本與效益',
+			'Strategy and decision-making': '策略與決策',
+			'Risks and challenges': '風險與挑戰',
+			'Recommendations': '建議',
+			'Context and background': '背景脈絡',
+			'Main themes': '主要主題',
+			'Characters or voices': '角色或聲音',
+			'Language and techniques': '語言與技巧',
+			'Interpretation and meaning': '詮釋與意義',
+			'Contemporary relevance': '當代意義',
+			'Definitions and overview': '定義與總覽',
+			'Background context': '背景脈絡',
+			'Main arguments or evidence': '主要論點或證據',
+			'Different perspectives': '不同觀點',
+			'Current relevance': '當代重要性',
+			'Recommended conclusion or action': '建議結論或行動',
+			'What factors increase risk?': '哪些因素會提高風險？',
+			'How does the issue affect health, relationships, or decision-making?': '這個議題會如何影響健康、人際關係或決策？',
+			'What prevention or support responses are most effective?': '哪些預防或支持方式最有效？',
+			'What scientific process or mechanism explains the topic?': '哪一種科學過程或機制最能解釋這個主題？',
+			'What evidence supports the main claim?': '哪些證據最能支持核心論點？',
+			'What are the practical applications or implications?': '有哪些實際應用或影響？',
+			'What events shaped the topic?': '哪些事件形塑了這個主題？',
+			'Which perspectives are most important to compare?': '最值得比較的是哪些觀點？',
+			'What legacy does the topic leave behind?': '這個主題留下了什麼歷史影響？',
+			'What drives the problem?': '是什麼因素驅動了這個問題？',
+			'Who or what is affected most?': '誰或哪些事物受到的影響最大？',
+			'Which responses are realistic and effective?': '哪些回應方式既實際又有效？',
+			'How does the technology work?': '這項科技是如何運作的？',
+			'What problem does it solve?': '它解決了什麼問題？',
+			'What tradeoffs or ethical concerns matter most?': '最值得關注的取捨或倫理問題是什麼？',
+			'What is the problem or opportunity?': '核心問題或機會是什麼？',
+			'Who benefits or loses?': '誰會受益，誰會承受損失？',
+			'Which strategy appears strongest and why?': '哪一種策略最有說服力，為什麼？',
+			'What themes should be prioritized?': '應優先處理哪些主題？',
+			'How do language choices shape meaning?': '語言選擇如何塑造意義？',
+			'Why does this text still matter?': '這份文本為什麼至今仍重要？',
+			'What does the audience need to understand first?': '觀眾最先需要理解的是什麼？',
+			'Which evidence is strongest?': '哪一項證據最有力？',
+			'What should the audience think or do after the project?': '專題結束後，觀眾應該理解什麼或採取什麼行動？',
+			'project output': '專題成果'
+		};
+
+		const displayValue = (value, language = state.language) => isZh(language) ? (zhDisplayText[value] || value) : value;
+
+		const getModeCopy = (mode) => {
+			if (!isZh()) {
+				return { label: mode.label, status: mode.status, description: mode.description };
+			}
+			return getLocaleValue(localizedValues.mode[mode.id]);
+		};
+
+		const audienceLabelMap = {
+			classmates: 'Classmates',
+			teachers: 'Teachers',
+			'younger students': 'Younger students',
+			'parents and caregivers': 'Parents and caregivers',
+			'community audience': 'Community audience',
+			'mixed audience': 'Mixed audience'
+		};
+
+		const subjectLabelMap = {
+			health: 'Health and social issues',
+			science: 'Science',
+			history: 'History',
+			environment: 'Environment',
+			technology: 'Technology',
+			business: 'Business and economics',
+			literature: 'Literature and language',
+			general: 'General interdisciplinary'
+		};
+
+		const chineseKeywordMap = {
+			statistics: '統計',
+			'risk factors': '風險因素',
+			prevention: '預防',
+			'case study': '案例',
+			'support services': '支援服務',
+			mechanism: '機制',
+			experiment: '實驗',
+			data: '數據',
+			model: '模型',
+			evidence: '證據',
+			timeline: '時間線',
+			'primary source': '第一手資料',
+			'historical context': '歷史背景',
+			causes: '成因',
+			consequences: '後果',
+			impact: '影響',
+			policy: '政策',
+			solutions: '解方',
+			'applications': '應用',
+			ethics: '倫理',
+			'future trends': '未來趨勢',
+			'market analysis': '市場分析',
+			stakeholders: '利害關係人',
+			strategy: '策略',
+			trends: '趨勢',
+			'theme analysis': '主題分析',
+			'literary techniques': '文學技巧',
+			context: '背景',
+			interpretation: '詮釋',
+			'critical essay': '評論文章',
+			overview: '總覽',
+			perspectives: '觀點',
+			'current issues': '當代議題'
+		};
+
+		const escapeHtml = (value) => value
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#39;');
+
+		const sentenceList = (items) => {
+			if (items.length === 0) {
+				return isZh() ? '完整而清楚的總覽' : 'a strong overview';
+			}
+			if (items.length === 1) {
+				return items[0];
+			}
+			if (items.length === 2) {
+				return isZh() ? `${items[0]}與${items[1]}` : `${items[0]} and ${items[1]}`;
+			}
+			return isZh() ? `${items.slice(0, -1).join('、')}與${items.at(-1)}` : `${items.slice(0, -1).join(', ')}, and ${items.at(-1)}`;
+		};
+
+		const titleCase = (value) => value
+			.split(' ')
+			.filter(Boolean)
+			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+			.join(' ');
+
+		const cleanPhrase = (value) => value
+			.replace(/[_-]+/g, ' ')
+			.replace(/\s+/g, ' ')
+			.replace(/\s*\([^)]*\)\s*/g, ' ')
+			.trim();
+
+		const humanizeTopic = () => {
+			const raw = cleanPhrase(state.topic || '');
+			if (isZh()) {
+				if (!raw) {
+					return {
+						raw: '這個主題',
+						label: '這個主題',
+						title: '這個主題',
+						withArticle: '這個主題',
+						asDomain: '這個主題',
+						material: '這個主題',
+						question: '這個主題'
+					};
+				}
+				return {
+					raw,
+					label: raw,
+					title: raw,
+					withArticle: raw,
+					asDomain: raw,
+					material: raw,
+					question: raw
+				};
+			}
+			if (!raw) {
+				return {
+					raw: 'this topic',
+					label: 'this topic',
+					title: 'This Topic',
+					withArticle: 'this topic',
+					asDomain: 'the topic',
+					material: 'the topic',
+					question: 'this topic'
+				};
+			}
+
+			const lower = raw.toLowerCase();
+			const looksPlural = /s$/.test(lower) && !/ss$/.test(lower);
+			const startsWithArticle = /^(a|an|the)\s/.test(lower);
+			const abstractNoun = /(ism|ity|tion|sion|ment|ness|ship|hood)$/.test(lower.split(' ').at(-1) || '');
+			const needsTopicLabel = raw.split(' ').length === 1 || abstractNoun;
+			const withArticle = startsWithArticle ? lower : (looksPlural ? lower : `the ${lower}`);
+			return {
+				raw,
+				label: lower,
+				title: titleCase(raw),
+				withArticle,
+				asDomain: needsTopicLabel ? `the topic of ${lower}` : withArticle,
+				material: needsTopicLabel ? `this topic` : withArticle,
+				question: needsTopicLabel ? `the topic of ${lower}` : lower
+			};
+		};
+
+		const humanizeContent = (content) => {
+			const raw = cleanPhrase(content);
+			const lower = raw.toLowerCase();
+			return {
+				raw,
+				label: lower,
+				title: titleCase(raw),
+				asSection: /^(how|why|what)\s/.test(lower) ? raw : lower,
+				asFocus: /section|analysis|discussion|overview/.test(lower) ? lower : `${lower} section`
+			};
+		};
+
+		const joinFocusAreas = (items) => {
+			const cleaned = items.map((item) => humanizeContent(item).raw);
+			return sentenceList(cleaned.map((item) => displayValue(item)));
+		};
+
+		const getAudienceLabel = (language = state.language) => displayValue(audienceLabelMap[state.audience] || state.audience, language);
+
+		const getSubjectLabel = (language = state.language) => displayValue(subjectLabelMap[state.subject] || state.subject, language);
+
+		const getKeywordSuggestions = () => {
+			const preset = getSubjectPreset();
+			if (useChineseKeywords()) {
+				return preset.keywords.map((keyword) => `${state.topic} ${chineseKeywordMap[keyword] || keyword}`);
+			}
+			return preset.keywords.map((keyword) => `${state.topic} ${keyword}`);
+		};
+
+		const getTopicSafetyProfile = () => {
+			const raw = cleanPhrase(state.topic || '');
+			const lower = raw.toLowerCase();
+			const checks = [
+				{
+					match: /自殺|suicide|suicidal/,
+					zhBase: '自殺防治與支持',
+					enBase: 'Suicide Prevention and Support'
+				},
+				{
+					match: /自傷|self-harm|self harm|self injury|self-injury/,
+					zhBase: '自傷防治與支持',
+					enBase: 'Self-Harm Prevention and Support'
+				},
+				{
+					match: /成癮|毒品|藥物濫用|物質濫用|addiction|substance abuse|drug abuse|drug use/,
+					zhBase: '成癮預防與支持',
+					enBase: 'Addiction Prevention and Support'
+				},
+				{
+					match: /霸凌|bullying|cyberbullying|cyber bullying/,
+					zhBase: '反霸凌與支持',
+					enBase: 'Bullying Prevention and Support'
+				},
+				{
+					match: /家暴|虐待|暴力|abuse|violence|assault/,
+					zhBase: '防暴與支持',
+					enBase: 'Violence Prevention and Support'
+				}
+			];
+
+			const matched = checks.find((item) => item.match.test(raw) || item.match.test(lower));
+			return {
+				sensitive: Boolean(matched),
+				zhBase: matched ? matched.zhBase : raw,
+				enBase: matched ? matched.enBase : titleCase(raw)
+			};
+		};
+
+		const getModeTitleStyle = (language = state.language, sensitive = false) => {
+			if (isZh(language)) {
+				if (sensitive) {
+					switch (state.modeId) {
+						case 'campaign':
+							return '教育與支持專題';
+						case 'documentary':
+							return '紀錄與倡議專題';
+						case 'workshop':
+							return '互動學習專題';
+						case 'panel':
+							return '觀點分析專題';
+						case 'report':
+							return '研究專題';
+						default:
+							return '專題';
+					}
+				}
+				switch (state.modeId) {
+					case 'campaign':
+						return '主題宣導專題';
+					case 'documentary':
+						return '紀錄式探究';
+					case 'workshop':
+						return '互動學習專題';
+					case 'panel':
+						return '觀點分析專題';
+					case 'report':
+						return '研究專題';
+					case 'exhibit':
+						return '展覽專題';
+					default:
+						return '專題';
+				}
+			}
+
+			if (sensitive) {
+				switch (state.modeId) {
+					case 'campaign':
+						return 'Education and Support Project';
+					case 'documentary':
+						return 'Documentary Project';
+					case 'workshop':
+						return 'Interactive Learning Project';
+					case 'panel':
+						return 'Perspective Analysis Project';
+					case 'report':
+						return 'Research Project';
+					default:
+						return 'Project';
+				}
+			}
+
+			switch (state.modeId) {
+				case 'campaign':
+					return 'Awareness Project';
+				case 'documentary':
+					return 'Documentary Project';
+				case 'workshop':
+					return 'Interactive Learning Project';
+				case 'panel':
+					return 'Perspective Analysis Project';
+				case 'report':
+					return 'Research Project';
+				case 'exhibit':
+					return 'Exhibition Project';
+				default:
+					return 'Project';
+			}
+		};
+
+		const getTitleStyleLabel = (style = state.titleStyle, language = state.language) => {
+			const keyMap = {
+				formal: 'titleStyleFormal',
+				school: 'titleStyleSchool',
+				awareness: 'titleStyleAwareness'
+			};
+			return t(keyMap[style] || 'titleStyleFormal', language);
+		};
+
+		const dedupeTitles = (items) => [...new Set(items.map((item) => item.trim()).filter(Boolean))].slice(0, 6);
+
+		const buildSuggestedTitles = () => {
+			if (!state.topic.trim()) {
+				return [];
+			}
+			const topic = humanizeTopic();
+			const safety = getTopicSafetyProfile();
+			const style = state.titleStyle || 'formal';
+			const firstContent = [...state.selectedContent, ...state.customContent][0];
+			const contentLabel = firstContent ? displayValue(firstContent) : '';
+			if (isZh()) {
+				if (style === 'school') {
+					return dedupeTitles([
+						`${safety.zhBase}：重點整理與分享`,
+						`${safety.zhBase}：你需要知道的幾件事`,
+						`${safety.zhBase}：認識、影響與回應`,
+						contentLabel ? `${safety.zhBase}：從${contentLabel}看重點` : `${safety.zhBase}：課堂簡報版`,
+						`${safety.zhBase}：給同學的清晰整理`,
+						state.modeId === 'campaign' ? `${safety.zhBase}：${safety.sensitive ? '預防與求助重點' : '認識與行動重點'}` : `${safety.zhBase}：${getModeTitleStyle(state.language, safety.sensitive)}`
+					]);
+				}
+				if (style === 'awareness') {
+					return dedupeTitles([
+						`${safety.zhBase}：理解、關心與行動`,
+						`${safety.zhBase}：教育、支持與回應`,
+						`${safety.zhBase}：從認識走向支持`,
+						contentLabel ? `${safety.zhBase}：聚焦${contentLabel}與支持策略` : `${safety.zhBase}：公共溝通與支持`,
+						`${safety.zhBase}：建立理解與求助意識`,
+						state.modeId === 'campaign' ? `${safety.zhBase}：${safety.sensitive ? '教育、預防與求助' : '認識、倡議與行動'}` : `${safety.zhBase}：${getModeTitleStyle(state.language, true)}`
+					]);
+				}
+				return dedupeTitles([
+					`${safety.zhBase}：認識、${safety.sensitive ? '風險' : '影響'}與回應`,
+					`${safety.zhBase}：議題分析與實務回應`,
+					`${safety.zhBase}：研究視角下的理解與應對`,
+					contentLabel ? `${safety.zhBase}：從${contentLabel}出發` : `${safety.zhBase}：${getModeTitleStyle(state.language, safety.sensitive)}`,
+					`${safety.zhBase}：核心議題與關鍵證據`,
+					state.modeId === 'campaign' ? `${safety.zhBase}：${safety.sensitive ? '教育、預防與求助' : '認識與行動'}` : `${safety.zhBase}：${getModeTitleStyle(state.language, safety.sensitive)}`
+				]);
+			}
+			if (style === 'school') {
+				return dedupeTitles([
+					`${safety.enBase}: Key Ideas for Class`,
+					`${safety.enBase}: What Students Should Know`,
+					`${safety.enBase}: Understanding the Issue`,
+					contentLabel ? `${safety.enBase}: A Student Guide to ${contentLabel}` : `${safety.enBase}: Classroom Presentation`,
+					`${safety.enBase}: A Clear Guide for Students`,
+					state.modeId === 'campaign' ? `${safety.enBase}: ${safety.sensitive ? 'Prevention and Help-Seeking' : 'Awareness and Action'}` : `${safety.enBase}: ${getModeTitleStyle('en', safety.sensitive)}`
+				]);
+			}
+			if (style === 'awareness') {
+				return dedupeTitles([
+					`${safety.enBase}: Awareness, Support, and Response`,
+					`${safety.enBase}: Understanding and Taking Action`,
+					`${safety.enBase}: From Awareness to Support`,
+					contentLabel ? `${safety.enBase}: ${contentLabel} and Support Strategies` : `${safety.enBase}: Public Awareness and Support`,
+					`${safety.enBase}: Building Understanding and Help-Seeking`,
+					state.modeId === 'campaign' ? `${safety.enBase}: ${safety.sensitive ? 'Prevention, Support, and Awareness' : 'Awareness, Advocacy, and Action'}` : `${safety.enBase}: ${getModeTitleStyle('en', true)}`
+				]);
+			}
+			return dedupeTitles([
+				`${safety.enBase}: Understanding ${safety.sensitive ? 'Risk, Support, and Response' : 'the Issue'}`,
+				`${safety.enBase}: Analysis and Practical Response`,
+				`${safety.enBase}: Research Perspectives and Response`,
+				contentLabel ? `${safety.enBase}: Focus on ${contentLabel}` : `${safety.enBase}: ${getModeTitleStyle('en', safety.sensitive)}`,
+				`${safety.enBase}: Key Questions and Evidence`,
+				state.modeId === 'campaign' ? `${safety.enBase}: ${safety.sensitive ? 'Prevention, Support, and Awareness' : 'Awareness and Action'}` : `${safety.enBase}: ${getModeTitleStyle('en', safety.sensitive)}`
+			]);
+		};
+
+		const withPlannerLanguage = (language, callback) => {
+			const previousLanguage = state.language;
+			state.language = language;
+			try {
+				return callback();
+			} finally {
+				state.language = previousLanguage;
+			}
+		};
+
+		const renderInterfaceText = () => {
+			document.documentElement.lang = isZh() ? 'zh-Hant' : 'en';
+			document.title = t('documentTitle');
+			document.querySelector('.eyebrow').textContent = t('eyebrow');
+			document.querySelector('.hero h1').textContent = t('heroTitle');
+			document.querySelector('.hero p').textContent = t('heroBody');
+
+			const statLabels = document.querySelectorAll('.stat-label');
+			statLabels[0].textContent = t('statModes');
+			statLabels[1].textContent = t('statContent');
+			statLabels[2].textContent = t('statResources');
+
+			const sectionKickers = document.querySelectorAll('.section .kicker');
+			sectionKickers[0].textContent = t('projectSetup');
+			sectionKickers[1].textContent = t('presentationMode');
+			sectionKickers[2].textContent = t('contentBuilder');
+			sectionKickers[3].textContent = t('guidedExploration');
+			sectionKickers[4].textContent = t('resourceFinder');
+
+			const sectionTitles = document.querySelectorAll('.section h2');
+			sectionTitles[0].textContent = t('defineFrame');
+			sectionTitles[1].textContent = t('tailorDelivery');
+			sectionTitles[2].textContent = t('chooseContents');
+			sectionTitles[3].textContent = t('exploreResearch');
+			sectionTitles[4].textContent = t('resourceHeading');
+
+			const fieldLabels = document.querySelectorAll('.field-label');
+			fieldLabels[0].textContent = t('projectTopic');
+			fieldLabels[1].textContent = t('subjectArea');
+			fieldLabels[2].textContent = t('plannerLanguage');
+			fieldLabels[3].textContent = t('audience');
+			fieldLabels[4].textContent = t('projectLength');
+			fieldLabels[5].textContent = t('teamSize');
+			fieldLabels[6].textContent = t('projectTitle');
+			fieldLabels[7].textContent = t('titleStyle');
+			fieldLabels[8].textContent = t('presentationTime');
+			fieldLabels[9].textContent = t('teacherBrief');
+			fieldLabels[10].textContent = t('customAngle');
+			fieldLabels[11].textContent = t('coreContent');
+			fieldLabels[12].textContent = t('formatsOutcomes');
+
+			document.querySelectorAll('.mini-note')[0].textContent = t('exploreNote');
+			document.querySelectorAll('.mini-note')[1].textContent = t('resourceNote');
+			document.querySelector('.preview .kicker').textContent = t('generatedBrief');
+			document.querySelector('.summary-box h3').textContent = t('projectConcept');
+			document.querySelectorAll('.mini-card span')[0].textContent = t('essentialQuestion');
+			document.querySelectorAll('.mini-card span')[1].textContent = t('mainDeliverable');
+			const previewBlockTitles = document.querySelectorAll('.preview-block h3');
+			previewBlockTitles[1].textContent = t('recommendedStructure');
+			previewBlockTitles[2].textContent = t('timeline');
+			previewBlockTitles[3].textContent = t('successOutcomes');
+			previewBlockTitles[4].textContent = t('researchStarterList');
+			document.querySelector('.section .preview-block h3').textContent = t('searchPrompts');
+
+			elements.addContentButton.textContent = t('addSection');
+			elements.addFormatButton.textContent = t('addFormat');
+			elements.addOutcomeButton.textContent = t('addOutcome');
+			elements.demoButton.textContent = t('loadDemo');
+			elements.resetButton.textContent = t('reset');
+			elements.copyButton.textContent = t('copyAction');
+			elements.downloadTextButton.textContent = t('downloadText');
+			elements.downloadBilingualButton.textContent = t('downloadBilingual');
+			elements.downloadJsonButton.textContent = t('downloadJson');
+			elements.printButton.textContent = t('print');
+			elements.languageSwitchButton.textContent = t('switchLanguage');
+
+			elements.customContentInput.placeholder = t('addCustomContentPlaceholder');
+			elements.customFormatInput.placeholder = t('addCustomFormatPlaceholder');
+			elements.customOutcomeInput.placeholder = t('addCustomOutcomePlaceholder');
+			elements.customModeInput.placeholder = t('customModePlaceholder');
+			elements.briefInput.placeholder = t('briefPlaceholder');
+
+			Array.from(elements.subjectSelect.options).forEach((option) => {
+				option.textContent = displayValue(subjectLabelMap[option.value] || option.value);
+			});
+
+			Array.from(elements.audienceSelect.options).forEach((option) => {
+				option.textContent = displayValue(audienceLabelMap[option.value] || option.value);
+			});
+
+			Array.from(elements.presentationTimeSelect.options).forEach((option) => {
+				option.textContent = displayValue(option.value);
+			});
+
+			Array.from(elements.durationSelect.options).forEach((option) => {
+				const count = Number(option.value);
+				option.textContent = isZh() ? `${count} 週` : `${count} week${count === 1 ? '' : 's'}`;
+			});
+
+			Array.from(elements.titleStyleSelect.options).forEach((option) => {
+				const labelMap = {
+					formal: t('titleStyleFormal'),
+					school: t('titleStyleSchool'),
+					awareness: t('titleStyleAwareness')
+				};
+				option.textContent = labelMap[option.value] || option.textContent;
+			});
+		};
+
+		const classifyContent = (content) => {
+			const text = content.toLowerCase();
+			if (/(definition|overview|background|context|key term|vocabulary)/.test(text)) {
+				return 'foundation';
+			}
+			if (/(cause|risk|driver|origin|factor)/.test(text)) {
+				return 'causes';
+			}
+			if (/(process|mechanism|how it works|science)/.test(text)) {
+				return 'mechanism';
+			}
+			if (/(effect|impact|consequence|wellbeing|health)/.test(text)) {
+				return 'impact';
+			}
+			if (/(history|event|turning point|legacy)/.test(text)) {
+				return 'history';
+			}
+			if (/(case study|example|scenario|real-world)/.test(text)) {
+				return 'case';
+			}
+			if (/(perspective|stakeholder|ethic|policy|debate|argument)/.test(text)) {
+				return 'perspectives';
+			}
+			if (/(prevention|solution|response|recommendation|future|action)/.test(text)) {
+				return 'responses';
+			}
+			if (/(support|treatment|recovery|service|help)/.test(text)) {
+				return 'support';
+			}
+			if (/(data|evidence|experiment|research|analysis)/.test(text)) {
+				return 'evidence';
+			}
+			return 'custom';
+		};
+
+		const categoryOrder = {
+			foundation: 10,
+			history: 15,
+			causes: 20,
+			mechanism: 25,
+			evidence: 30,
+			impact: 35,
+			case: 40,
+			perspectives: 45,
+			responses: 50,
+			support: 55,
+			custom: 60
+		};
+
+		const getOutlineLead = () => {
+			const topic = humanizeTopic();
+			if (isZh()) {
+				switch (state.modeId) {
+					case 'documentary':
+						return {
+							title: '先用具體情境帶入',
+							detail: `先用情境、短案例或人物故事帶入，讓觀眾先和${topic.question}建立連結，再進入說明與證據。`
+						};
+					case 'workshop':
+						return {
+							title: '先用互動引起思考',
+							detail: `先用投票、情境題或快速挑戰，讓${getAudienceLabel()}先思考${topic.question}，再進入主體內容。`
+						};
+					case 'panel':
+						return {
+							title: '先界定核心爭點',
+							detail: `一開始先說清楚${topic.question}中最值得討論的爭點，讓後面的各段內容都能回扣比較與判斷。`
+						};
+					case 'report':
+						return {
+							title: '先提出研究問題',
+							detail: `先明確界定${topic.question}的研究範圍、關鍵詞與要回答的核心問題。`
+						};
+					case 'exhibit':
+						return {
+							title: '先設計吸睛主視覺',
+							detail: `先用標題、數據或圖像快速帶出${topic.question}，讓觀眾在閱讀各區塊前先抓到重點。`
+						};
+					default:
+						return {
+							title: '先抓住觀眾注意力',
+							detail: `先用一個強烈事實、常見迷思或明顯衝突切入，讓${getAudienceLabel()}知道${topic.question}為什麼重要。`
+						};
+				}
+			}
+			switch (state.modeId) {
+				case 'documentary':
+					return {
+						title: `Open with a human entry point`,
+						detail: `Open with a scene, short case, or lived example that helps the audience connect with ${topic.asDomain} before moving into explanation and evidence.`
+					};
+				case 'workshop':
+					return {
+						title: `Start with interaction`,
+						detail: `Start with a poll, scenario, or quick challenge that gets ${state.audience} thinking about ${topic.question} before the main explanation begins.`
+					};
+				case 'panel':
+					return {
+						title: `Frame the central debate`,
+						detail: `Define the main tension or contested question early, so every later section helps the audience judge competing viewpoints on ${topic.question}.`
+					};
+				case 'report':
+					return {
+						title: `State the research question`,
+						detail: `Begin with a precise research framing for ${topic.asDomain}, including scope, key terms, and exactly what the project is trying to explain or evaluate.`
+					};
+				case 'exhibit':
+					return {
+						title: `Create a headline panel`,
+						detail: `Use a strong headline, visual, or statistic to orient the audience immediately before they move through the rest of the display on ${topic.question}.`
+					};
+				default:
+					return {
+						title: `Hook the audience fast`,
+						detail: `Open with one striking fact, misconception, or tension that shows why ${state.audience} should care about ${topic.question} now.`
+					};
+			}
+		};
+
+		const getOutlineCloser = (formats, outcomes) => {
+			const deliverable = formats[0] || 'project output';
+			if (isZh()) {
+				const deliverableLabel = displayValue(deliverable);
+				if (outcomes.some((item) => /action|recommendation|practical/i.test(item))) {
+					return {
+						title: '最後收束到可行做法',
+						detail: `在${deliverableLabel}結尾整理出可執行的建議、回應方式或下一步，讓觀眾帶著實際行動離開。`
+					};
+				}
+				if (outcomes.some((item) => /discussion|reflection/i.test(item))) {
+					return {
+						title: '最後引導反思',
+						detail: '在結尾安排反思或討論，讓專題不只是提供資訊，而是促使觀眾進一步思考與回應。'
+					};
+				}
+				return {
+					title: '最後落實核心結論',
+					detail: `在結尾把最有力的證據重新連回${deliverableLabel}的核心訊息，讓觀眾清楚記住重點。`
+				};
+			}
+			if (outcomes.some((item) => /action|recommendation|practical/i.test(item))) {
+				return {
+					title: `Finish with usable action`,
+					detail: `End the ${deliverable.toLowerCase()} with practical recommendations, response options, or next steps so the audience leaves with something they can apply.`
+				};
+			}
+			if (outcomes.some((item) => /discussion|reflection/i.test(item))) {
+				return {
+					title: `Close with reflection`,
+					detail: `Use the ending to push reflection, discussion, or audience response so the project creates thought instead of stopping at information.`
+				};
+			}
+			return {
+				title: `Land the final takeaway`,
+				detail: `Close by tying the strongest evidence back to the central message of the ${deliverable.toLowerCase()} so the final takeaway is clear and memorable.`
+			};
+		};
+
+		const buildContentSection = (content) => {
+			const topic = humanizeTopic();
+			const section = humanizeContent(content);
+			const subjectLabel = getSubjectLabel();
+			const category = classifyContent(content);
+			if (isZh()) {
+				switch (category) {
+					case 'foundation':
+						return { title: '先界定主題範圍', detail: `用「${displayValue(section.raw)}」說清楚${topic.question}在${subjectLabel}脈絡中的定義、範圍與基本概念。` };
+					case 'history':
+						return { title: '補足背景脈絡', detail: `用「${displayValue(section.raw)}」說明${topic.question}如何形成、哪些轉折點最重要，以及現況從何而來。` };
+					case 'causes':
+						return { title: '分析主要成因', detail: `用「${displayValue(section.raw)}」拆解驅動因素、彼此之間的關係，以及哪些原因最值得${getAudienceLabel()}關注。` };
+					case 'mechanism':
+						return { title: '解釋運作機制', detail: `用「${displayValue(section.raw)}」把過程一步一步講清楚，讓觀眾真正理解主題如何運作。` };
+					case 'evidence':
+						return { title: '用證據驗證說法', detail: `用「${displayValue(section.raw)}」比較資料、研究發現與來源品質，指出哪些說法最有依據。` };
+					case 'impact':
+						return { title: '呈現實際影響', detail: `把「${displayValue(section.raw)}」設計成影響分析區塊，說明規模、嚴重性，以及為何這個主題值得重視。` };
+					case 'case':
+						return { title: '用案例讓內容落地', detail: `用「${displayValue(section.raw)}」把抽象概念連回具體案例或情境，讓觀眾更容易理解與記住。` };
+					case 'perspectives':
+						return { title: '比較不同觀點', detail: `把「${displayValue(section.raw)}」設計成觀點比較區，說明各方立場、證據與爭議。` };
+					case 'responses':
+						return { title: '評估可行回應', detail: `用「${displayValue(section.raw)}」比較哪些解方、策略或回應方式最可行，也最適合這次專題的對象。` };
+					case 'support':
+						return { title: '補上支持與後續方向', detail: `把「${displayValue(section.raw)}」做成實用收束區塊，提供資源、支持路徑或後續做法。` };
+					default:
+						return { title: `發展「${displayValue(section.raw)}」這一段`, detail: `把「${displayValue(section.raw)}」做成專門段落，補強細節，讓整體結構更貼合${topic.question}。` };
+				}
+			}
+			switch (category) {
+				case 'foundation':
+					return {
+						title: `Define the scope clearly`,
+						detail: `Use ${section.asSection} to establish what ${topic.asDomain} means in a ${subjectLabel.toLowerCase()} context, what belongs inside the topic, and which ideas the audience needs first.`
+					};
+				case 'history':
+					return {
+						title: `Trace the background`,
+						detail: `Use ${section.asSection} to explain how ${topic.asDomain} developed, which turning points matter, and why the current situation looks the way it does.`
+					};
+				case 'causes':
+					return {
+						title: `Map the driving factors`,
+						detail: `Use ${section.asSection} to explain what drives ${topic.asDomain}, how the factors interact, and which causes deserve the most attention for ${state.audience}.`
+					};
+				case 'mechanism':
+					return {
+						title: `Explain how the core process works`,
+						detail: `Use ${section.asSection} to break the topic down step by step, so the audience understands how it works instead of hearing only conclusions.`
+					};
+				case 'evidence':
+					return {
+						title: `Test the main claims with evidence`,
+						detail: `Use ${section.asSection} to compare data, findings, and source quality, making this the section that shows which claims about ${topic.asDomain} are strongest.`
+					};
+				case 'impact':
+					return {
+						title: `Show the real impact`,
+						detail: `Build ${section.asSection} into a consequences section that shows scale, seriousness, and why ${topic.asDomain} matters beyond theory.`
+					};
+				case 'case':
+					return {
+						title: `Ground the project in a concrete example`,
+						detail: `Use ${section.asSection} to connect abstract ideas to a case, story, or example that makes the project easier to remember and discuss.`
+					};
+				case 'perspectives':
+					return {
+						title: `Compare the key viewpoints`,
+						detail: `Use ${section.asSection} as the comparison section, showing where people disagree, what evidence they use, and which position is most defensible.`
+					};
+				case 'responses':
+					return {
+						title: `Evaluate the best responses`,
+						detail: `Use ${section.asSection} to assess which solutions, strategies, or responses are realistic, effective, and appropriate for the chosen audience.`
+					};
+				case 'support':
+					return {
+						title: `Show where support or recovery begins`,
+						detail: `Use ${section.asSection} as the practical support section so the project ends with pathways, resources, or follow-up actions instead of stopping at description.`
+					};
+				default:
+					return {
+						title: `Develop a focused section on ${section.raw}`,
+						detail: `Use ${section.asSection} as a dedicated focus area that gives the project more depth and helps the final structure fit ${topic.question} more naturally.`
+					};
+			}
+		};
+
+		const buildOptimalOutline = () => {
+			const content = [...state.selectedContent, ...state.customContent];
+			const formats = [...state.selectedFormats, ...state.customFormats];
+			const outcomes = [...state.selectedOutcomes, ...state.customOutcomes];
+			const uniqueContent = [...new Set(content)];
+			const orderedContent = uniqueContent
+				.map((item, index) => ({ item, index, order: categoryOrder[classifyContent(item)] || categoryOrder.custom }))
+				.sort((left, right) => left.order - right.order || left.index - right.index)
+				.map((entry) => entry.item);
+
+			const outline = [getOutlineLead()];
+
+			if (orderedContent.length === 0 && state.topic.trim()) {
+				outline.push({
+					title: isZh() ? '建立核心說明主軸' : 'Build the core explanation',
+					detail: isZh() ? `先替${humanizeTopic().question}挑出兩到四個最有力的角度，讓專題可以自然地從背景走向分析、證據與回應。` : `Select two to four strong angles for ${humanizeTopic().asDomain} so the project can move from clear background into analysis, evidence, and response.`
+				});
+			} else {
+				orderedContent.forEach((item) => {
+					outline.push(buildContentSection(item));
+				});
+			}
+
+			outline.push(getOutlineCloser(formats, outcomes));
+			return outline;
+		};
+
+		const hasPlannerContent = () => {
+			return Boolean(
+				state.topic.trim() ||
+				state.title.trim() ||
+				state.brief.trim() ||
+				state.customMode.trim() ||
+				state.selectedContent.length ||
+				state.selectedFormats.length ||
+				state.selectedOutcomes.length ||
+				state.customContent.length ||
+				state.customFormats.length ||
+				state.customOutcomes.length
+			);
+		};
+
+		const buildSearchQuery = (extraTerm = '') => {
+			const selected = [...state.selectedContent, ...state.customContent].slice(0, 3).join(' ');
+			if (isZh()) {
+				const chineseRegionTerms = isZhHk() ? ['繁體中文', '香港', '台灣', '中國', '論文', '研究'] : ['繁體中文', '台灣', '香港', '中國', '論文', '研究'];
+				return [state.topic, getSubjectLabel(), selected, ...chineseRegionTerms, extraTerm].filter(Boolean).join(' ');
+			}
+			if (useChineseKeywords()) {
+				return [state.topic, selected, '中文', '研究', '論文', extraTerm].filter(Boolean).join(' ');
+			}
+			return [state.topic, state.subject, selected, extraTerm].filter(Boolean).join(' ');
+		};
+
+		const buildSourceUrl = (resource, extraTerm = '') => {
+			const query = encodeURIComponent(buildSearchQuery(extraTerm));
+			const locale = isZh() ? (isZhHk() ? 'zh-HK' : 'zh-TW') : (useChineseKeywords() ? 'zh-TW' : 'en');
+			if (resource.type === 'scholar') {
+				return `https://scholar.google.com/scholar?hl=${locale}&q=${query}`;
+			}
+			if (resource.type === 'pubmed') {
+				return `https://pubmed.ncbi.nlm.nih.gov/?term=${query}`;
+			}
+			if (resource.domain) {
+				return `https://www.google.com/search?hl=${locale}&q=${encodeURIComponent(`site:${resource.domain} ${buildSearchQuery(extraTerm)}`)}`;
+			}
+			return `https://www.google.com/search?hl=${locale}&q=${query}`;
+		};
+
+		const buildTimeline = (duration, modeLabel) => {
+			const weeks = Number(duration);
+			if (isZh()) {
+				if (weeks <= 1) {
+					return [
+						{ title: '第 1-2 天：聚焦主題與蒐集資料', detail: '先確認切入角度、分配工作，並蒐集起始資料。' },
+						{ title: '第 3-4 天：完成內容製作', detail: `依照${displayValue(modeLabel)}的形式製作主要內容與視覺素材。` },
+						{ title: '第 5 天：排練與修正', detail: '檢查時間控制、說明清楚度與對象適配性。' }
+					];
+				}
+				const items = [
+					{ title: '第 1 週：研究與聚焦', detail: '確定核心問題、蒐集證據，並安排各組員任務。' },
+					{ title: '第 2 週：草稿與結構設計', detail: '整理段落、建立視覺內容，並形成主要論述或說明脈絡。' }
+				];
+				if (weeks >= 3) {
+					items.push({ title: '第 3 週：製作完成與排練', detail: '完成成果、修順轉場並排練發表。' });
+				}
+				if (weeks >= 4) {
+					items.push({ title: '第 4 週：回饋與修正', detail: '依同儕或老師回饋調整內容、證據與表達方式。' });
+				}
+				if (weeks >= 5) {
+					items.push({ title: '第 5 週：延伸設計', detail: '加入互動活動、補充資料或更深入的研究支持。' });
+				}
+				if (weeks >= 6) {
+					items.push({ title: '第 6 週：最終展示', detail: '進行正式發表並完成學習反思。' });
+				}
+				return items;
+			}
+			if (weeks <= 1) {
+				return [
+					{ title: 'Day 1-2: Scope and source gathering', detail: 'Define the angle, select roles, and collect starting sources.' },
+					{ title: 'Day 3-4: Build the project', detail: `Develop the ${modeLabel.toLowerCase()} content and visuals.` },
+					{ title: 'Day 5: Rehearse and refine', detail: 'Check timing, clarity, and audience fit.' }
+				];
+			}
+
+			const items = [
+				{ title: 'Week 1: Research and focus', detail: 'Define the main question, gather evidence, and confirm project roles.' },
+				{ title: 'Week 2: Draft and structure', detail: 'Organize sections, create visuals, and shape the core argument or explanation.' }
+			];
+
+			if (weeks >= 3) {
+				items.push({ title: 'Week 3: Production and rehearsal', detail: 'Finish the final output, improve transitions, and rehearse delivery.' });
+			}
+			if (weeks >= 4) {
+				items.push({ title: 'Week 4: Feedback and revision', detail: 'Use peer or teacher feedback to sharpen evidence and presentation quality.' });
+			}
+			if (weeks >= 5) {
+				items.push({ title: 'Week 5: Extension features', detail: 'Add interactive elements, handouts, or deeper research support.' });
+			}
+			if (weeks >= 6) {
+				items.push({ title: 'Week 6: Final showcase', detail: 'Present the project and complete a reflection on learning and impact.' });
+			}
+
+			return items;
+		};
+
+		const createTagMarkup = (value, index) => `
+			<span class="tag">
+				${escapeHtml(value)}
+				<button type="button" data-index="${index}">×</button>
+			</span>
+		`;
+
+		const renderTags = (container, values, removeFn) => {
+			container.innerHTML = values.map(createTagMarkup).join('');
+			container.querySelectorAll('button[data-index]').forEach((button) => {
+				button.addEventListener('click', () => removeFn(Number(button.dataset.index)));
+			});
+		};
+
+		const renderTitleSuggestions = () => {
+			const suggestions = buildSuggestedTitles();
+			elements.titleSuggestionList.innerHTML = suggestions.map((title) => `
+				<button type="button" class="chip-button" data-title="${escapeHtml(title)}">${escapeHtml(title)}</button>
+			`).join('');
+			elements.titleSuggestionList.querySelectorAll('button[data-title]').forEach((button) => {
+				button.addEventListener('click', () => {
+					state.title = button.dataset.title || '';
+					elements.titleInput.value = state.title;
+					renderAll();
+				});
+			});
+		};
+
+		const makePill = (labelText, group, checked, onChange) => {
+			const label = document.createElement('label');
+			label.className = `pill${checked ? ' active' : ''}`;
+			const input = document.createElement('input');
+			input.type = 'checkbox';
+			input.name = group;
+			input.checked = checked;
+			input.addEventListener('change', () => {
+				label.classList.toggle('active', input.checked);
+				onChange(input.checked);
+			});
+			const span = document.createElement('span');
+			span.textContent = labelText;
+			label.append(input, span);
+			return label;
+		};
+
+		const renderModeCards = () => {
+			elements.modeGrid.innerHTML = modes.map((mode) => `
+				<button type="button" class="mode-card${mode.id === state.modeId ? ' active' : ''}" data-mode-id="${mode.id}">
+					<h3>${escapeHtml(getModeCopy(mode).label)}</h3>
+					<p>${escapeHtml(getModeCopy(mode).description)}</p>
+				</button>
+			`).join('');
+
+			elements.modeGrid.querySelectorAll('[data-mode-id]').forEach((button) => {
+				button.addEventListener('click', () => {
+					state.modeId = button.dataset.modeId;
+					renderModeCards();
+					renderPreview();
+				});
+			});
+		};
+
+		const renderOptionGrid = (container, options, selected, name, onUpdate) => {
+			container.innerHTML = '';
+			options.forEach((option) => {
+				const pill = makePill(displayValue(option), name, selected.includes(option), (checked) => {
+					if (checked) {
+						if (!selected.includes(option)) {
+							selected.push(option);
+						}
+					} else {
+						const index = selected.indexOf(option);
+						if (index >= 0) {
+							selected.splice(index, 1);
+						}
+					}
+					onUpdate();
+				});
+				container.appendChild(pill);
+			});
+		};
+
+		const syncInputs = () => {
+			elements.languageSelect.value = state.language;
+			elements.topicInput.value = state.topic;
+			elements.subjectSelect.value = state.subject;
+			elements.audienceSelect.value = state.audience;
+			elements.durationSelect.value = String(state.duration);
+			elements.teamSizeInput.value = String(state.teamSize);
+			elements.titleInput.value = state.title;
+			elements.titleStyleSelect.value = state.titleStyle;
+			elements.presentationTimeSelect.value = state.presentationTime;
+			elements.briefInput.value = state.brief;
+			elements.customModeInput.value = state.customMode;
+		};
+
+		const buildSuggestedContent = () => {
+			if (!state.topic.trim()) {
+				return [];
+			}
+			const preset = getSubjectPreset();
+			const selected = [...state.selectedContent, ...state.customContent];
+			const missing = preset.content.filter((item) => !selected.includes(item)).slice(0, 4);
+			const keywords = getKeywordSuggestions();
+			if (isZh()) {
+				return [
+					{ title: t('suggestedTitles'), meta: `${t('titleStyle')}｜${getTitleStyleLabel()}`, description: sentenceList(buildSuggestedTitles()) || '輸入主題後即可產生標題建議。' },
+					{ title: '建議補充的內容區塊', meta: '內容地圖', description: missing.length ? sentenceList(missing.map((item) => displayValue(item))) : '你目前已涵蓋這個學科常見的重要內容。' },
+					{ title: '可以引導研究的問題', meta: '探究問題', description: sentenceList(preset.questions.map((item) => displayValue(item))) },
+					{ title: '適合搜尋的關鍵詞組合', meta: '搜尋關鍵字', description: sentenceList(keywords.slice(0, 4)) },
+					{ title: '對象調整提醒', meta: '表達方向', description: `例子與說明要貼近${getAudienceLabel()}，並依${getModeCopy(getMode()).label}的節奏安排內容。` }
+				];
+			}
+
+			return [
+				{
+					title: t('suggestedTitles'),
+					meta: `Title ideas | ${getTitleStyleLabel()}`,
+					description: sentenceList(buildSuggestedTitles()) || 'Enter a topic to generate project titles.'
+				},
+				{
+					title: 'Recommended sections to add',
+					meta: 'Content map',
+					description: missing.length ? sentenceList(missing) : 'You already cover the main starter sections for this subject area.'
+				},
+				{
+					title: 'Questions that can guide research',
+					meta: 'Inquiry prompts',
+					description: sentenceList(preset.questions)
+				},
+				{
+					title: 'Useful keyword combinations',
+					meta: 'Search terms',
+					description: sentenceList(keywords.slice(0, 4))
+				},
+				{
+					title: 'Audience focus',
+					meta: 'Tailoring note',
+					description: `Shape examples and explanations for ${state.audience}, and use a ${getMode().tone} tone.`
+				}
+			];
+		};
+
+		const buildResearchPrompts = () => {
+			if (!state.topic.trim()) {
+				return [];
+			}
+			const preset = getSubjectPreset();
+			const contentTerms = [...state.selectedContent, ...state.customContent].slice(0, 4);
+			if (isZh()) {
+				return [
+					`針對${state.topic}，${getAudienceLabel()}最需要先知道哪些基本事實？`,
+					`哪些證據最能說明${sentenceList((contentTerms.length ? contentTerms : preset.content.slice(0, 3)).map((item) => displayValue(item)))}？`,
+					`有哪些案例、統計或專家觀點最能提高這個主題的可信度？`,
+					`這份專題最後應該給觀眾哪些可行建議或後續行動？`
+				];
+			}
+			const prompts = [
+				`What are the most important facts about ${state.topic} for ${state.audience}?`,
+				`What evidence best explains ${sentenceList(contentTerms.length ? contentTerms : preset.content.slice(0, 3))}?`,
+				`Which case studies, statistics, or expert viewpoints make this topic credible?`,
+				`What practical recommendations or actions should appear in the final project?`
+			];
+			return prompts;
+		};
+
+		const buildResources = () => {
+			if (!state.topic.trim()) {
+				return [];
+			}
+			if (isZh()) {
+				return [
+					{ name: 'Google 學術搜尋', note: '優先查找中文學術論文、引用與相關研究', type: 'scholar' },
+					{ name: '中國知網 CNKI', note: '搜尋中國期刊、學位論文與研究資料', domain: 'cnki.net' },
+					{ name: '國家哲學社會科學文獻中心', note: '查找中國開放學術文獻與研究成果', domain: 'ncpssd.org' },
+					{ name: '臺灣博碩士論文知識加值系統', note: '搜尋台灣博碩士論文與摘要', domain: 'ndltd.ncl.edu.tw' },
+					{ name: 'Airiti Library 華藝線上圖書館', note: '搜尋台灣與華文期刊、論文與研究資料', domain: 'airitilibrary.com' },
+					{ name: '香港高校學術庫', note: '搜尋香港大學、教育大學等機構的研究庫', domain: 'scholarhub.hku.hk' },
+					{ name: '香港政府與公共資料', note: '搜尋香港政府公開研究、統計與政策資料', domain: 'gov.hk' },
+					{ name: '兩岸三地學術機構', note: '搜尋中國、台灣與香港的高校與研究單位', domain: 'edu' }
+				].map((resource) => ({
+					...resource,
+					url: buildSourceUrl(resource),
+					queryUrl: buildSourceUrl(resource, '案例 統計 論文 比較')
+				}));
+			}
+			const preset = getSubjectPreset();
+			return preset.resources.map((resource) => ({
+				...resource,
+				url: buildSourceUrl(resource),
+				queryUrl: buildSourceUrl(resource, 'statistics OR case study')
+			}));
+		};
+
+		const renderSuggestions = () => {
+			const suggestions = buildSuggestedContent();
+			elements.suggestionGrid.innerHTML = suggestions.length ? suggestions.map((item) => `
+				<article class="suggestion-card">
+					<span class="suggestion-meta">${escapeHtml(item.meta)}</span>
+					<h4>${escapeHtml(item.title)}</h4>
+					<p>${escapeHtml(item.description)}</p>
+				</article>
+			`).join('') : '';
+
+			const prompts = buildResearchPrompts();
+			elements.searchPromptList.innerHTML = prompts.map((prompt, index) => `
+				<li>
+					<span class="list-mark">${index + 1}</span>
+					<div>${escapeHtml(prompt)}</div>
+				</li>
+			`).join('');
+		};
+
+		const renderResources = () => {
+			const resources = buildResources();
+			elements.resourceCount.textContent = String(resources.length);
+			elements.resourceGrid.innerHTML = resources.map((resource) => `
+				<article class="resource-card">
+					<span class="resource-meta">${escapeHtml(t('resourceSource'))}</span>
+					<h4>${escapeHtml(resource.name)}</h4>
+					<p>${escapeHtml(resource.note)}</p>
+					<div class="resource-actions">
+						<a class="link-button" href="${resource.url}" target="_blank" rel="noreferrer">${escapeHtml(t('openSourceSearch'))}</a>
+						<a class="link-button" href="${resource.queryUrl}" target="_blank" rel="noreferrer">${escapeHtml(t('openEvidenceSearch'))}</a>
+					</div>
+				</article>
+			`).join('');
+		};
+
+		const createBriefText = () => {
+			if (!hasPlannerContent()) {
+				return '';
+			}
+			const mode = getMode();
+			const content = [...state.selectedContent, ...state.customContent];
+			const formats = [...state.selectedFormats, ...state.customFormats];
+			const outcomes = [...state.selectedOutcomes, ...state.customOutcomes];
+			const timeline = buildTimeline(state.duration, mode.label);
+			const prompts = buildResearchPrompts();
+			const outline = buildOptimalOutline();
+			const modeCopy = getModeCopy(mode);
+			if (isZh()) {
+				return [
+					state.title || state.topic,
+					'',
+					`主題：${state.topic}`,
+					`學科領域：${getSubjectLabel()}`,
+					`對象：${getAudienceLabel()}`,
+					`模式：${modeCopy.label}`,
+					`組員人數：${state.teamSize}`,
+					`專題時長：${state.duration} 週`,
+					`發表時間：${displayValue(state.presentationTime)}`,
+					'',
+					'專題概念',
+					`最佳方向：以${modeCopy.label}的方式規劃這份專題，聚焦在${joinFocusAreas(content.length ? content : ['重要內容'])}，並以${sentenceList((formats.length ? formats : ['成果形式']).map((item) => displayValue(item)))}作為主要成果。`,
+					'',
+					'最佳大綱',
+					...outline.map((item, index) => `${index + 1}. ${item.title}：${item.detail}`),
+					'',
+					'建議結構',
+					...outline.map((item, index) => `${index + 1}. ${item.title}`),
+					'',
+					'預期成果',
+					...outcomes.map((item, index) => `${index + 1}. ${displayValue(item)}`),
+					'',
+					'研究提示',
+					...prompts.map((item, index) => `${index + 1}. ${item}`),
+					'',
+					'時程安排',
+					...timeline.map((item) => `- ${item.title}：${item.detail}`),
+					'',
+					'老師補充',
+					state.brief
+				].join('\n');
+			}
+			return [
+				state.title || state.topic,
+				'',
+				`Topic: ${state.topic}`,
+				`Subject area: ${state.subject}`,
+				`Audience: ${getAudienceLabel()}`,
+				`Mode: ${modeCopy.label}`,
+				`Team size: ${state.teamSize}`,
+				`Project length: ${state.duration} week(s)`,
+				`Presentation time: ${state.presentationTime}`,
+				'',
+				'Project concept',
+				`Best-fit direction: shape the project as a ${modeCopy.label.toLowerCase()} for ${getAudienceLabel()}, focusing on ${joinFocusAreas(content.length ? content : ['a focused set of content sections'])} and delivering the work through ${sentenceList((formats.length ? formats : ['a final deliverable']).map((item) => displayValue(item)))}.`,
+				'',
+				'Optimal outline',
+				...outline.map((item, index) => `${index + 1}. ${item.title}: ${item.detail}`),
+				'',
+				'Recommended structure',
+				...outline.map((item, index) => `${index + 1}. ${item.title}`),
+				'',
+				'Desired outcomes',
+				...outcomes.map((item, index) => `${index + 1}. ${displayValue(item)}`),
+				'',
+				'Research prompts',
+				...prompts.map((item, index) => `${index + 1}. ${item}`),
+				'',
+				'Timeline',
+				...timeline.map((item) => `- ${item.title}: ${item.detail}`),
+				'',
+				'Teacher note',
+				state.brief
+			].join('\n');
+		};
+
+		const createBriefTextForLanguage = (language) => withPlannerLanguage(language, () => createBriefText());
+
+		const createBilingualBriefText = () => {
+			if (!hasPlannerContent()) {
+				return '';
+			}
+			const chineseLanguage = isZh() ? state.language : 'zh-TW';
+			return [
+				`=== ${t('bilingualExportTitle', 'en')} ===`,
+				'',
+				createBriefTextForLanguage('en'),
+				'',
+				`=== ${t('bilingualExportDivider', chineseLanguage)} ===`,
+				'',
+				createBriefTextForLanguage(chineseLanguage)
+			].join('\n');
+		};
+
+		const renderPreview = () => {
+			if (!hasPlannerContent()) {
+				elements.previewTitle.textContent = '';
+				elements.previewSubtitle.textContent = '';
+				elements.statusPill.textContent = '';
+				elements.summaryText.textContent = '';
+				elements.conceptOutlineList.innerHTML = '';
+				elements.essentialQuestion.textContent = '';
+				elements.primaryDeliverable.textContent = '';
+				elements.footerNote.textContent = '';
+				elements.structureList.innerHTML = '';
+				elements.timelineList.innerHTML = '';
+				elements.outcomeList.innerHTML = '';
+				elements.researchStarterList.innerHTML = '';
+				return;
+			}
+			const mode = getMode();
+			const content = [...state.selectedContent, ...state.customContent];
+			const formats = [...state.selectedFormats, ...state.customFormats];
+			const outcomes = [...state.selectedOutcomes, ...state.customOutcomes];
+			const timeline = buildTimeline(state.duration, mode.label);
+			const resources = buildResources();
+			const outline = buildOptimalOutline();
+			const modeCopy = getModeCopy(mode);
+			const subtitle = isZh() ? `${state.duration} ${t('weekPlan')} • ${state.teamSize}${t(state.teamSize === 1 ? 'teamMember' : 'teamMembers')} • ${displayValue(state.presentationTime)}` : `${state.duration} week plan • ${state.teamSize} team member${state.teamSize === 1 ? '' : 's'} • ${state.presentationTime}`;
+			const topic = humanizeTopic();
+
+			elements.previewTitle.textContent = state.title || state.topic || '';
+			elements.previewSubtitle.textContent = subtitle;
+			elements.statusPill.textContent = modeCopy.status;
+			elements.summaryText.textContent = isZh() ? `最適合的概念方向：先以${modeCopy.label}的方式切入，再圍繞${joinFocusAreas(content.length ? content.slice(0, 4) : ['最重要的內容'])}展開主體，最後收束到${outcomes.length ? sentenceList(outcomes.slice(0, 2).map((item) => displayValue(item))) : '清楚而實用的結論'}。` : `Best-fit concept for ${topic.question}: start with a ${modeCopy.label.toLowerCase()} entry point, build the body around ${joinFocusAreas(content.length ? content.slice(0, 4) : ['the strongest content sections'])}, and finish with ${outcomes.length ? sentenceList(outcomes.slice(0, 2).map((item) => displayValue(item))).toLowerCase() : 'a clear audience takeaway'}.`;
+			elements.conceptOutlineList.innerHTML = outline.slice(0, 5).map((item, index) => `
+				<li>
+					<span class="list-mark">${index + 1}</span>
+					<div>
+						<strong>${escapeHtml(item.title)}</strong>
+						<div>${escapeHtml(item.detail)}</div>
+					</div>
+				</li>
+			`).join('');
+			elements.essentialQuestion.textContent = isZh() ? `要如何讓${getAudienceLabel()}透過清楚的證據、合理的結構與具體的收穫，更深入理解${state.topic}？` : `How can ${getAudienceLabel()} better understand ${state.topic} through clear evidence, thoughtful structure, and useful takeaways?`;
+			elements.primaryDeliverable.textContent = displayValue(formats[0] || mode.formats[0]);
+			elements.footerNote.textContent = state.brief.trim()
+				? (isZh() ? `專題提醒：${state.brief.trim()}` : `Project note: ${state.brief.trim()}`)
+				: t('projectNoteFallback');
+
+			elements.structureList.innerHTML = outline.map((item, index) => `
+				<li>
+					<span class="list-mark">${index + 1}</span>
+					<div>
+						<span class="timeline-label">${escapeHtml(item.title)}</span>
+						<div>${escapeHtml(item.detail)}</div>
+					</div>
+				</li>
+			`).join('');
+
+			elements.timelineList.innerHTML = timeline.map((item, index) => `
+				<li>
+					<span class="list-mark">${index + 1}</span>
+					<div>
+						<span class="timeline-label">${escapeHtml(item.title)}</span>
+						<div>${escapeHtml(item.detail)}</div>
+					</div>
+				</li>
+			`).join('');
+
+			elements.outcomeList.innerHTML = outcomes.map((item, index) => `
+				<li>
+					<span class="list-mark">${index + 1}</span>
+					<div>${escapeHtml(displayValue(item))}</div>
+				</li>
+			`).join('');
+
+			elements.researchStarterList.innerHTML = resources.slice(0, 4).map((resource, index) => `
+				<li>
+					<span class="list-mark">${index + 1}</span>
+					<div>
+						<span class="timeline-label">${escapeHtml(resource.name)}</span>
+						<div>${escapeHtml(resource.note)}</div>
+					</div>
+				</li>
+			`).join('');
+		};
+
+		const addUniqueItem = (input, target, rerender) => {
+			const value = input.value.trim();
+			if (!value) {
+				return;
+			}
+			if (!target.includes(value)) {
+				target.push(value);
+				rerender();
+			}
+			input.value = '';
+			input.focus();
+		};
+
+		const renderAll = () => {
+			renderInterfaceText();
+			const preset = getSubjectPreset();
+			elements.modeCount.textContent = String(modes.length);
+			elements.contentCount.textContent = String(preset.content.length + state.customContent.length);
+
+			renderTitleSuggestions();
+			renderModeCards();
+			renderOptionGrid(elements.contentGrid, preset.content, state.selectedContent, 'content', () => {
+				renderSuggestions();
+				renderResources();
+				renderPreview();
+			});
+			renderOptionGrid(elements.formatGrid, formatOptions, state.selectedFormats, 'format', renderPreview);
+			renderOptionGrid(elements.outcomeGrid, outcomeOptions, state.selectedOutcomes, 'outcome', renderPreview);
+
+			renderTags(elements.customContentTags, state.customContent, (index) => {
+				state.customContent.splice(index, 1);
+				renderAll();
+			});
+			renderTags(elements.customFormatTags, state.customFormats, (index) => {
+				state.customFormats.splice(index, 1);
+				renderAll();
+			});
+			renderTags(elements.customOutcomeTags, state.customOutcomes, (index) => {
+				state.customOutcomes.splice(index, 1);
+				renderAll();
+			});
+
+			renderSuggestions();
+			renderResources();
+			renderPreview();
+		};
+
+		const updateStateFromInputs = (event) => {
+			state.language = elements.languageSelect.value;
+			state.topic = elements.topicInput.value.trim();
+			if (event?.target === elements.topicInput) {
+				if (hasChineseCharacters(state.topic) && !isZh(state.language)) {
+					state.language = 'zh-TW';
+					elements.languageSelect.value = state.language;
+				} else if (!hasChineseCharacters(state.topic) && hasEnglishLetters(state.topic) && isZh(state.language)) {
+					state.language = 'en';
+					elements.languageSelect.value = state.language;
+				}
+			}
+			state.subject = elements.subjectSelect.value;
+			state.audience = elements.audienceSelect.value;
+			state.duration = Math.max(1, Number(elements.durationSelect.value) || 1);
+			state.teamSize = Math.max(1, Number(elements.teamSizeInput.value) || 1);
+			elements.teamSizeInput.value = String(state.teamSize);
+			state.title = elements.titleInput.value.trim();
+			state.titleStyle = elements.titleStyleSelect.value;
+			state.presentationTime = elements.presentationTimeSelect.value;
+			state.brief = elements.briefInput.value.trim();
+			state.customMode = elements.customModeInput.value.trim();
+			renderAll();
+		};
+
+		const cycleLanguage = () => {
+			const languages = ['en', 'zh-TW', 'zh-HK'];
+			const currentIndex = languages.indexOf(state.language);
+			state.language = languages[(currentIndex + 1) % languages.length];
+			elements.languageSelect.value = state.language;
+			renderAll();
+		};
+
+		const resetState = () => {
+			Object.assign(state, structuredClone(defaultState), { language: state.language });
+			syncInputs();
+			renderAll();
+		};
+
+		const loadDemoState = () => {
+			const chineseDemo = isZh();
+			Object.assign(state, structuredClone(defaultState), {
+				language: state.language,
+				topic: chineseDemo ? '物質濫用與成癮' : 'Substance abuse and addiction',
+				subject: 'health',
+				audience: 'classmates',
+				duration: 4,
+				teamSize: 5,
+				title: chineseDemo ? (isZhHk() ? '青少年成癮預防宣導計劃' : '青少年成癮預防宣導計畫') : 'Youth Addiction Prevention Awareness Campaign',
+					titleStyle: 'awareness',
+				presentationTime: '12-15 minutes',
+				brief: chineseDemo ? (isZhHk() ? '加入本地支援服務、一個迷思與事實互動活動，以及可實際採取的求助訊息。' : '加入在地支持服務、一個迷思與事實互動活動，以及可實際採取的求助訊息。') : 'Include local support services, one myth-versus-fact activity, and a practical help-seeking message.',
+				modeId: 'workshop',
+				customMode: chineseDemo ? (isZhHk() ? '由學生主導的互動工作坊，包含短情境活動與連到支援資訊的 QR 碼單張。' : '由學生主導的互動工作坊，包含短情境活動與連結支持資訊的 QR 碼單張。') : 'Student-led workshop with a short scenario activity and a QR-linked support sheet.',
+				selectedContent: ['Definitions and key terms', 'Causes and risk factors', 'Effects on health and wellbeing', 'Prevention strategies', 'Support, treatment, and recovery'],
+				selectedFormats: ['Slide deck', 'Interactive worksheet', 'Infographic'],
+				selectedOutcomes: ['Teach the audience clearly', 'Correct common misconceptions', 'Encourage discussion and reflection', 'Provide practical actions or recommendations'],
+				customContent: [chineseDemo ? (isZhHk() ? '本地青少年支援服務' : '在地青少年支持服務') : 'Local youth support services'],
+				customFormats: [chineseDemo ? '反思留言牆' : 'Reflection wall'],
+				customOutcomes: [chineseDemo ? '讓觀眾帶走一個具體可行的求助行動' : 'Leave the audience with one concrete help-seeking action']
+			});
+			syncInputs();
+			renderAll();
+		};
+
+		const downloadFile = (content, filename, type) => {
+			const blob = new Blob([content], { type });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = filename;
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+			URL.revokeObjectURL(url);
+		};
+
+		const copyBrief = async () => {
+			const briefText = createBriefText();
+			if (!briefText) {
+				alert(t('enterDetails'));
+				return;
+			}
+			try {
+				await navigator.clipboard.writeText(briefText);
+				elements.copyButton.textContent = t('copied');
+				setTimeout(() => {
+					elements.copyButton.textContent = t('copyAction');
+				}, 1400);
+			} catch (error) {
+				console.error(error);
+				alert(t('clipboardBlocked'));
+			}
+		};
+
+		const bindEvents = () => {
+			[
+				elements.languageSelect,
+				elements.topicInput,
+				elements.subjectSelect,
+				elements.audienceSelect,
+				elements.durationSelect,
+				elements.teamSizeInput,
+				elements.titleInput,
+								elements.titleStyleSelect,
+				elements.presentationTimeSelect,
+				elements.briefInput,
+				elements.customModeInput
+			].forEach((element) => {
+				element.addEventListener('input', updateStateFromInputs);
+				element.addEventListener('change', updateStateFromInputs);
+			});
+
+			elements.addContentButton.addEventListener('click', () => addUniqueItem(elements.customContentInput, state.customContent, renderAll));
+			elements.addFormatButton.addEventListener('click', () => addUniqueItem(elements.customFormatInput, state.customFormats, renderAll));
+			elements.addOutcomeButton.addEventListener('click', () => addUniqueItem(elements.customOutcomeInput, state.customOutcomes, renderAll));
+
+			[elements.customContentInput, elements.customFormatInput, elements.customOutcomeInput].forEach((input) => {
+				input.addEventListener('keydown', (event) => {
+					if (event.key !== 'Enter') {
+						return;
+					}
+					event.preventDefault();
+					if (input === elements.customContentInput) {
+						addUniqueItem(elements.customContentInput, state.customContent, renderAll);
+					} else if (input === elements.customFormatInput) {
+						addUniqueItem(elements.customFormatInput, state.customFormats, renderAll);
+					} else {
+						addUniqueItem(elements.customOutcomeInput, state.customOutcomes, renderAll);
+					}
+				});
+			});
+
+			elements.demoButton.addEventListener('click', loadDemoState);
+			elements.resetButton.addEventListener('click', resetState);
+			elements.languageSwitchButton.addEventListener('click', cycleLanguage);
+			elements.copyButton.addEventListener('click', copyBrief);
+			elements.downloadTextButton.addEventListener('click', () => {
+				const briefText = createBriefText();
+				if (!briefText) {
+					alert(t('enterDetails'));
+					return;
+				}
+				downloadFile(briefText, isZh() ? '互動式專題摘要.txt' : 'interactive-project-brief.txt', 'text/plain;charset=utf-8');
+			});
+			elements.downloadBilingualButton.addEventListener('click', () => {
+				const bilingualText = createBilingualBriefText();
+				if (!bilingualText) {
+					alert(t('enterDetails'));
+					return;
+				}
+				downloadFile(bilingualText, isZh() ? '互動式專題雙語摘要.txt' : 'interactive-project-brief-bilingual.txt', 'text/plain;charset=utf-8');
+			});
+			elements.downloadJsonButton.addEventListener('click', () => {
+				downloadFile(JSON.stringify(state, null, 2), isZh() ? '互動式專題規劃.json' : 'interactive-project-plan.json', 'application/json;charset=utf-8');
+			});
+			elements.printButton.addEventListener('click', () => window.print());
+		};
+
+		syncInputs();
+		bindEvents();
+		renderAll();
+	</script>
+</body>
+</html>

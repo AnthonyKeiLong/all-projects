@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homework Chaser - Local Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .grid-item { user-select: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-12">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="bg-indigo-600 text-white p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/></svg>
+                </div>
+                <h1 class="text-xl font-bold text-slate-900 tracking-tight">Homework Chaser <span class="text-sm font-medium text-indigo-600 ml-2 px-2 py-0.5 bg-indigo-50 rounded-full border border-indigo-100">Local Edition</span></h1>
+            </div>
+            <div class="text-sm text-slate-500 font-medium">All data stays on your device</div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-6">
+
+        <!-- Top Controls Section -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Input Area -->
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between items-end mb-1">
+                        <label class="block text-sm font-bold text-slate-700">Class List (No. Name)</label>
+                        <button onclick="window.loadDemoClass()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded border border-indigo-200">
+                            Load Demo
+                        </button>
+                    </div>
+                    <textarea id="class-list-input" rows="4" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none" placeholder="Paste list here...&#10;1 John Doe&#10;2 Jane Smith" oninput="window.parseInput()"></textarea>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="h-px bg-slate-200 flex-1"></div>
+                    <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">OR</span>
+                    <div class="h-px bg-slate-200 flex-1"></div>
+                </div>
+                <div>
+                    <input type="file" id="excel-upload" class="hidden" accept=".xlsx, .xls" onchange="window.handleExcelUpload(event)">
+                    <button onclick="document.getElementById('excel-upload').click()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-lg transition-colors border border-slate-200 flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        Import Class from Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings & Export Area -->
+            <div class="space-y-4 flex flex-col">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Assignment Name</label>
+                    <input type="text" id="assignment-name" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="e.g. Math Worksheet 1" oninput="window.updateOutput()">
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-100 p-4 rounded-lg mt-auto">
+                    <h3 class="text-sm font-bold text-blue-900 mb-1">How to use:</h3>
+                    <ul class="text-xs text-blue-800 space-y-1 list-disc pl-4">
+                        <li>Click a student once to mark <span class="font-bold text-red-600">Missing</span>.</li>
+                        <li>Click again to mark <span class="font-bold text-slate-500">Absent</span>.</li>
+                        <li>Exporting triggers a "Save As" dialog so you can choose your folder.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid & Output Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left: Student Grid -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-end mb-4 border-b border-slate-100 pb-4">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-500"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        Student Roster
+                    </h2>
+                    <div id="stats-counter" class="text-sm font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                        0 Students
+                    </div>
+                </div>
+
+                <div id="empty-state" class="py-12 text-center text-slate-400 flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-3 opacity-50"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    <p>Paste a class list or upload an Excel file to generate the grid.</p>
+                </div>
+
+                <div id="student-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                    <!-- Buttons generated by JS -->
+                </div>
+            </div>
+
+            <!-- Right: Output Lists -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full">
+                <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-4">
+                    <h2 class="text-lg font-bold text-slate-800">Results</h2>
+                    <button onclick="window.exportToExcel()" class="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md font-semibold transition-colors flex items-center gap-1 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Export Excel
+                    </button>
+                </div>
+
+                <!-- Missing -->
+                <div class="flex-1 min-h-[150px] flex flex-col mb-4">
+                    <h3 class="text-sm font-bold text-red-600 mb-2 flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        Missing Homework
+                    </h3>
+                    <div id="output-message" class="flex-1 bg-red-50/50 border border-red-100 rounded-lg p-3 text-sm font-mono text-slate-700 whitespace-pre-wrap overflow-y-auto"></div>
+                    <button onclick="window.copyMessage('output-message')" id="copy-btn-missing" class="mt-2 w-full bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold py-2 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy Missing List
+                    </button>
+                </div>
+
+                <!-- Absent -->
+                <div class="flex-1 min-h-[150px] flex flex-col">
+                    <h3 class="text-sm font-bold text-slate-500 mb-2 flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                        Absent Students
+                    </h3>
+                    <div id="output-absent" class="flex-1 bg-slate-100/50 border border-slate-200 rounded-lg p-3 text-sm font-mono text-slate-700 whitespace-pre-wrap overflow-y-auto"></div>
+                    <button onclick="window.copyMessage('output-absent')" id="copy-btn-absent" class="mt-2 w-full bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold py-2 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy Absent List
+                    </button>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Bottom Section: Local Storage Tracker -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-slate-100 pb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span class="bg-indigo-100 text-indigo-700 w-6 h-6 rounded-full flex items-center justify-center text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                        </span> 
+                        Local Records Tracker
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-1">Tracks students missing homework. Saved locally; export/import JSON to backup.</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto flex-wrap justify-end">
+                    <input type="file" id="db-upload" class="hidden" accept=".json" onchange="window.loadDatabase(event)">
+                    <button onclick="document.getElementById('db-upload').click()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-colors border border-slate-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        Load Backup (.json)
+                    </button>
+                    <button onclick="window.downloadDatabase()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-colors border border-slate-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Save Backup (.json)
+                    </button>
+                    <button onclick="window.addToTracker()" id="add-tracker-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+                        Add Missing to Tracker
+                    </button>
+                    <button onclick="window.exportFlagsToExcel()" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Export Flags (.xlsx)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter -->
+            <div class="mb-4 flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    Flag Students with:
+                </label>
+                <select id="flag-threshold" onchange="window.renderLocalRecords()" class="border border-slate-300 rounded-md px-3 py-1.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none bg-white cursor-pointer">
+                    <option value="1">1+ Missed Assignments</option>
+                    <option value="3" selected>3+ Missed Assignments</option>
+                    <option value="5">5+ Missed Assignments</option>
+                    <option value="10">10+ Missed Assignments</option>
+                    <option value="15">15+ Missed Assignments</option>
+                </select>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto rounded-lg border border-slate-200">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b border-slate-200">
+                        <tr>
+                            <th class="px-6 py-4 w-24 text-center">Class No.</th>
+                            <th class="px-6 py-4">Name</th>
+                            <th class="px-6 py-4 text-center w-36">Total Missed</th>
+                            <th class="px-6 py-4">Assignment Records</th>
+                        </tr>
+                    </thead>
+                    <tbody id="local-records-tbody" class="divide-y divide-slate-100 bg-white">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+                <div id="local-empty-state" class="p-10 text-center text-slate-500 flex flex-col items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-30 mb-3"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"></path><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"></path></svg>
+                    <p>No students match the current flag threshold.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Main Logic Module -->
+    <script type="module">
+        // Global State
+        let students = [];
+        let localRecords = [];
+
+        // DOM Elements
+        const classListInput = document.getElementById('class-list-input');
+        const assignmentInput = document.getElementById('assignment-name');
+        const studentGrid = document.getElementById('student-grid');
+        const emptyState = document.getElementById('empty-state');
+        const statsCounter = document.getElementById('stats-counter');
+        const outputMessage = document.getElementById('output-message');
+        const outputAbsent = document.getElementById('output-absent');
+
+        // ==========================================
+        // Helper: File Name Generation with Timestamp
+        // ==========================================
+        const getFormattedFileName = (extension, suffix = '') => {
+            const now = new Date();
+            const dd = String(now.getDate()).padStart(2, '0');
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            
+            let hwName = assignmentInput.value.trim();
+            hwName = hwName ? hwName.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_') : 'Unnamed_Assignment';
+            hwName = hwName.replace(/_+/g, '_').replace(/_+$/, ''); 
+
+            let fileName = `${dd}${mm}${yyyy}_${hh}_${min}_${hwName}`;
+            if (suffix) {
+                fileName += `_${suffix}`;
+            }
+            
+            return `${fileName}.${extension}`;
+        };
+
+        // ==========================================
+        // Helper: Save File Dialog (File System Access API)
+        // ==========================================
+        const saveFileWithDialog = async (blob, defaultFileName, fileTypeOptions) => {
+            try {
+                // Check if browser supports File System Access API (Chrome, Edge)
+                if (window.showSaveFilePicker) {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: defaultFileName,
+                        types: [fileTypeOptions]
+                    });
+                    const writable = await handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                } else {
+                    // Fallback for browsers that don't support it (Firefox, Safari)
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = defaultFileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(url);
+                }
+            } catch (err) {
+                // AbortError is thrown if the user clicks "Cancel" in the dialog window. We can safely ignore it.
+                if (err.name !== 'AbortError') {
+                    console.error("Save failed:", err);
+                    alert("Failed to save the file. See console for details.");
+                }
+            }
+        };
+
+        // ==========================================
+        // Core Logic & Demo Functions
+        // ==========================================
+        
+        window.loadDemoClass = () => {
+            const demoData = `1 Alice Smith\n2 Bob Johnson\n3 Charlie Williams\n4 Diana Brown\n5 Ethan Jones\n6 Fiona Garcia\n7 George Martinez\n8 Hannah Rodriguez\n9 Ian Lee\n10 Julia Perez\n11 Kevin White\n12 Liam Harris\n13 Mia Clark\n14 Noah Lewis\n15 Olivia Robinson\n16 Peter Walker\n17 Quinn Hall\n18 Rachel Allen\n19 Samuel Young\n20 Taylor King`;
+            classListInput.value = demoData;
+            assignmentInput.value = "Chapter 4 Math Test";
+            window.parseInput();
+            window.updateOutput();
+        };
+
+        window.parseInput = () => {
+            const text = classListInput.value;
+            const lines = text.split('\n');
+            students = [];
+
+            lines.forEach(line => {
+                const match = line.match(/^(\d+)\s+(.+)$/);
+                if (match) {
+                    students.push({
+                        classNum: match[1],
+                        name: match[2].trim(),
+                        status: 'present' 
+                    });
+                }
+            });
+
+            window.renderGrid();
+        };
+
+        window.renderGrid = () => {
+            studentGrid.innerHTML = '';
+            
+            if (students.length === 0) {
+                emptyState.classList.remove('hidden');
+                studentGrid.classList.add('hidden');
+                statsCounter.innerText = `0 Students`;
+            } else {
+                emptyState.classList.add('hidden');
+                studentGrid.classList.remove('hidden');
+                statsCounter.innerText = `${students.length} Students`;
+            }
+
+            students.forEach((student, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'grid-item h-20 rounded-xl flex flex-col items-center justify-center p-2 text-sm transition-all duration-200 border-2 font-medium relative shadow-sm overflow-hidden group';
+                
+                // Status Styling
+                if (student.status === 'present') {
+                    btn.classList.add('bg-white', 'border-slate-200', 'hover:border-indigo-300', 'hover:shadow-md');
+                    btn.innerHTML = `
+                        <span class="text-slate-400 font-mono text-xs mb-1">#${student.classNum}</span>
+                        <span class="text-slate-700 text-center w-full truncate px-1">${student.name}</span>
+                    `;
+                } else if (student.status === 'missing') {
+                    btn.classList.add('bg-red-50', 'border-red-400', 'shadow-inner');
+                    btn.innerHTML = `
+                        <div class="absolute inset-0 bg-red-100/50"></div>
+                        <span class="relative z-10 text-red-500 font-mono text-xs mb-1 font-bold">#${student.classNum}</span>
+                        <span class="relative z-10 text-red-700 text-center w-full truncate px-1 font-bold">${student.name}</span>
+                        <div class="absolute top-1 right-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-red-500"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </div>
+                    `;
+                } else if (student.status === 'absent') {
+                    btn.classList.add('bg-slate-100', 'border-slate-300', 'opacity-70');
+                    btn.innerHTML = `
+                        <span class="text-slate-400 font-mono text-xs mb-1">#${student.classNum}</span>
+                        <span class="text-slate-500 text-center w-full truncate px-1 line-through">${student.name}</span>
+                        <div class="absolute top-1 right-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                        </div>
+                    `;
+                }
+
+                btn.onclick = () => window.toggleStatus(index);
+                studentGrid.appendChild(btn);
+            });
+
+            window.updateOutput();
+        };
+
+        window.toggleStatus = (index) => {
+            const currentStatus = students[index].status;
+            if (currentStatus === 'present') students[index].status = 'missing';
+            else if (currentStatus === 'missing') students[index].status = 'absent';
+            else students[index].status = 'present';
+            
+            window.renderGrid();
+        };
+
+        window.updateOutput = () => {
+            const hwName = assignmentInput.value.trim() || 'Homework';
+            
+            const missing = students.filter(s => s.status === 'missing');
+            if (missing.length === 0) {
+                outputMessage.innerHTML = `<span class="text-slate-400 italic">No missing students recorded yet.</span>`;
+            } else {
+                let msg = `[${hwName} - Missing List]\n\n`;
+                missing.forEach(s => msg += `${s.classNum}. ${s.name}\n`);
+                msg += `\nTotal Missing: ${missing.length}`;
+                outputMessage.innerText = msg;
+            }
+
+            const absent = students.filter(s => s.status === 'absent');
+            if (absent.length === 0) {
+                outputAbsent.innerHTML = `<span class="text-slate-400 italic">No absent students recorded yet.</span>`;
+            } else {
+                let msg = `[${hwName} - Absent List]\n\n`;
+                absent.forEach(s => msg += `${s.classNum}. ${s.name}\n`);
+                msg += `\nTotal Absent: ${absent.length}`;
+                outputAbsent.innerText = msg;
+            }
+        };
+
+        window.copyMessage = (elementId) => {
+            const el = document.getElementById(elementId);
+            const text = el.innerText;
+            if (text.includes('No missing students') || text.includes('No absent students')) return;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const btnId = elementId === 'output-message' ? 'copy-btn-missing' : 'copy-btn-absent';
+                const btn = document.getElementById(btnId);
+                const originalHtml = btn.innerHTML;
+                
+                btn.classList.add('bg-green-50', 'text-green-700', 'border-green-200');
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!`;
+                
+                setTimeout(() => {
+                    btn.classList.remove('bg-green-50', 'text-green-700', 'border-green-200');
+                    btn.innerHTML = originalHtml;
+                }, 2000);
+            });
+        };
+
+        // ==========================================
+        // Excel Import / Export (Current Roster)
+        // ==========================================
+
+        window.handleExcelUpload = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                let parsedText = '';
+                jsonData.forEach(row => {
+                    if (row.length >= 2) {
+                        const no = row[0];
+                        const name = row[1];
+                        if (no && name && !isNaN(no)) {
+                            parsedText += `${no} ${name}\n`;
+                        }
+                    }
+                });
+
+                if (parsedText) {
+                    classListInput.value = parsedText.trim();
+                    window.parseInput();
+                } else {
+                    alert("Could not find valid 'Class No' and 'Name' columns in the Excel file. Please ensure column A is Number and column B is Name.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            e.target.value = '';
+        };
+
+        window.exportToExcel = () => {
+            if (students.length === 0) {
+                alert("No student data to export.");
+                return;
+            }
+
+            const data = students.map(s => ({
+                "Class Number": s.classNum,
+                "Student Name": s.name,
+                "Status": s.status.charAt(0).toUpperCase() + s.status.slice(1)
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Homework Status");
+
+            const fileName = getFormattedFileName('xlsx');
+            
+            // Create Blob and trigger Save As dialog
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            
+            saveFileWithDialog(blob, fileName, {
+                description: 'Excel Workbook',
+                accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
+            });
+        };
+
+
+        // ==========================================
+        // Local File-Based Tracking (Database)
+        // ==========================================
+        
+        window.renderLocalRecords = () => {
+            const threshold = parseInt(document.getElementById('flag-threshold').value, 10);
+            const tbody = document.getElementById('local-records-tbody');
+            const emptyStateEl = document.getElementById('local-empty-state');
+            
+            const grouped = {};
+            localRecords.forEach(r => {
+                const key = `${r.classNum}_${r.studentName}`;
+                if (!grouped[key]) {
+                    grouped[key] = { 
+                        classNum: parseInt(r.classNum, 10) || r.classNum, 
+                        name: r.studentName, 
+                        count: 0, 
+                        assignments: [] 
+                    };
+                }
+                grouped[key].count++;
+                grouped[key].assignments.push(r.assignmentName);
+            });
+
+            const flagged = Object.values(grouped)
+                .filter(s => s.count >= threshold)
+                .sort((a, b) => {
+                    if (b.count !== a.count) return b.count - a.count;
+                    return a.classNum - b.classNum;
+                });
+
+            tbody.innerHTML = '';
+            
+            if (flagged.length === 0) {
+                emptyStateEl.classList.remove('hidden');
+                tbody.parentElement.classList.add('hidden');
+            } else {
+                emptyStateEl.classList.add('hidden');
+                tbody.parentElement.classList.remove('hidden');
+                
+                flagged.forEach(s => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50 transition-colors";
+                    
+                    let badgeClass = "bg-slate-100 text-slate-800";
+                    if (s.count >= 10) badgeClass = "bg-red-100 text-red-800 ring-1 ring-red-200";
+                    else if (s.count >= 5) badgeClass = "bg-orange-100 text-orange-800 ring-1 ring-orange-200";
+                    else if (s.count >= 3) badgeClass = "bg-amber-100 text-amber-800 ring-1 ring-amber-200";
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 font-mono text-center text-slate-500">${s.classNum}</td>
+                        <td class="px-6 py-4 font-semibold text-slate-900">${s.name}</td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}">
+                                ${s.count} Missed
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-xs text-slate-600 leading-relaxed">
+                            ${s.assignments.join('<br><span class="text-slate-300">|</span> ')}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        };
+
+        window.addToTracker = () => {
+            const missingStudents = students.filter(s => s.status === 'missing');
+            if (missingStudents.length === 0) {
+                alert("There are no 'Missing' students marked in the roster to add.");
+                return;
+            }
+            
+            const hwName = assignmentInput.value.trim() || 'Unnamed Assignment';
+            const dateStr = new Date().toISOString();
+
+            missingStudents.forEach(s => {
+                localRecords.push({
+                    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString() + Math.random(),
+                    classNum: s.classNum,
+                    studentName: s.name,
+                    assignmentName: hwName,
+                    date: dateStr,
+                    timestamp: Date.now()
+                });
+            });
+
+            window.renderLocalRecords();
+            
+            const addBtn = document.getElementById('add-tracker-btn');
+            const originalHtml = addBtn.innerHTML;
+            
+            addBtn.classList.replace('bg-indigo-600', 'bg-green-600');
+            addBtn.classList.replace('hover:bg-indigo-700', 'hover:bg-green-700');
+            addBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Added to Tracker!`;
+            
+            setTimeout(() => {
+                addBtn.innerHTML = originalHtml;
+                addBtn.classList.replace('bg-green-600', 'bg-indigo-600');
+                addBtn.classList.replace('hover:bg-green-700', 'hover:bg-indigo-700');
+            }, 3000);
+        };
+
+        window.downloadDatabase = () => {
+            if (localRecords.length === 0) {
+                alert("There are no records to backup.");
+                return;
+            }
+            
+            const fileName = getFormattedFileName('json', 'Backup');
+            const jsonStr = JSON.stringify(localRecords, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            
+            saveFileWithDialog(blob, fileName, {
+                description: 'JSON Database',
+                accept: { 'application/json': ['.json'] }
+            });
+        };
+
+        window.loadDatabase = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (Array.isArray(data)) {
+                        localRecords = data;
+                        window.renderLocalRecords();
+                        alert("Database backup loaded successfully.");
+                    } else {
+                        alert("Invalid backup file format.");
+                    }
+                } catch (err) {
+                    alert("Error reading backup file.");
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        };
+
+        window.exportFlagsToExcel = () => {
+            if (localRecords.length === 0) {
+                alert("No records found in tracker to export.");
+                return;
+            }
+            
+            const threshold = parseInt(document.getElementById('flag-threshold').value, 10);
+            
+            const grouped = {};
+            localRecords.forEach(r => {
+                const key = `${r.classNum}_${r.studentName}`;
+                if (!grouped[key]) {
+                    grouped[key] = { classNum: parseInt(r.classNum, 10) || r.classNum, name: r.studentName, count: 0, assignments: [] };
+                }
+                grouped[key].count++;
+                grouped[key].assignments.push(r.assignmentName);
+            });
+
+            const flagged = Object.values(grouped)
+                .filter(s => s.count >= threshold)
+                .sort((a, b) => b.count - a.count);
+
+            if (flagged.length === 0) {
+                alert(`No students found with ${threshold}+ missed assignments to export.`);
+                return;
+            }
+
+            const data = flagged.map(s => ({
+                "Class Number": s.classNum,
+                "Student Name": s.name,
+                "Times Missed": s.count,
+                "Assignments Missed": s.assignments.join(', ')
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, `Flagged (${threshold}+)`);
+
+            const fileName = getFormattedFileName('xlsx', 'Flagged');
+            
+            // Create Blob and trigger Save As dialog
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            
+            saveFileWithDialog(blob, fileName, {
+                description: 'Excel Workbook',
+                accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
+            });
+        };
+
+        // Initialize empty state
+        window.renderGrid();
+
+    </script>
+</body>
+</html>

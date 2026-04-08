@@ -1,0 +1,78 @@
+{
+  "timestamp": "20260326_102013",
+  "total_files": 2,
+  "actions": [
+    {
+      "old_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\Exam guidebook.pdf",
+      "new_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\[Unknown][Unknown]Mock Exam Papers.pdf"
+    }
+  ],
+  "details": [
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\Exam guidebook.pdf",
+      "sha256": "b4ec7c36588b4e6368ddec9274107b08ffcb6949c69703ac648164904bfe6d05",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "",
+          "confidence": 0.0,
+          "snippet": ""
+        },
+        "publisher": {
+          "value": "Unknown",
+          "confidence": 0.2,
+          "snippet": ""
+        },
+        "subject": {
+          "value": "Unknown",
+          "confidence": 0.1,
+          "snippet": ""
+        },
+        "part": {
+          "value": "",
+          "confidence": 0.0,
+          "snippet": ""
+        },
+        "language": "eng",
+        "multi_papers": [],
+        "overall_confidence": 0.1
+      },
+      "suggested_name": "[Unknown][Unknown]Mock Exam Papers.pdf",
+      "skipped": false,
+      "skip_reason": ""
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\Prep for DSE.pdf",
+      "sha256": "3140ebf58bdb68e5320be64423cb770f42b66bdd35be0205d82e98afb57988cf",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "",
+          "confidence": 0.0,
+          "snippet": ""
+        },
+        "publisher": {
+          "value": "Unknown",
+          "confidence": 0.2,
+          "snippet": ""
+        },
+        "subject": {
+          "value": "Unknown",
+          "confidence": 0.1,
+          "snippet": ""
+        },
+        "part": {
+          "value": "",
+          "confidence": 0.0,
+          "snippet": ""
+        },
+        "language": "eng",
+        "multi_papers": [],
+        "overall_confidence": 0.1
+      },
+      "suggested_name": "[Unknown][Unknown]Mock Exam Papers.pdf",
+      "skipped": false,
+      "skip_reason": ""
+    }
+  ]
+}

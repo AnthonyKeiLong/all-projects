@@ -1,0 +1,4 @@
+remote_pattern,local_template
+/files/docs/(.*),docs/\1
+/files/images/(.*),assets/images/\1
+/archive/(\d{4})/(.*),old/\1/\2

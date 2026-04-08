@@ -1,0 +1,50 @@
+{
+  "timestamp": "20260326_120000",
+  "total_files": 1,
+  "actions": [
+    {
+      "old_path": "C:/exams/aristo_math_mock_2023.pdf",
+      "new_path": "C:/exams/[2022-2023][Aristo][Mathematics]Mock Exam Papers[Paper 1].pdf"
+    }
+  ],
+  "details": [
+    {
+      "original_path": "C:/exams/aristo_math_mock_2023.pdf",
+      "sha256": "a1b2c3d4e5f6...",
+      "text_method": "native",
+      "fields": {
+        "year": {
+          "value": "2022-2023",
+          "confidence": 0.95,
+          "snippet": "HKDSE 2022-2023 Mock Examination"
+        },
+        "publisher": {
+          "value": "Aristo",
+          "confidence": 0.95,
+          "snippet": "Aristo Educational Press"
+        },
+        "subject": {
+          "value": "Mathematics",
+          "confidence": 0.9,
+          "snippet": "Mathematics Compulsory Part"
+        },
+        "part": {
+          "value": "Paper 1",
+          "confidence": 0.9,
+          "snippet": "Paper 1 Section A(1)"
+        },
+        "language": "eng",
+        "multi_papers": [],
+        "isbn": {
+          "value": "978-962-123-456-7",
+          "confidence": 0.9,
+          "snippet": "ISBN: 978-962-123-456-7"
+        },
+        "overall_confidence": 0.925
+      },
+      "suggested_name": "[2022-2023][Aristo][Mathematics]Mock Exam Papers[Paper 1].pdf",
+      "skipped": false,
+      "skip_reason": ""
+    }
+  ]
+}

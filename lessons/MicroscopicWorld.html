@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE Chemistry: Microscopic World</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .nucleus-particle {
+            transition: all 0.3s ease;
+        }
+        .electron-orbit {
+            animation: spin 10s linear infinite;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Bonding Animations */
+        .bonding-tab-content { display: none; }
+        .bonding-tab-content.active { display: block; }
+        
+        .transfer-electron { animation: transfer 2.5s infinite ease-in-out; }
+        @keyframes transfer {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            40% { transform: translate(120px, 0) scale(1); opacity: 1; }
+            50% { transform: translate(120px, 0) scale(0); opacity: 0; }
+            100% { transform: translate(120px, 0) scale(0); opacity: 0; }
+        }
+
+        .delocalized-electron { animation: drift 3s infinite ease-in-out alternate; }
+        @keyframes drift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, -20px); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-6 shadow-lg mb-8">
+        <div class="max-w-6xl mx-auto flex items-center gap-4">
+            <i class="fas fa-atom text-4xl text-blue-200"></i>
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight">HKDSE Microscopic World</h1>
+                <p class="text-blue-200 text-sm mt-1">Interactive Study Guide for Atomic Structure & Bonding</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 space-y-10">
+
+        <!-- SECTION 1: ATOMIC STRUCTURE & ISOTOPES -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-100 px-6 py-4 border-b border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-microscope text-blue-600"></i> 1. Atomic Structure & Isotopes
+                </h2>
+            </div>
+            
+            <div class="p-6">
+                <!-- Interactive Atom Builder -->
+                <div class="flex flex-col md:flex-row gap-8 bg-slate-50 p-6 rounded-xl border border-slate-200 mb-8">
+                    <!-- Controls -->
+                    <div class="w-full md:w-1/3 space-y-6">
+                        <h3 class="text-lg font-bold text-slate-700 border-b pb-2">Atom Builder</h3>
+                        
+                        <!-- Protons -->
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-red-600">Protons (p⁺)</span>
+                                <span id="proton-count" class="text-lg font-bold">6</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <button onclick="updateAtom('proton', -1)" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center font-bold">-</button>
+                                <input type="range" id="proton-slider" min="1" max="94" value="6" class="w-full" oninput="updateFromSlider('proton')">
+                                <button onclick="updateAtom('proton', 1)" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center font-bold">+</button>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2">Determines the Element (Atomic Number)</p>
+                        </div>
+
+                        <!-- Neutrons -->
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-blue-600">Neutrons (n⁰)</span>
+                                <span id="neutron-count" class="text-lg font-bold">6</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <button onclick="updateAtom('neutron', -1)" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center font-bold">-</button>
+                                <input type="range" id="neutron-slider" min="0" max="150" value="6" class="w-full" oninput="updateFromSlider('neutron')">
+                                <button onclick="updateAtom('neutron', 1)" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center font-bold">+</button>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2">Determines the Isotope (Mass Number)</p>
+                        </div>
+                    </div>
+
+                    <!-- Display -->
+                    <div class="w-full md:w-2/3 flex flex-col items-center justify-center bg-white rounded-lg shadow-sm border border-slate-100 p-6 relative overflow-hidden">
+                        <div class="absolute top-4 left-4">
+                            <div class="text-5xl font-serif font-bold text-slate-800" id="element-symbol">C</div>
+                            <div class="text-lg text-slate-600 mt-1" id="element-name">Carbon-12</div>
+                        </div>
+                        
+                        <div class="absolute top-4 right-4 text-right">
+                            <div id="stability-badge" class="px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700 border border-green-200">
+                                Stable
+                            </div>
+                            <div class="mt-2 text-sm text-slate-600">Mass: <span id="mass-number" class="font-bold">12</span></div>
+                        </div>
+
+                        <!-- Visual representation of nucleus -->
+                        <div class="w-48 h-48 rounded-full border-4 border-dashed border-slate-200 flex items-center justify-center relative mt-12">
+                            <!-- Electrons visualization (symbolic) -->
+                            <div class="absolute inset-0 electron-orbit rounded-full border border-blue-200" style="width: 120%; height: 120%; left: -10%; top: -10%;">
+                                <div class="w-3 h-3 bg-yellow-400 rounded-full absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                                <div class="w-3 h-3 bg-yellow-400 rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"></div>
+                            </div>
+                            
+                            <!-- Nucleus -->
+                            <div id="nucleus-container" class="relative w-24 h-24 flex flex-wrap items-center justify-center content-center gap-0.5">
+                                <!-- Particles injected via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deep Dive: Isotope Stability -->
+                <h3 class="text-xl font-bold text-slate-800 mb-4 mt-10 border-b pb-2">Nuclear Stability Deep Dive</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Stable -->
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 border-t-4 border-t-green-500 hover:shadow-md transition-shadow">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-shield-alt text-green-500"></i> Stable Isotopes
+                        </h3>
+                        <p class="text-slate-700 text-sm mb-3">Isotopes with a balanced ratio of protons to neutrons. The strong nuclear force perfectly balances the electrostatic repulsion between protons.</p>
+                        <ul class="text-sm text-slate-600 space-y-2 mb-4 list-disc pl-5">
+                            <li>Do not undergo radioactive decay.</li>
+                            <li>Make up most of the matter we interact with daily.</li>
+                        </ul>
+                        <div class="bg-green-50 text-green-800 text-xs p-3 rounded border border-green-100">
+                            <strong>Example:</strong> Carbon-12 (6p, 6n) and Carbon-13 (6p, 7n) are both entirely stable.
+                        </div>
+                    </div>
+
+                    <!-- Radioisotopes -->
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 border-t-4 border-t-yellow-500 hover:shadow-md transition-shadow relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-1 rounded-bl-lg border-b border-l border-yellow-200">KEY TERM</div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-radiation text-yellow-500"></i> Radioisotopes
+                        </h3>
+                        <p class="text-slate-700 text-sm mb-3">Also known as <strong>Radionuclides</strong>. These are unstable isotopes of an element caused by having too many or too few neutrons compared to protons.</p>
+                        <p class="text-slate-700 text-sm mb-4">To achieve stability, the unstable nucleus spontaneously decays, emitting alpha, beta, or gamma radiation.</p>
+                        <div class="bg-yellow-50 text-yellow-800 text-xs p-3 rounded border border-yellow-100">
+                            <strong>Example:</strong> Carbon-14 (6p, 8n) has too many neutrons and decays via beta emission. It is used in radiocarbon dating.
+                        </div>
+                    </div>
+
+                    <!-- Unstable Elements -->
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 border-t-4 border-t-red-500 hover:shadow-md transition-shadow">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-exclamation-triangle text-red-500"></i> Unstable Elements
+                        </h3>
+                        <p class="text-slate-700 text-sm mb-3">Elements with massive nuclei (Atomic Number > 82). The strong nuclear force has a very short range and cannot overcome the immense electrostatic repulsion of dozens of protons.</p>
+                        <div class="bg-red-50 text-red-800 text-xs p-3 rounded border border-red-100 mt-4">
+                            <strong>No Stable Isotopes:</strong> For elements like Uranium (92p) or Plutonium (94p), no amount of neutron "glue" works. Every single isotope of these elements is a radionuclide.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: CHEMICAL BONDING -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-100 px-6 py-4 border-b border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-link text-indigo-600"></i> 2. Chemical Bonding
+                </h2>
+            </div>
+            
+            <div class="p-0">
+                <!-- Bonding Tabs Navigation -->
+                <div class="flex border-b border-slate-200 bg-slate-50 flex-col md:flex-row">
+                    <button onclick="switchBondingTab('ionic')" id="tab-btn-ionic" class="tab-btn flex-1 py-4 px-2 text-center font-bold text-indigo-700 bg-white border-b-2 border-indigo-600 transition-colors">Ionic Bonding</button>
+                    <button onclick="switchBondingTab('covalent')" id="tab-btn-covalent" class="tab-btn flex-1 py-4 px-2 text-center font-bold text-slate-500 border-b-2 border-transparent hover:text-teal-600 transition-colors">Covalent Bonding</button>
+                    <button onclick="switchBondingTab('metallic')" id="tab-btn-metallic" class="tab-btn flex-1 py-4 px-2 text-center font-bold text-slate-500 border-b-2 border-transparent hover:text-orange-600 transition-colors">Metallic Bonding</button>
+                </div>
+
+                <div class="p-6 md:p-8">
+                    <!-- Ionic Content -->
+                    <div id="tab-ionic" class="bonding-tab-content active">
+                        <div class="flex flex-col md:flex-row gap-8 items-center">
+                            <div class="w-full md:w-1/2">
+                                <h4 class="font-bold text-indigo-700 text-2xl mb-4">Ionic Bonding</h4>
+                                <p class="text-slate-700 mb-4">Occurs between <strong>metals and non-metals</strong>. Atoms completely transfer valence electrons to achieve a full, stable outer shell (octet configuration).</p>
+                                <ul class="list-disc pl-5 text-slate-600 space-y-2 mb-4">
+                                    <li>Metals lose electrons to become positive ions (cations).</li>
+                                    <li>Non-metals gain electrons to become negative ions (anions).</li>
+                                    <li>Opposite charges attract via strong electrostatic forces, forming a giant ionic lattice.</li>
+                                </ul>
+                                <div class="bg-indigo-50 p-4 rounded-lg text-sm text-indigo-800 font-mono text-center">
+                                    Na (2,8,1) + Cl (2,8,7) <br>↓<br> Na⁺ (2,8) + Cl⁻ (2,8,8)
+                                </div>
+                            </div>
+                            <div class="w-full md:w-1/2 flex justify-center py-10 bg-slate-50 rounded-xl border border-slate-200">
+                                <div class="flex items-center gap-12 relative">
+                                    <!-- Na Atom -->
+                                    <div class="relative w-20 h-20 rounded-full border-2 border-indigo-300 flex items-center justify-center bg-indigo-100 shadow-inner">
+                                        <span class="font-bold text-indigo-800 text-xl">Na</span>
+                                        <div class="w-4 h-4 bg-yellow-400 rounded-full absolute -top-2 right-4 transfer-electron shadow-sm border border-yellow-500 z-10"></div>
+                                    </div>
+                                    <!-- Cl Atom -->
+                                    <div class="relative w-24 h-24 rounded-full border-2 border-green-300 flex items-center justify-center bg-green-100 shadow-inner">
+                                        <span class="font-bold text-green-800 text-xl">Cl</span>
+                                        <div class="w-4 h-4 bg-yellow-400 rounded-full absolute top-2 left-2 opacity-50"></div>
+                                        <div class="w-4 h-4 bg-yellow-400 rounded-full absolute top-2 right-2 opacity-50"></div>
+                                        <div class="w-4 h-4 bg-yellow-400 rounded-full absolute bottom-2 left-2 opacity-50"></div>
+                                        <div class="w-4 h-4 bg-yellow-400 rounded-full absolute bottom-2 right-2 opacity-50"></div>
+                                        <div class="w-4 h-4 bg-yellow-400 rounded-full absolute left-0 top-1/2 -translate-y-1/2 opacity-50"></div>
+                                        <div class="w-4 h-4 bg-yellow-400 rounded-full absolute right-0 top-1/2 -translate-y-1/2 opacity-50"></div>
+                                        <div class="w-4 h-4 bg-yellow-400 rounded-full absolute -bottom-2 right-1/2 opacity-50"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Covalent Content -->
+                    <div id="tab-covalent" class="bonding-tab-content">
+                        <div class="flex flex-col md:flex-row gap-8 items-center">
+                            <div class="w-full md:w-1/2">
+                                <h4 class="font-bold text-teal-700 text-2xl mb-4">Covalent Bonding</h4>
+                                <p class="text-slate-700 mb-4">Occurs between <strong>non-metal atoms</strong>. Atoms share pairs of valence electrons because neither atom is willing to completely lose an electron.</p>
+                                <ul class="list-disc pl-5 text-slate-600 space-y-2 mb-4">
+                                    <li>The shared electrons are strongly attracted to both positive nuclei, holding the atoms together.</li>
+                                    <li>Can form simple molecules (e.g., H₂O, CO₂) or giant covalent structures (e.g., Diamond, Graphite).</li>
+                                </ul>
+                                <div class="bg-teal-50 p-4 rounded-lg text-sm text-teal-800 font-mono text-center">
+                                    H (1) + H (1) <br>↓<br> H : H (or H-H)
+                                </div>
+                            </div>
+                            <div class="w-full md:w-1/2 flex justify-center py-10 bg-slate-50 rounded-xl border border-slate-200">
+                                <div class="flex items-center relative">
+                                    <!-- H Atom 1 -->
+                                    <div class="relative w-24 h-24 rounded-full border-2 border-teal-400 flex items-center justify-center bg-teal-50/50 translate-x-4 mix-blend-multiply">
+                                        <span class="font-bold text-teal-800 text-xl -translate-x-3">H</span>
+                                    </div>
+                                    <!-- H Atom 2 -->
+                                    <div class="relative w-24 h-24 rounded-full border-2 border-teal-400 flex items-center justify-center bg-teal-50/50 -translate-x-4 mix-blend-multiply">
+                                        <span class="font-bold text-teal-800 text-xl translate-x-3">H</span>
+                                    </div>
+                                    <!-- Shared Electrons -->
+                                    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col gap-2">
+                                        <div class="w-3 h-3 bg-yellow-400 rounded-full shadow-sm border border-yellow-500"></div>
+                                        <div class="w-3 h-3 bg-yellow-400 rounded-full shadow-sm border border-yellow-500"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metallic Content -->
+                    <div id="tab-metallic" class="bonding-tab-content">
+                        <div class="flex flex-col md:flex-row gap-8 items-center">
+                            <div class="w-full md:w-1/2">
+                                <h4 class="font-bold text-orange-700 text-2xl mb-4">Metallic Bonding</h4>
+                                <p class="text-slate-700 mb-4">Occurs in <strong>pure metals and alloys</strong>. Metal atoms pack closely together and their outer valence electrons become "delocalized" (free to move).</p>
+                                <ul class="list-disc pl-5 text-slate-600 space-y-2 mb-4">
+                                    <li>Creates a regular lattice of positive metal ions immersed in a "sea" of delocalized electrons.</li>
+                                    <li>The strong electrostatic attraction between the ions and the mobile electrons forms the metallic bond.</li>
+                                    <li>Explains properties like electrical conductivity and malleability.</li>
+                                </ul>
+                            </div>
+                            <div class="w-full md:w-1/2 flex justify-center py-10 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden relative">
+                                <div class="grid grid-cols-3 gap-4">
+                                    <!-- Metal Ions -->
+                                    <div class="w-12 h-12 rounded-full bg-orange-200 border-2 border-orange-400 flex items-center justify-center font-bold text-orange-800 shadow-md z-10">M⁺</div>
+                                    <div class="w-12 h-12 rounded-full bg-orange-200 border-2 border-orange-400 flex items-center justify-center font-bold text-orange-800 shadow-md z-10">M⁺</div>
+                                    <div class="w-12 h-12 rounded-full bg-orange-200 border-2 border-orange-400 flex items-center justify-center font-bold text-orange-800 shadow-md z-10">M⁺</div>
+                                    <div class="w-12 h-12 rounded-full bg-orange-200 border-2 border-orange-400 flex items-center justify-center font-bold text-orange-800 shadow-md z-10">M⁺</div>
+                                    <div class="w-12 h-12 rounded-full bg-orange-200 border-2 border-orange-400 flex items-center justify-center font-bold text-orange-800 shadow-md z-10">M⁺</div>
+                                    <div class="w-12 h-12 rounded-full bg-orange-200 border-2 border-orange-400 flex items-center justify-center font-bold text-orange-800 shadow-md z-10">M⁺</div>
+                                </div>
+                                <!-- Delocalized Electrons -->
+                                <div class="w-3 h-3 bg-blue-400 rounded-full absolute top-12 left-12 delocalized-electron" style="animation-delay: 0s;"></div>
+                                <div class="w-3 h-3 bg-blue-400 rounded-full absolute top-16 right-16 delocalized-electron" style="animation-delay: -1s;"></div>
+                                <div class="w-3 h-3 bg-blue-400 rounded-full absolute bottom-12 left-1/2 delocalized-electron" style="animation-delay: -2s;"></div>
+                                <div class="w-3 h-3 bg-blue-400 rounded-full absolute top-24 left-20 delocalized-electron" style="animation-delay: -1.5s;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: KNOWLEDGE CHECK / TEST -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-100 px-6 py-4 border-b border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-clipboard-check text-green-600"></i> 3. Knowledge Check
+                </h2>
+            </div>
+            <div class="p-6 md:p-8 space-y-8" id="quiz-container">
+                
+                <!-- Q1 -->
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                    <p class="font-bold text-slate-800 text-lg mb-4">1. An isotope of Carbon has 6 protons and 8 neutrons. What is its mass number?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <input type="radio" name="q1" value="wrong1" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">6</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <input type="radio" name="q1" value="wrong2" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">8</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <input type="radio" name="q1" value="wrong3" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">12</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <input type="radio" name="q1" value="correct" id="q1-correct" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">14</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                    <p class="font-bold text-slate-800 text-lg mb-4">2. What type of bonding is typically formed between a metal and a non-metal?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <input type="radio" name="q2" value="wrong1" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">Covalent Bonding</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <input type="radio" name="q2" value="correct" id="q2-correct" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">Ionic Bonding</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <input type="radio" name="q2" value="wrong2" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">Metallic Bonding</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <input type="radio" name="q2" value="wrong3" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">Hydrogen Bonding</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                    <p class="font-bold text-slate-800 text-lg mb-4">3. Why are massive elements like Uranium entirely unstable (radioactive)?</p>
+                    <div class="grid grid-cols-1 gap-3">
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <input type="radio" name="q3" value="wrong1" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">They have too few neutrons compared to protons.</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <input type="radio" name="q3" value="wrong2" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">They have a stable octet arrangement.</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <input type="radio" name="q3" value="correct" id="q3-correct" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium text-slate-700">The nucleus is too large for the short-range strong nuclear force to overcome proton repulsion.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row items-center gap-4 border-t border-slate-200 pt-6 mt-6">
+                    <button onclick="checkQuiz()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-sm transition-colors text-lg flex items-center justify-center gap-2">
+                        <i class="fas fa-check-circle"></i> Submit Answers
+                    </button>
+                    <div id="quiz-result" class="hidden py-3 px-6 rounded-xl font-bold text-lg flex-1 text-center md:text-left w-full"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Element Data (Simplified for first 20 elements + Uranium/Plutonium for demo)
+        const elements = [
+            { z: 1, sym: "H", name: "Hydrogen", stableNeutrons: [0, 1] },
+            { z: 2, sym: "He", name: "Helium", stableNeutrons: [1, 2] },
+            { z: 3, sym: "Li", name: "Lithium", stableNeutrons: [3, 4] },
+            { z: 4, sym: "Be", name: "Beryllium", stableNeutrons: [5] },
+            { z: 5, sym: "B", name: "Boron", stableNeutrons: [5, 6] },
+            { z: 6, sym: "C", name: "Carbon", stableNeutrons: [6, 7] },
+            { z: 7, sym: "N", name: "Nitrogen", stableNeutrons: [7, 8] },
+            { z: 8, sym: "O", name: "Oxygen", stableNeutrons: [8, 9, 10] },
+            { z: 9, sym: "F", name: "Fluorine", stableNeutrons: [10] },
+            { z: 10, sym: "Ne", name: "Neon", stableNeutrons: [10, 11, 12] },
+            { z: 11, sym: "Na", name: "Sodium", stableNeutrons: [12] },
+            { z: 12, sym: "Mg", name: "Magnesium", stableNeutrons: [12, 13, 14] },
+            { z: 13, sym: "Al", name: "Aluminum", stableNeutrons: [14] },
+            { z: 14, sym: "Si", name: "Silicon", stableNeutrons: [14, 15, 16] },
+            { z: 15, sym: "P", name: "Phosphorus", stableNeutrons: [16] },
+            { z: 16, sym: "S", name: "Sulfur", stableNeutrons: [16, 17, 18, 20] },
+            { z: 17, sym: "Cl", name: "Chlorine", stableNeutrons: [18, 20] },
+            { z: 18, sym: "Ar", name: "Argon", stableNeutrons: [18, 20, 22] },
+            { z: 19, sym: "K", name: "Potassium", stableNeutrons: [20, 22] },
+            { z: 20, sym: "Ca", name: "Calcium", stableNeutrons: [20, 22, 23, 24, 26] },
+            // Skip middle elements for simple demo, jump to heavy
+            { z: 92, sym: "U", name: "Uranium", stableNeutrons: [] }, // No stable isotopes
+            { z: 94, sym: "Pu", name: "Plutonium", stableNeutrons: [] } // No stable isotopes
+        ];
+
+        // Full lookup lists for elements 1-94 to prevent the "?" fallback
+        const allSymbols = ["", "H","He","Li","Be","B","C","N","O","F","Ne","Na","Mg","Al","Si","P","S","Cl","Ar","K","Ca","Sc","Ti","V","Cr","Mn","Fe","Co","Ni","Cu","Zn","Ga","Ge","As","Se","Br","Kr","Rb","Sr","Y","Zr","Nb","Mo","Tc","Ru","Rh","Pd","Ag","Cd","In","Sn","Sb","Te","I","Xe","Cs","Ba","La","Ce","Pr","Nd","Pm","Sm","Eu","Gd","Tb","Dy","Ho","Er","Tm","Yb","Lu","Hf","Ta","W","Re","Os","Ir","Pt","Au","Hg","Tl","Pb","Bi","Po","At","Rn","Fr","Ra","Ac","Th","Pa","U","Np","Pu"];
+        const allNames = ["", "Hydrogen","Helium","Lithium","Beryllium","Boron","Carbon","Nitrogen","Oxygen","Fluorine","Neon","Sodium","Magnesium","Aluminum","Silicon","Phosphorus","Sulfur","Chlorine","Argon","Potassium","Calcium","Scandium","Titanium","Vanadium","Chromium","Manganese","Iron","Cobalt","Nickel","Copper","Zinc","Gallium","Germanium","Arsenic","Selenium","Bromine","Krypton","Rubidium","Strontium","Yttrium","Zirconium","Niobium","Molybdenum","Technetium","Ruthenium","Rhodium","Palladium","Silver","Cadmium","Indium","Tin","Antimony","Tellurium","Iodine","Xenon","Cesium","Barium","Lanthanum","Cerium","Praseodymium","Neodymium","Promethium","Samarium","Europium","Gadolinium","Terbium","Dysprosium","Holmium","Erbium","Thulium","Ytterbium","Lutetium","Hafnium","Tantalum","Tungsten","Rhenium","Osmium","Iridium","Platinum","Gold","Mercury","Thallium","Lead","Bismuth","Polonium","Astatine","Radon","Francium","Radium","Actinium","Thorium","Protactinium","Uranium","Neptunium","Plutonium"];
+
+        let currentProtons = 6;
+        let currentNeutrons = 6;
+
+        function getElementData(protons) {
+            // Find exact match in our detailed array first
+            let el = elements.find(e => e.z === protons);
+            if (el) return el;
+            
+            // Fallback for elements missing detailed stable isotope data
+            let sym = allSymbols[protons] || "Unk";
+            let name = allNames[protons] || "Heavy Element";
+            
+            if (protons > 82) {
+                 return { z: protons, sym: sym, name: name, stableNeutrons: [] };
+            }
+            
+            // Rough mathematical guess for the stable neutron count of middle-range elements
+            let guessedNeutrons = Math.floor(protons * (1 + (protons / 150))); 
+            return { z: protons, sym: sym, name: name, stableNeutrons: [guessedNeutrons] }; 
+        }
+
+        function updateAtom(type, change) {
+            if (type === 'proton') {
+                currentProtons = Math.max(1, Math.min(94, currentProtons + change));
+                document.getElementById('proton-slider').value = currentProtons;
+                // Auto-adjust neutrons to nearest stable isotope to make UI friendly
+                let elData = getElementData(currentProtons);
+                if (elData.stableNeutrons.length > 0) {
+                    currentNeutrons = elData.stableNeutrons[0];
+                    document.getElementById('neutron-slider').value = currentNeutrons;
+                } else {
+                    currentNeutrons = Math.floor(currentProtons * 1.5); // Rough guess for heavy elements
+                    document.getElementById('neutron-slider').value = currentNeutrons;
+                }
+            } else {
+                currentNeutrons = Math.max(0, Math.min(150, currentNeutrons + change));
+                document.getElementById('neutron-slider').value = currentNeutrons;
+            }
+            renderAtom();
+        }
+
+        function updateFromSlider(type) {
+            if (type === 'proton') {
+                currentProtons = parseInt(document.getElementById('proton-slider').value);
+                let elData = getElementData(currentProtons);
+                if (elData.stableNeutrons.length > 0) {
+                    currentNeutrons = elData.stableNeutrons[0];
+                    document.getElementById('neutron-slider').value = currentNeutrons;
+                }
+            } else {
+                currentNeutrons = parseInt(document.getElementById('neutron-slider').value);
+            }
+            renderAtom();
+        }
+
+        function renderAtom() {
+            // Update Text Data
+            document.getElementById('proton-count').innerText = currentProtons;
+            document.getElementById('neutron-count').innerText = currentNeutrons;
+            
+            let elData = getElementData(currentProtons);
+            let mass = currentProtons + currentNeutrons;
+            
+            document.getElementById('element-symbol').innerText = elData.sym;
+            document.getElementById('element-name').innerText = `${elData.name}-${mass}`;
+            document.getElementById('mass-number').innerText = mass;
+
+            // Determine Stability
+            let badge = document.getElementById('stability-badge');
+            if (currentProtons > 82) {
+                badge.innerText = "Unstable Element (Radionuclide)";
+                badge.className = "px-3 py-1 rounded-full text-sm font-bold bg-red-100 text-red-700 border border-red-200";
+            } else if (elData.stableNeutrons.includes(currentNeutrons)) {
+                badge.innerText = "Stable Isotope";
+                badge.className = "px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700 border border-green-200";
+            } else {
+                badge.innerText = "Radioisotope (Unstable)";
+                badge.className = "px-3 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-700 border border-yellow-200";
+            }
+
+            // Visual Rendering of Nucleus (capped for performance)
+            const container = document.getElementById('nucleus-container');
+            container.innerHTML = '';
+            
+            const maxParticlesToDraw = 40; // Don't draw 200 divs, it gets messy
+            const drawProtons = Math.min(currentProtons, maxParticlesToDraw / 2);
+            const drawNeutrons = Math.min(currentNeutrons, maxParticlesToDraw / 2);
+
+            let particles = [];
+            for(let i=0; i<drawProtons; i++) particles.push('p');
+            for(let i=0; i<drawNeutrons; i++) particles.push('n');
+            
+            // Shuffle for visual randomness
+            particles.sort(() => Math.random() - 0.5);
+
+            particles.forEach(p => {
+                let div = document.createElement('div');
+                div.className = `w-4 h-4 rounded-full shadow-sm flex items-center justify-center text-[8px] font-bold text-white nucleus-particle`;
+                if (p === 'p') {
+                    div.classList.add('bg-red-500');
+                    div.innerText = '+';
+                } else {
+                    div.classList.add('bg-blue-500');
+                }
+                container.appendChild(div);
+            });
+
+            if (currentProtons + currentNeutrons > maxParticlesToDraw) {
+                let overflow = document.createElement('div');
+                overflow.className = "absolute -bottom-6 text-xs text-slate-500 bg-white/80 px-2 rounded";
+                overflow.innerText = "Nucleus visualization simplified";
+                container.appendChild(overflow);
+            }
+        }
+
+        // Init
+        renderAtom();
+
+        // --- NEW LOGIC: Bonding Tabs ---
+        function switchBondingTab(tabId) {
+            // Hide all contents
+            document.querySelectorAll('.bonding-tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Reset all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'border-indigo-600', 'text-indigo-700', 'border-teal-600', 'text-teal-700', 'border-orange-600', 'text-orange-700');
+                btn.classList.add('text-slate-500', 'border-transparent');
+            });
+            
+            // Show selected content
+            document.getElementById('tab-' + tabId).classList.add('active');
+            
+            // Highlight selected button
+            const btn = document.getElementById('tab-btn-' + tabId);
+            btn.classList.remove('text-slate-500', 'border-transparent');
+            btn.classList.add('bg-white');
+            
+            if (tabId === 'ionic') {
+                btn.classList.add('border-indigo-600', 'text-indigo-700');
+            } else if (tabId === 'covalent') {
+                btn.classList.add('border-teal-600', 'text-teal-700');
+            } else if (tabId === 'metallic') {
+                btn.classList.add('border-orange-600', 'text-orange-700');
+            }
+        }
+
+        // --- NEW LOGIC: Quiz ---
+        function checkQuiz() {
+            let score = 0;
+            const total = 3;
+            
+            if (document.getElementById('q1-correct').checked) score++;
+            if (document.getElementById('q2-correct').checked) score++;
+            if (document.getElementById('q3-correct').checked) score++;
+            
+            const resultDiv = document.getElementById('quiz-result');
+            resultDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800', 'border-green-200', 'border-yellow-200', 'border-red-200');
+            
+            if (score === total) {
+                resultDiv.innerHTML = `<i class="fas fa-star text-yellow-500 mr-2"></i> Perfect! You scored ${score}/${total}!`;
+                resultDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-200');
+            } else if (score > 0) {
+                resultDiv.innerHTML = `Good try! You scored ${score}/${total}. Review the concepts and try again.`;
+                resultDiv.classList.add('bg-yellow-100', 'text-yellow-800', 'border', 'border-yellow-200');
+            } else {
+                resultDiv.innerHTML = `You scored ${score}/${total}. Keep studying the atomic models!`;
+                resultDiv.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-200');
+            }
+        }
+    </script>
+</body>
+</html>

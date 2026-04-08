@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The War of Resistance - Interactive Map & Strategic Analysis</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* Global CSS for Leaflet Overrides */
+        .leaflet-container { background: #0f172a; outline: none; font-family: inherit; }
+        .leaflet-control-zoom { border: none !important; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5) !important; }
+        .leaflet-control-zoom a { background-color: #18181b !important; color: #d4d4d8 !important; border-color: #3f3f46 !important; }
+        .leaflet-control-zoom a:hover { background-color: #27272a !important; color: #fff !important; }
+        .leaflet-control-attribution { background: rgba(0,0,0,0.6) !important; color: #a1a1aa !important; }
+        .leaflet-popup-content-wrapper { background: #18181b; color: #fff; border-radius: 8px; }
+        .leaflet-popup-tip { background: #18181b; }
+        
+        /* Custom scrollbar for sidebar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #18181b; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+        /* Smooth accordion transitions */
+        .analysis-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+        .analysis-content.open { max-height: 1000px; }
+        .analysis-inner { overflow: auto; }
+
+        /* Smooth transitions for map layers */
+        .zone-transition { transition: fill-opacity 0.8s ease, opacity 0.8s ease; }
+        .marker-fade { transition: opacity 0.8s ease; opacity: 0; }
+        .marker-fade.visible { opacity: 1; }
+
+        /* Smooth transitions for map layers */
+        .zone-transition { transition: fill-opacity 0.8s ease, opacity 0.8s ease; }
+        .marker-fade { transition: opacity 0.8s ease; opacity: 0; }
+        .marker-fade.visible { opacity: 1; }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 font-sans overflow-hidden h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="px-6 py-4 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between z-10 shadow-md">
+        <div class="flex items-center gap-3">
+            <svg class="w-6 h-6 text-red-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            <h1 class="text-xl font-bold tracking-wide">The War of Resistance <span class="text-zinc-500 font-normal ml-2 hidden sm:inline">(1931 - 1945)</span></h1>
+        </div>
+        <div class="flex items-center gap-2 text-sm text-zinc-400 bg-zinc-800 px-3 py-1.5 rounded-full border border-zinc-700">
+            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+            Strategic Analysis Mode
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+        
+        <!-- Left: Map Area -->
+        <div class="flex-1 relative bg-[#0f172a] overflow-hidden border-b lg:border-b-0 lg:border-r border-zinc-800 shadow-inner">
+            <div id="map" class="w-full h-full z-0 cursor-grab active:cursor-grabbing"></div>
+            
+            <!-- Year Overlay -->
+            <div class="absolute top-6 left-6 pointer-events-none z-[400]">
+                <h2 id="overlay-year" class="text-6xl md:text-8xl font-black text-white/20 tracking-tighter drop-shadow-2xl">1931</h2>
+            </div>
+            
+            <!-- Map Legend -->
+            <div class="absolute bottom-6 left-6 bg-zinc-900/90 backdrop-blur border border-zinc-700 p-3 rounded-lg text-xs space-y-3 pointer-events-auto shadow-2xl z-[400] max-w-xs">
+                <div class="font-semibold text-zinc-300 pb-1 border-b border-zinc-700/50 mb-2 flex items-center justify-between">
+                    <span>Map Legend</span>
+                    <button id="btn-troop-toggle" class="ml-2 px-2 py-0.5 bg-zinc-800 hover:bg-zinc-700 rounded text-[10px] font-bold text-zinc-300 transition-colors">
+                        Show Troops
+                    </button>
+                </div>
+                
+                <!-- Territory Control -->
+                <div class="space-y-1.5">
+                    <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Territory Control</div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 bg-red-600/60 border-2 border-red-500 rounded-sm"></div> <span>Japanese Occupation</span></div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 bg-blue-600/40 border-2 border-blue-500 border-dashed rounded-sm"></div> <span>Chinese Controlled</span></div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 bg-yellow-500/40 border-2 border-yellow-500 rounded-sm"></div> <span>Contested Zone</span></div>
+                </div>
+
+                <!-- Geographic Hazards & Events -->
+                <div class="space-y-1.5 border-t border-zinc-700/30 pt-2">
+                    <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Hazards & Events</div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 bg-blue-400/60 border-2 border-blue-400 rounded-sm animate-pulse"></div> <span>Flood Zone</span></div>
+                    <div class="flex items-center gap-2">
+                        <div class="relative w-3 h-3">
+                            <div class="absolute inset-0 bg-yellow-500 rounded-full animate-ping opacity-75"></div>
+                            <div class="absolute inset-0 bg-yellow-500 rounded-full border border-white"></div>
+                        </div> 
+                        <span>Major Battle</span>
+                    </div>
+                </div>
+
+                <!-- Troop Deployments -->
+                <div id="troop-info" class="space-y-1.5 border-t border-zinc-700/30 pt-2 hidden">
+                    <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Troop Positions</div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-red-500 rounded-full" style="box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);"></div> 
+                        <span>Japanese Army (H=Heavy, M=Medium, L=Light)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full" style="box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);"></div> 
+                        <span>Chinese Forces (H=Heavy, M=Medium, L=Light)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Sidebar -->
+        <div class="w-full lg:w-[450px] xl:w-[500px] bg-zinc-900 flex flex-col z-10 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] transition-all">
+            
+            <!-- Dynamic Info Panel -->
+            <div class="flex-1 p-6 md:p-8 overflow-y-auto">
+                <div id="badge-container" class="inline-flex items-center gap-2 px-3 py-1 bg-zinc-800 text-zinc-300 rounded-full text-xs font-semibold uppercase tracking-wider mb-4">
+                    <span id="badge-icon"></span>
+                    <span id="badge-year">1931</span>
+                </div>
+                
+                <h2 id="lesson-title" class="text-3xl font-bold mb-4 leading-tight text-white">
+                    The Mukden Incident
+                </h2>
+                
+                <div class="prose prose-invert prose-zinc prose-p:leading-relaxed prose-p:text-zinc-300 text-sm md:text-base mb-6">
+                    <p id="lesson-content">Content goes here...</p>
+                </div>
+                
+                <!-- EXPERT ANALYSIS SECTION -->
+                <div class="mt-6 border border-indigo-900/50 bg-zinc-950/50 rounded-xl overflow-hidden shadow-lg">
+                    <button id="analysis-toggle" class="w-full flex items-center justify-between p-4 bg-indigo-950/40 hover:bg-indigo-900/40 transition-colors text-left">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
+                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><circle cx="11" cy="11" r="3"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-indigo-100">Expert Strategic Analysis</h3>
+                                <p class="text-xs text-indigo-300/70">Decisions under the microscope</p>
+                            </div>
+                        </div>
+                        <svg id="analysis-chevron" class="w-5 h-5 text-indigo-400 transform transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    
+                    <div id="analysis-content" class="analysis-content open">
+                        <div class="analysis-inner p-4 space-y-5">
+                            
+                            <!-- Japan Analysis -->
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between border-b border-zinc-800 pb-1">
+                                    <span class="font-semibold text-zinc-300 flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-red-600"></div> Imperial Japan
+                                    </span>
+                                    <span id="japan-verdict-badge" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">FLAWED</span>
+                                </div>
+                                <div class="text-sm">
+                                    <p class="text-zinc-400 mb-2"><strong class="text-zinc-300">Move:</strong> <span id="japan-decision">...</span></p>
+                                    <div class="bg-zinc-900/80 p-3 rounded border-l-2 border-indigo-500">
+                                        <p class="text-indigo-200/90 mb-1"><strong class="text-indigo-300">Alternative:</strong> <span id="japan-alt">...</span></p>
+                                        <p class="text-indigo-200/70 text-xs"><strong class="text-indigo-300/80">Impact:</strong> <span id="japan-impact">...</span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Allies/China Analysis -->
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between border-b border-zinc-800 pb-1">
+                                    <span class="font-semibold text-zinc-300 flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-blue-500"></div> China / Allies
+                                    </span>
+                                    <span id="china-verdict-badge" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">OPTIMAL</span>
+                                </div>
+                                <div class="text-sm">
+                                    <p class="text-zinc-400 mb-2"><strong class="text-zinc-300">Move:</strong> <span id="china-decision">...</span></p>
+                                    <div class="bg-zinc-900/80 p-3 rounded border-l-2 border-indigo-500">
+                                        <p class="text-indigo-200/90 mb-1"><strong class="text-indigo-300">Alternative:</strong> <span id="china-alt">...</span></p>
+                                        <p class="text-indigo-200/70 text-xs"><strong class="text-indigo-300/80">Impact:</strong> <span id="china-impact">...</span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Special Alert Boxes -->
+                <div class="mt-6 space-y-4">
+                    <div id="alert-turning-point" class="hidden bg-blue-900/20 border border-blue-800/50 p-4 rounded-lg flex gap-3">
+                        <svg class="w-5 h-5 text-blue-400 shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
+                        <p class="text-sm text-blue-200">This event is considered a major turning point, drastically altering the strategic landscape of the conflict.</p>
+                    </div>
+                    
+                    <div id="alert-atrocity" class="hidden bg-red-900/20 border border-red-800/50 p-4 rounded-lg flex gap-3">
+                        <svg class="w-5 h-5 text-red-400 shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>
+                        <p class="text-sm text-red-200">This event resulted in massive civilian casualties and remains a deep scar in historical memory.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="p-6 bg-zinc-950 border-t border-zinc-800">
+                <div class="flex items-center justify-between">
+                    <button id="btn-prev" class="p-2 rounded-full hover:bg-zinc-800 disabled:opacity-30 transition-colors">
+                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    
+                    <button id="btn-play" class="flex items-center gap-2 px-6 py-3 bg-red-700 hover:bg-red-600 text-white rounded-full font-medium transition-colors shadow-lg shadow-red-900/20">
+                        <span id="play-icon">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        </span>
+                        <span id="play-text">Auto-Play</span>
+                    </button>
+                    
+                    <button id="btn-next" class="p-2 rounded-full hover:bg-zinc-800 disabled:opacity-30 transition-colors">
+                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline Bottom Bar -->
+    <div class="h-20 bg-zinc-950 border-t border-zinc-800 px-6 py-4 flex flex-col justify-center">
+        <div class="relative flex items-center w-full">
+            <div class="absolute h-1 w-full bg-zinc-800 rounded-full"></div>
+            <div id="timeline-progress" class="absolute h-1 bg-red-600 rounded-full transition-all duration-500 ease-in-out" style="width: 0%"></div>
+            <div id="timeline-dots" class="relative flex justify-between w-full">
+                <!-- Dots generated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA & CONFIGURATION ---
+        const lessonData = [
+            {
+                id: 1, year: "1931", title: "The Mukden Incident", type: "prelude", iconType: "shield", iconColor: "text-red-400",
+                content: "Seeking resources and expansion, Japanese officers staged a dynamite explosion near a Japanese-owned railway in Mukden (Shenyang) on September 18, 1931. Blaming Chinese dissidents, Japan used this as a pretext to invade and occupy all of Manchuria, establishing the puppet state of Manchukuo. The League of Nations condemned the act, but took no real action.",
+                mapState: { zones: ['manchuria'], focus: { lat: 41.8, lng: 123.4, zoom: 6 }, markers: [{ lat: 41.80, lng: 123.43, type: 'incident', label: 'Mukden Bombing' }], geoHighlight: 'none' },
+                troops: {
+                    japan: [{ lat: 41.5, lng: 123.0, strength: 'Heavy' }, { lat: 42.5, lng: 126.0, strength: 'Medium' }],
+                    china: [{ lat: 41.3, lng: 121.5, strength: 'Light' }, { lat: 39.5, lng: 122.0, strength: 'Light' }]
+                },
+                analysis: {
+                    japan: { verdict: "Flawed", decision: "Staged a false flag to fully occupy Manchuria, defying international law.", alternative: "Diplomatic coercion to secure resource rights without outright military annexation.", impact: "Would have secured necessary resources without alienating the League of Nations and setting the stage for a ruinous multi-front war." },
+                    allies: { verdict: "Flawed", decision: "Chiang Kai-shek ordered a strict policy of non-resistance, hoping for international intervention.", alternative: "Authorize limited, organized military resistance by the Northeastern Army.", impact: "Would have slowed Japanese momentum, bled their resources early, and forced a stronger, more immediate international response." }
+                }
+            },
+            {
+                id: 2, year: "1937 (Jul)", title: "Marco Polo Bridge Incident", type: "outbreak", iconType: "shield", iconColor: "text-red-500",
+                content: "On July 7, 1937, a dispute between Japanese and Chinese troops near the Marco Polo Bridge outside Beijing escalated into full-scale combat. This event marks the official beginning of the Second Sino-Japanese War. Japanese forces quickly mobilized to capture Beijing and the surrounding North China plain.",
+                mapState: { zones: ['manchuria', 'north_initial'], focus: { lat: 39.9, lng: 116.4, zoom: 6 }, markers: [{ lat: 39.85, lng: 116.22, type: 'battle', label: 'Marco Polo Bridge' }], geoHighlight: 'plains' },
+                troops: {
+                    japan: [{ lat: 41.5, lng: 123.0, strength: 'Heavy' }, { lat: 39.8, lng: 116.5, strength: 'Heavy' }, { lat: 39.3, lng: 115.5, strength: 'Medium' }],
+                    china: [{ lat: 39.85, lng: 116.22, strength: 'Medium' }, { lat: 38.8, lng: 115.8, strength: 'Heavy' }, { lat: 37.5, lng: 114.0, strength: 'Medium' }]
+                },
+                analysis: {
+                    japan: { verdict: "Flawed", decision: "Used a localized skirmish to launch a full-scale invasion of China proper.", alternative: "De-escalate the bridge incident and maintain focus on consolidating Manchuria and preparing against the USSR.", impact: "Avoided bogging down the Imperial Army in a vast, unwinnable land war in China." },
+                    allies: { verdict: "Optimal", decision: "Refused further appeasement and committed central army forces to resist the invasion.", alternative: "Yield North China to Japanese 'autonomy' demands.", impact: "Yielding would have meant the piecemeal dismemberment of China without a fight, completely collapsing domestic morale." }
+                }
+            },
+            {
+                id: 3, year: "1937 (Aug-Nov)", title: "Battle of Shanghai", type: "battle", iconType: "anchor", iconColor: "text-orange-400",
+                content: "Realizing the northern plains favored Japan's mechanized army, Chinese leader Chiang Kai-shek opened a second front in the urban sprawl of Shanghai. The battle was a meat grinder. Chinese forces fought fiercely for three months, shattering Japan's boast of conquering China in three months, though China ultimately had to retreat.",
+                mapState: { zones: ['manchuria', 'north_expanded', 'shanghai'], focus: { lat: 31.2, lng: 121.5, zoom: 7 }, markers: [{ lat: 31.23, lng: 121.47, type: 'battle', label: 'Urban Combat' }], geoHighlight: 'plains' },
+                troops: {
+                    japan: [{ lat: 41.5, lng: 123.0, strength: 'Heavy' }, { lat: 37.5, lng: 117.0, strength: 'Heavy' }, { lat: 31.5, lng: 121.5, strength: 'Heavy' }],
+                    china: [{ lat: 39.5, lng: 115.0, strength: 'Heavy' }, { lat: 31.2, lng: 121.5, strength: 'Heavy' }, { lat: 30.0, lng: 119.0, strength: 'Medium' }]
+                },
+                analysis: {
+                    japan: { verdict: "Suboptimal", decision: "Drawn into heavy urban combat, suffering massive casualties to break Chinese elite divisions.", alternative: "Bypass Shanghai entirely and maintain strict focus on rapid northern decapitation strikes.", impact: "Preserved elite veteran divisions that were decimated in the street-to-street fighting." },
+                    allies: { verdict: "Optimal", decision: "Forced the axis of war from a North-South advance to an East-West advance, pulling Japan into the Yangtze river valley.", alternative: "Fight defensive battles exclusively on the flat northern plains.", impact: "China's army would have been rapidly encircled and annihilated by superior Japanese armor and mobility in the north." }
+                }
+            },
+            {
+                id: 4, year: "1937 (Dec)", title: "Fall of Nanjing", type: "atrocity", iconType: "skull", iconColor: "text-red-600",
+                content: "Following the Chinese retreat from Shanghai, the capital city of Nanjing fell in December 1937. Over the next six weeks, Japanese troops committed horrific atrocities, known as the Nanjing Massacre. Hundreds of thousands of disarmed soldiers and civilians were murdered, and massive looting and violence occurred.",
+                mapState: { zones: ['manchuria', 'north_expanded', 'jiangsu'], focus: { lat: 32.1, lng: 118.8, zoom: 7 }, markers: [{ lat: 32.06, lng: 118.80, type: 'atrocity', label: 'Nanjing Massacre' }], geoHighlight: 'none' },
+                troops: {
+                    japan: [{ lat: 41.5, lng: 123.0, strength: 'Heavy' }, { lat: 37.5, lng: 117.0, strength: 'Heavy' }, { lat: 32.0, lng: 118.8, strength: 'Heavy' }],
+                    china: [{ lat: 39.5, lng: 115.0, strength: 'Light' }, { lat: 32.0, lng: 118.8, strength: 'Light' }, { lat: 30.0, lng: 119.0, strength: 'Medium' }]
+                },
+                analysis: {
+                    japan: { verdict: "Flawed", decision: "Allowed completely unrestrained brutality against civilians and POWs upon taking the capital.", alternative: "Maintain strict military discipline and use the capture of the capital to force a political settlement.", impact: "The atrocity permanently hardened Chinese resolve to fight to the death and destroyed Japan's international image, making foreign intervention inevitable." },
+                    allies: { verdict: "Suboptimal", decision: "Attempted to mount a doomed defense of the capital, resulting in a chaotic rout.", alternative: "Declare Nanjing an open city and conduct an orderly, early withdrawal of elite forces.", impact: "Would have preserved crucial veteran troops and commanders for the defense of the interior, rather than losing them in a disorganized retreat." }
+                }
+            },
+            {
+                id: 5, year: "1938 (Jun)", title: "The Yellow River Flood", type: "turning-point", iconType: "map", iconColor: "text-blue-400",
+                content: "A devastating strategic decision. To halt the rapid Japanese advance toward the new temporary capital of Wuhan, Nationalist troops destroyed the dikes of the Yellow River at Huayuankou. The massive flood stalled the Japanese army for months, but at a horrific cost: an estimated 500,000 to 800,000 Chinese civilians drowned or died of starvation, and millions were displaced.",
+                mapState: { zones: ['manchuria', 'north_expanded', 'jiangsu'], special: 'flood', focus: { lat: 34.5, lng: 114.0, zoom: 6 }, markers: [{ lat: 34.96, lng: 113.67, type: 'incident', label: 'Dikes Destroyed' }], geoHighlight: 'plains' },
+                troops: {
+                    japan: [{ lat: 41.5, lng: 123.0, strength: 'Heavy' }, { lat: 37.5, lng: 117.0, strength: 'Medium' }, { lat: 34.0, lng: 114.0, strength: 'Heavy' }],
+                    china: [{ lat: 39.5, lng: 115.0, strength: 'Light' }, { lat: 34.0, lng: 115.0, strength: 'Medium' }, { lat: 30.0, lng: 119.0, strength: 'Heavy' }]
+                },
+                analysis: {
+                    japan: { verdict: "Suboptimal", decision: "Advanced rapidly into the flood plain without adequate reconnaissance of Chinese desperation tactics.", alternative: "Develop alternative logistical routes utilizing rail and naval superiority before advancing deep inland.", impact: "Would have allowed a faster, unimpeded advance on Wuhan without losing entire mechanized divisions to the mud and floodwaters." },
+                    allies: { verdict: "Suboptimal", decision: "Unleashed a catastrophic flood, sacrificing hundreds of thousands of their own civilians to buy time.", alternative: "Employ a rigorous defense-in-depth strategy utilizing natural choke points and scorched earth without destroying the dams.", impact: "Would have saved immense civilian life and prevented massive loss of domestic support, even if Wuhan fell a few weeks earlier." }
+                }
+            },
+            {
+                id: 6, year: "1938 (Oct)", title: "Retreat to Chongqing", type: "strategy", iconType: "shield", iconColor: "text-neutral-400",
+                content: "Despite the flood, Wuhan eventually fell in October 1938. The Chinese government relocated deep inland to Chongqing, situated behind the protective, mountainous terrain of Sichuan province. The war entered a grueling stalemate. Japan controlled the coasts and cities, while Chinese forces controlled the vast interior countryside.",
+                mapState: { zones: ['manchuria', 'north_expanded', 'coast', 'wuhan'], focus: { lat: 30.5, lng: 110.0, zoom: 5 }, markers: [{ lat: 29.56, lng: 106.55, type: 'capital', label: 'Wartime Capital (Chongqing)' }, { lat: 30.59, lng: 114.30, type: 'capture', label: 'Wuhan Falls' }], geoHighlight: 'mountains' },
+                troops: {
+                    japan: [{ lat: 37.5, lng: 117.0, strength: 'Heavy' }, { lat: 34.0, lng: 114.0, strength: 'Medium' }, { lat: 31.0, lng: 121.0, strength: 'Heavy' }],
+                    china: [{ lat: 29.5, lng: 106.5, strength: 'Heavy' }, { lat: 34.0, lng: 115.0, strength: 'Medium' }, { lat: 30.0, lng: 119.0, strength: 'Medium' }]
+                },
+                analysis: {
+                    japan: { verdict: "Flawed", decision: "Continued to chase the Nationalist government into the vast, untamable Chinese interior.", alternative: "Halt advances at Wuhan, consolidate the wealthy coastal regions, and establish a viable, legitimate puppet government.", impact: "Could have avoided the logistical nightmare of the interior quagmire and freed up millions of troops for the upcoming Pacific conflict." },
+                    allies: { verdict: "Optimal", decision: "Adopted a grand strategy of 'trading space for time', retreating behind impassable mountains.", alternative: "Stand and fight a decisive, final battle at Wuhan.", impact: "A final stand at Wuhan would have resulted in the total destruction of the Chinese military and immediate loss of the war." }
+                }
+            },
+            {
+                id: 7, year: "1940", title: "Hundred Regiments Offensive", type: "battle", iconType: "shield", iconColor: "text-orange-500",
+                content: "The Chinese Communist Party (CCP), operating behind enemy lines in the north, launched a massive guerrilla offensive involving roughly 400,000 troops. They successfully sabotaged Japanese rail lines, bridges, and coal mines, proving the effectiveness of guerrilla warfare, though it invited brutal Japanese retaliation ('Three Alls Policy').",
+                mapState: { zones: ['manchuria', 'north_expanded', 'coast', 'wuhan'], focus: { lat: 38.0, lng: 112.0, zoom: 6 }, markers: [{ lat: 37.87, lng: 112.55, type: 'guerilla', label: 'Sabotage Operations' }, { lat: 39.00, lng: 115.00, type: 'guerilla', label: 'Rail Lines Cut' }], geoHighlight: 'mountains' },
+                troops: {
+                    japan: [{ lat: 37.5, lng: 117.0, strength: 'Medium' }, { lat: 40.0, lng: 115.0, strength: 'Heavy' }, { lat: 31.0, lng: 121.0, strength: 'Heavy' }],
+                    china: [{ lat: 37.87, lng: 112.55, strength: 'Heavy' }, { lat: 39.00, lng: 115.00, strength: 'Heavy' }, { lat: 29.5, lng: 106.5, strength: 'Heavy' }]
+                },
+                analysis: {
+                    japan: { verdict: "Suboptimal", decision: "Over-relied on thin, vulnerable rail lines ('points and lines') to control vast swathes of northern territory.", alternative: "Implement deeper, localized garrisoning and mobile anti-partisan units rather than static defense.", impact: "Would have drastically reduced the operational success of Chinese guerrilla sabotage and maintained better territorial control." },
+                    allies: { verdict: "Suboptimal", decision: "CCP launched a massive, conventional-style offensive that revealed their true troop strength.", alternative: "Continue localized, quiet hit-and-run tactics while expanding base areas out of sight.", impact: "Revealing their strength triggered the horrific 'Three Alls' (Kill All, Burn All, Loot All) retaliation, devastating Communist base areas in 1941-42." }
+                }
+            },
+            {
+                id: 8, year: "1941 (Dec)", title: "Pearl Harbor & The Allies", type: "turning-point", iconType: "plane", iconColor: "text-blue-300",
+                content: "Japan's attack on Pearl Harbor merged the Sino-Japanese War into the broader conflict of World War II. China formally declared war on Japan and joined the Allies. Western aid, previously trickling in, increased via the perilous 'Hump' airlift over the Himalayas. The American 'Flying Tigers' provided crucial air support.",
+                mapState: { zones: ['manchuria', 'north_expanded', 'coast', 'wuhan', 'south_coast'], special: 'airlift', focus: { lat: 26.0, lng: 97.0, zoom: 5 }, markers: [{ lat: 26.50, lng: 99.00, type: 'supply', label: 'Allied Supply Lines' }], geoHighlight: 'plateau' },
+                troops: {
+                    japan: [{ lat: 37.5, lng: 117.0, strength: 'Medium' }, { lat: 40.0, lng: 115.0, strength: 'Medium' }, { lat: 31.0, lng: 121.0, strength: 'Heavy' }],
+                    china: [{ lat: 37.5, lng: 112.0, strength: 'Medium' }, { lat: 39.0, lng: 115.0, strength: 'Medium' }, { lat: 29.5, lng: 106.5, strength: 'Heavy' }, { lat: 26.0, lng: 97.0, strength: 'Light' }]
+                },
+                analysis: {
+                    japan: { verdict: "Flawed", decision: "Attacked the United States to secure Pacific flanks while expanding into resource-rich Southeast Asia.", alternative: "Strike only British and Dutch colonies for oil, avoiding a direct attack on American soil.", impact: "Might have secured necessary oil for the China war without immediately drawing the massive industrial might of the US into the conflict." },
+                    allies: { verdict: "Optimal", decision: "China survived long enough alone to seamlessly integrate into the global Allied grand alliance.", alternative: "Capitulate or seek a negotiated peace during the darkest days of 1940.", impact: "Capitulation would have turned China into a Japanese vassal state, providing Japan limitless manpower and resources to fight the West." }
+                }
+            },
+            {
+                id: 9, year: "1944", title: "Operation Ichi-Go", type: "offensive", iconType: "shield", iconColor: "text-red-700",
+                content: "Facing crippling shipping losses to US submarines in the Pacific, Japan launched its largest land offensive of the war. Operation Ichi-Go aimed to secure a continuous overland rail route from Beijing to French Indochina and destroy US bomber bases in southern China. It was a tactical success but strategically exhausted Japan.",
+                mapState: { zones: ['manchuria', 'north_expanded', 'coast', 'wuhan', 'south_coast', 'ichigo_corridor'], focus: { lat: 28.0, lng: 112.0, zoom: 5 }, markers: [{ lat: 26.89, lng: 112.57, type: 'offensive', label: 'Massive Japanese Push' }], geoHighlight: 'none' },
+                troops: {
+                    japan: [{ lat: 37.5, lng: 117.0, strength: 'Heavy' }, { lat: 40.0, lng: 115.0, strength: 'Light' }, { lat: 31.0, lng: 121.0, strength: 'Heavy' }, { lat: 25.0, lng: 110.0, strength: 'Heavy' }],
+                    china: [{ lat: 37.5, lng: 112.0, strength: 'Light' }, { lat: 39.0, lng: 115.0, strength: 'Light' }, { lat: 29.5, lng: 106.5, strength: 'Heavy' }, { lat: 24.0, lng: 110.0, strength: 'Medium' }]
+                },
+                analysis: {
+                    japan: { verdict: "Suboptimal", decision: "Committed half a million men to a massive offensive in China while the Pacific defensive perimeter was collapsing.", alternative: "Halt all offensives in China, recall crack troops to defend the home islands and brace for the inevitable US/Soviet strikes.", impact: "Ichi-Go was a tactical win but a strategic dead-end; those troops were desperately needed for home defense in 1945." },
+                    allies: { verdict: "Flawed", decision: "Allowed command friction (Stilwell vs. Chiang) to leave eastern Chinese fronts severely undermanned and uncoordinated.", alternative: "Prioritize the defense of eastern airbases over the Burma campaign and ensure unified Allied command.", impact: "Could have prevented the embarrassing collapse of the Nationalist armies in the East and saved crucial US bomber bases." }
+                }
+            },
+            {
+                id: 10, year: "1945 (Aug)", title: "Victory and Surrender", type: "end", iconType: "map", iconColor: "text-green-400",
+                content: "Following the atomic bombings of Hiroshima and Nagasaki, and the massive Soviet invasion of Manchuria, Imperial Japan surrendered unconditionally in August 1945. After eight years of unimaginable suffering and an estimated 15-20 million Chinese casualties, the war of resistance was finally over.",
+                mapState: { zones: [], special: 'surrender', focus: { lat: 35.0, lng: 105.0, zoom: 4 }, markers: [{ lat: 32.06, lng: 118.80, type: 'peace', label: 'Japanese Surrender (Nanjing)' }], geoHighlight: 'none' },
+                troops: {
+                    japan: [{ lat: 41.5, lng: 123.0, strength: 'Light' }],
+                    china: [{ lat: 35.0, lng: 105.0, strength: 'Heavy' }]
+                },
+                analysis: {
+                    japan: { verdict: "Flawed", decision: "Refused to surrender until atomic bombs were dropped and the Soviet Union completely destroyed the Kwantung Army.", alternative: "Surrender immediately after the fall of Saipan or Okinawa, when the war was demonstrably lost.", impact: "Would have spared the Japanese home islands from nuclear devastation and prevented the Soviet occupation of Manchuria and northern Korea." },
+                    allies: { verdict: "Optimal", decision: "Demanded absolute, unconditional surrender, culminating in the complete dismantling of the Japanese Empire.", alternative: "Accept a negotiated, conditional peace to end the bloodshed earlier.", impact: "A conditional peace would have left the Imperial military structure intact, risking a resurgence of Japanese militarism a decade later." }
+                }
+            }
+        ];
+
+        // Map configuration data
+        const CITIES = [
+            { name: "Beijing", coords: [39.9042, 116.4074], important: true },
+            { name: "Shanghai", coords: [31.2304, 121.4737], important: true },
+            { name: "Nanjing", coords: [32.0603, 118.7969], important: true },
+            { name: "Wuhan", coords: [30.5928, 114.3055] },
+            { name: "Chongqing", coords: [29.5630, 106.5515], important: true },
+            { name: "Guangzhou", coords: [23.1291, 113.2644] },
+            { name: "Shenyang", coords: [41.8057, 123.4315] },
+            { name: "Yan'an", coords: [36.5855, 109.4897] }
+        ];
+
+        const ZONE_COORDS = {
+            // Manchuria (1931) - Precise northeastern region following provincial boundaries
+            manchuria: [
+                [40.5, 120.2], [40.8, 120.0], [41.5, 119.8], [42.2, 119.5], [43.0, 119.3], [43.8, 119.5], [44.5, 119.8],
+                [45.2, 120.5], [45.8, 121.2], [46.2, 122.0], [46.5, 123.0], [46.8, 124.0], [46.5, 125.2], [45.8, 125.8],
+                [44.5, 126.5], [43.2, 127.0], [42.0, 127.2], [40.5, 126.0], [39.8, 124.5], [39.5, 123.0], [39.8, 121.5]
+            ],
+            
+            // Initial North (1937-early 1938) - Beijing, Tianjin, and immediate surroundings
+            north_initial: [
+                [39.4, 115.8], [39.8, 115.6], [40.2, 115.2], [40.5, 115.0], [40.8, 115.2], [40.8, 116.2], [40.5, 116.8],
+                [40.0, 117.0], [39.5, 116.8], [39.2, 116.2]
+            ],
+            
+            // Expanded North (1937-1938) - North China Plain with detailed boundaries
+            north_expanded: [
+                [35.0, 113.5], [35.8, 113.2], [36.5, 113.0], [37.2, 113.2], [37.8, 113.5], [38.5, 114.0], [39.0, 114.2],
+                [39.5, 115.0], [40.0, 115.8], [40.5, 116.5], [40.8, 117.2], [40.5, 118.0], [40.2, 118.8], [39.8, 119.2],
+                [39.0, 119.8], [38.0, 120.0], [37.0, 120.2], [36.0, 120.0], [35.5, 119.5], [35.0, 119.0], [34.8, 117.5],
+                [34.5, 116.0], [34.6, 114.5]
+            ],
+            
+            // Shanghai urban area (1937) - Precise city boundary
+            shanghai: [
+                [30.8, 120.9], [31.0, 120.8], [31.2, 120.9], [31.3, 121.2], [31.2, 121.5], [31.0, 121.6], [30.8, 121.5],
+                [30.7, 121.2]
+            ],
+            
+            // Jiangsu coastal region (1937-1938) - East coast with detailed shape
+            jiangsu: [
+                [30.3, 118.2], [31.0, 118.0], [31.8, 118.2], [32.5, 118.5], [33.0, 119.0], [33.5, 119.8], [33.8, 120.8],
+                [33.8, 121.5], [33.5, 122.0], [32.8, 122.0], [32.0, 121.8], [31.2, 121.5], [30.8, 121.2], [30.5, 120.5],
+                [30.4, 119.5]
+            ],
+            
+            // Coastal cities control (1937 onwards) - Including Nanjing area and beyond
+            coast: [
+                [22.5, 113.8], [23.2, 114.0], [24.0, 114.5], [24.8, 115.5], [25.5, 116.5], [26.2, 117.5], [27.0, 118.5],
+                [27.8, 119.2], [28.5, 119.8], [29.0, 120.2], [29.5, 120.5], [30.0, 120.8], [30.2, 120.5], [30.0, 119.0],
+                [29.5, 118.5], [28.8, 118.0], [27.5, 117.0], [26.0, 115.8], [24.5, 114.5], [23.0, 113.5]
+            ],
+            
+            // Wuhan region (1938) - Precise city and immediate surroundings
+            wuhan: [
+                [29.8, 113.8], [30.2, 113.6], [30.6, 113.8], [30.8, 114.2], [30.6, 114.8], [30.2, 115.0], [29.8, 114.8],
+                [29.6, 114.2]
+            ],
+            
+            // South coastal zone (1938+) - Guangdong coastal control
+            south_coast: [
+                [21.5, 108.8], [22.0, 109.0], [22.8, 109.8], [23.5, 110.8], [24.0, 111.8], [24.2, 113.0], [24.5, 114.5],
+                [24.2, 115.5], [23.5, 115.8], [22.5, 115.5], [21.5, 114.0], [21.2, 112.0]
+            ],
+            
+            // Ichi-Go Corridor (1944) - North-South rail connection with expanded control
+            ichigo_corridor: [
+                [35.2, 113.5], [35.8, 113.8], [36.5, 114.2], [37.2, 114.5], [38.0, 114.8], [38.8, 115.0], [39.5, 115.2],
+                [39.8, 115.5], [40.0, 116.0], [39.8, 116.5], [39.5, 116.8], [39.0, 117.0], [38.0, 117.2], [37.0, 117.0],
+                [36.0, 116.8], [35.5, 116.5], [35.2, 115.8], [35.0, 115.0]
+            ]
+        };
+
+        const GEO_LABELS = {
+            plains: { coords: [36.5, 116], text: 'NORTH CHINA PLAIN' },
+            mountains: { coords: [31.5, 108], text: 'SICHUAN BASIN & QINLING MOUNTAINS' },
+            plateau: { coords: [30, 95], text: 'TIBETAN PLATEAU / HIMALAYAS' }
+        };
+
+        // Icons
+        const ICONS = {
+            shield: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>`,
+            anchor: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" x2="12" y1="22" y2="8"/><line x1="5" x2="19" y1="12" y2="12"/><path d="M2 15a10 10 0 0 0 20 0"/></svg>`,
+            skull: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>`,
+            map: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>`,
+            plane: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.2-1.1.7l-1.4 4c-.1.5.3 1 0 .9L8 13.5l-4 4-2.8-.9c-.5-.1-.9.3-.8.8l.5 2c.1.5.7.8 1.2.6l4-1.4 4-4 5.5 5.5c.3.3.8.7 1.3.6l4-1.4c.5-.2.8-.6.7-1.1l-.9-2.8Z"/></svg>`,
+            info: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>`,
+            play: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
+            pause: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`
+        };
+
+        function getMarkerColor(type) {
+            switch(type) {
+                case 'battle': return '#f97316';
+                case 'atrocity': return '#dc2626';
+                case 'incident': return '#eab308';
+                case 'capital': return '#a8a29e';
+                case 'capture': return '#991b1b';
+                case 'guerilla': return '#f59e0b';
+                case 'supply': return '#3b82f6';
+                case 'offensive': return '#7f1d1d';
+                case 'peace': return '#22c55e';
+                default: return '#ffffff';
+            }
+        }
+
+        // --- STATE & GLOBAL VARIABLES ---
+        let currentStep = 0;
+        let isPlaying = false;
+        let playInterval = null;
+        let map = null;
+        let mapLayers = { zones: [], markers: [], zonesByKey: {} };
+        let isFirstLoad = true;
+        let isAnalysisOpen = true;
+        let showTroops = false;
+        let lastFocus = null;
+        let lastZoneCoords = {};
+
+        // --- DOM ELEMENTS ---
+        const els = {
+            overlayYear: document.getElementById('overlay-year'),
+            badgeContainer: document.getElementById('badge-container'),
+            badgeIcon: document.getElementById('badge-icon'),
+            badgeYear: document.getElementById('badge-year'),
+            lessonTitle: document.getElementById('lesson-title'),
+            lessonContent: document.getElementById('lesson-content'),
+            alertTurningPoint: document.getElementById('alert-turning-point'),
+            alertAtrocity: document.getElementById('alert-atrocity'),
+            
+            // Analysis Elements
+            analysisToggle: document.getElementById('analysis-toggle'),
+            analysisContent: document.getElementById('analysis-content'),
+            analysisChevron: document.getElementById('analysis-chevron'),
+            japanVerdict: document.getElementById('japan-verdict-badge'),
+            japanDecision: document.getElementById('japan-decision'),
+            japanAlt: document.getElementById('japan-alt'),
+            japanImpact: document.getElementById('japan-impact'),
+            chinaVerdict: document.getElementById('china-verdict-badge'),
+            chinaDecision: document.getElementById('china-decision'),
+            chinaAlt: document.getElementById('china-alt'),
+            chinaImpact: document.getElementById('china-impact'),
+
+            btnPrev: document.getElementById('btn-prev'),
+            btnNext: document.getElementById('btn-next'),
+            btnPlay: document.getElementById('btn-play'),
+            btnTroopToggle: document.getElementById('btn-troop-toggle'),
+            troopInfo: document.getElementById('troop-info'),
+            playIcon: document.getElementById('play-icon'),
+            playText: document.getElementById('play-text'),
+            timelineProgress: document.getElementById('timeline-progress'),
+            timelineDotsContainer: document.getElementById('timeline-dots')
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initTimeline();
+            initMap();
+            goToStep(0); 
+            setupEventListeners();
+        });
+
+        function initTimeline() {
+            lessonData.forEach((lesson, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `timeline-dot group relative flex flex-col items-center justify-center w-6 h-6 rounded-full transition-all duration-300 z-10 border-2 border-zinc-950 bg-zinc-700 hover:bg-zinc-500`;
+                btn.onclick = () => { setIsPlaying(false); goToStep(idx); };
+                
+                const tooltip = document.createElement('span');
+                tooltip.className = `absolute -top-8 text-xs whitespace-nowrap px-2 py-1 rounded bg-zinc-800 text-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity border border-zinc-700 pointer-events-none`;
+                tooltip.innerText = lesson.year;
+                
+                const ping = document.createElement('div');
+                ping.className = `ping-ring absolute w-8 h-8 rounded-full border-2 border-red-500/50 animate-ping hidden`;
+
+                btn.appendChild(tooltip);
+                btn.appendChild(ping);
+                els.timelineDotsContainer.appendChild(btn);
+            });
+        }
+
+        function initMap() {
+            map = L.map('map', { zoomControl: false, attributionControl: true });
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; NPS', maxZoom: 12
+            }).addTo(map);
+
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 12, opacity: 0.7
+            }).addTo(map);
+
+            CITIES.forEach(city => {
+                const cityIcon = L.divIcon({
+                    html: `<div class="flex items-center gap-1 -ml-1.5 -mt-1.5 pointer-events-none">
+                             <div class="rounded-full border-2 border-zinc-400 ${city.important ? 'bg-zinc-900 w-3 h-3 border-white' : 'bg-zinc-800 w-2.5 h-2.5'} shadow-md"></div>
+                             <span class="text-[10px] font-bold text-zinc-800 whitespace-nowrap" style="text-shadow: 1px 1px 0 rgba(255,255,255,0.8), -1px -1px 0 rgba(255,255,255,0.8), 1px -1px 0 rgba(255,255,255,0.8), -1px 1px 0 rgba(255,255,255,0.8);">${city.name}</span>
+                           </div>`,
+                    className: '', iconSize: [100, 20]
+                });
+                L.marker(city.coords, { icon: cityIcon, interactive: false }).addTo(map);
+            });
+        }
+
+        // --- CORE LOGIC ---
+        function getVerdictStyles(verdict) {
+            if (verdict === 'Optimal') return 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+            if (verdict === 'Suboptimal') return 'bg-amber-500/20 text-amber-400 border border-amber-500/30';
+            return 'bg-rose-500/20 text-rose-400 border border-rose-500/30';
+        }
+
+        function goToStep(index) {
+            if (index < 0 || index >= lessonData.length) return;
+            currentStep = index;
+            const lesson = lessonData[currentStep];
+
+            // Update Text
+            els.overlayYear.innerText = lesson.year.substring(0, 4);
+            els.badgeYear.innerText = lesson.year;
+            els.lessonTitle.innerText = lesson.title;
+            els.lessonContent.innerText = lesson.content;
+            
+            els.badgeIcon.innerHTML = ICONS[lesson.iconType] || ICONS.info;
+            els.badgeIcon.className = `w-5 h-5 ${lesson.iconColor}`;
+
+            // Update Analysis
+            if (lesson.analysis) {
+                const { japan, allies } = lesson.analysis;
+                
+                els.japanVerdict.innerText = japan.verdict;
+                els.japanVerdict.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getVerdictStyles(japan.verdict)}`;
+                els.japanDecision.innerText = japan.decision;
+                els.japanAlt.innerText = japan.alternative;
+                els.japanImpact.innerText = japan.impact;
+
+                els.chinaVerdict.innerText = allies.verdict;
+                els.chinaVerdict.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getVerdictStyles(allies.verdict)}`;
+                els.chinaDecision.innerText = allies.decision;
+                els.chinaAlt.innerText = allies.alternative;
+                els.chinaImpact.innerText = allies.impact;
+            }
+
+            els.alertTurningPoint.classList.toggle('hidden', lesson.type !== 'turning-point');
+            els.alertAtrocity.classList.toggle('hidden', lesson.type !== 'atrocity');
+
+            els.btnPrev.disabled = currentStep === 0;
+            els.btnNext.disabled = currentStep === lessonData.length - 1;
+
+            // Update Timeline
+            const progressPct = (currentStep / (lessonData.length - 1)) * 100;
+            els.timelineProgress.style.width = `${progressPct}%`;
+
+            const dots = els.timelineDotsContainer.querySelectorAll('.timeline-dot');
+            dots.forEach((dot, idx) => {
+                const ping = dot.querySelector('.ping-ring');
+                if (idx <= currentStep) {
+                    dot.classList.remove('bg-zinc-700', 'hover:bg-zinc-500');
+                    dot.classList.add('bg-red-600');
+                } else {
+                    dot.classList.remove('bg-red-600');
+                    dot.classList.add('bg-zinc-700', 'hover:bg-zinc-500');
+                }
+                ping.classList.toggle('hidden', idx !== currentStep);
+            });
+
+            // Update Map
+            renderMapState(lesson.mapState);
+        }
+
+        function fadeOutLayers(layers, delay = 800) {
+            layers.forEach(layer => {
+                try {
+                    if (layer.setStyle) layer.setStyle({ opacity: 0, fillOpacity: 0 });
+                    if (layer.setOpacity) layer.setOpacity(0);
+                } catch (e) {}
+            });
+            setTimeout(() => {
+                layers.forEach(layer => {
+                    try { map.removeLayer(layer); } catch (e) {}
+                });
+            }, delay);
+        }
+
+        function normalizeCoords(coords) {
+            // Ensure polygon is closed and flatten nested arrays (Leaflet returns [[LatLng,...]])
+            const flat = Array.isArray(coords[0][0]) ? coords[0] : coords;
+            const out = flat.map(pt => {
+                if (pt && typeof pt.lat === 'number' && typeof pt.lng === 'number') {
+                    return [pt.lat, pt.lng];
+                }
+                return [pt[0], pt[1]];
+            });
+            if (out.length > 1 && (out[0][0] !== out[out.length - 1][0] || out[0][1] !== out[out.length - 1][1])) {
+                out.push([...out[0]]);
+            }
+            return out;
+        }
+
+        function polygonPerimeter(coords) {
+            let dist = 0;
+            for (let i = 1; i < coords.length; i++) {
+                const a = coords[i - 1];
+                const b = coords[i];
+                dist += Math.hypot(b[0] - a[0], b[1] - a[1]);
+            }
+            return dist;
+        }
+
+        function resampleCoords(coords, count) {
+            const normalized = normalizeCoords(coords);
+            if (normalized.length === 0) return [];
+            if (normalized.length === count) return normalized;
+
+            const perimeter = polygonPerimeter(normalized);
+            if (perimeter === 0) return normalized;
+
+            const step = perimeter / (count - 1);
+            const result = [normalized[0]];
+            let traveled = 0;
+            let idx = 1;
+
+            while (result.length < count) {
+                const prev = normalized[idx - 1];
+                const next = normalized[idx];
+                const segment = Math.hypot(next[0] - prev[0], next[1] - prev[1]);
+                if (segment === 0) { idx++; continue; }
+
+                const remaining = step - traveled;
+                if (remaining <= segment) {
+                    const ratio = remaining / segment;
+                    result.push([prev[0] + (next[0] - prev[0]) * ratio, prev[1] + (next[1] - prev[1]) * ratio]);
+                    // start new segment at this interpolated point
+                    normalized[idx - 1] = result[result.length - 1];
+                    traveled = 0;
+                } else {
+                    traveled += segment;
+                    idx++;
+                    if (idx >= normalized.length) break;
+                }
+            }
+
+            // ensure closure
+            if (result.length > 1) result[result.length - 1] = [...result[0]];
+            return result;
+        }
+
+        function interpolateCoords(from, to, t) {
+            return from.map((pt, idx) => {
+                const target = to[idx] || pt;
+                return [
+                    pt[0] + (target[0] - pt[0]) * t,
+                    pt[1] + (target[1] - pt[1]) * t
+                ];
+            });
+        }
+
+        function animatePolygon(poly, fromCoords, toCoords, duration = 800, onComplete) {
+            const source = normalizeCoords(fromCoords);
+            const target = normalizeCoords(toCoords);
+            const maxPoints = Math.max(source.length, target.length);
+            const startCoords = resampleCoords(source, maxPoints);
+            const endCoords = resampleCoords(target, maxPoints);
+
+            const start = performance.now();
+            function step(now) {
+                const t = Math.min(1, (now - start) / duration);
+                const eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // easeInOutQuad
+                try {
+                    const coords = interpolateCoords(startCoords, endCoords, eased);
+                    poly.setLatLngs(coords);
+                } catch (e) {}
+                if (t < 1) {
+                    requestAnimationFrame(step);
+                } else if (typeof onComplete === 'function') {
+                    onComplete();
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        function renderMapState(state) {
+            if (!map) return;
+            map.invalidateSize();
+
+            const { focus, zones = [], markers = [], special, geoHighlight } = state;
+
+            // Animate map fly/zoom and show a push indicator
+            if (focus) {
+                if (isFirstLoad) {
+                    map.setView([focus.lat, focus.lng], focus.zoom);
+                    isFirstLoad = false;
+                } else {
+                    const prevFocus = lastFocus;
+                    lastFocus = focus;
+
+                    setTimeout(() => {
+                        try { map.flyTo([focus.lat, focus.lng], focus.zoom, { duration: 1.6, easeLinearity: 0.25 }); }
+                        catch (e) { map.setView([focus.lat, focus.lng], focus.zoom); }
+
+                        // Draw a push arrow if we have a previous focus
+                        if (prevFocus) {
+                            const arrowLine = L.polyline([ [prevFocus.lat, prevFocus.lng], [focus.lat, focus.lng] ], {
+                                color: '#f97316', weight: 4, opacity: 0.85, dashArray: '8, 6', interactive: false, className: 'zone-transition'
+                            }).addTo(map);
+                            setTimeout(() => { map.removeLayer(arrowLine); }, 1400);
+                        }
+                    }, 50);
+                }
+            }
+
+            // Keep old zones visible; fade out those no longer active
+            const activeZones = new Set(zones);
+            Object.keys(mapLayers.zonesByKey).forEach(zoneKey => {
+                if (!activeZones.has(zoneKey)) {
+                    const layer = mapLayers.zonesByKey[zoneKey];
+                    if (layer) fadeOutLayers([layer], 800);
+                    delete mapLayers.zonesByKey[zoneKey];
+                }
+            });
+
+            // Draw or update current occupation zones with smooth grow animation
+            zones.forEach(zoneKey => {
+                const coords = ZONE_COORDS[zoneKey];
+                if (!coords) return;
+
+                const existing = mapLayers.zonesByKey[zoneKey];
+
+                if (existing) {
+                    // Smoothly grow/morph existing shape into new zone
+                    const currentCoords = normalizeCoords(existing.getLatLngs()[0]);
+                    animatePolygon(existing, currentCoords, coords, 1200);
+                } else {
+                    // Create new zone and grow it into place
+                    const baseCoords = normalizeCoords(coords);
+                    const poly = L.polygon(baseCoords, {
+                        color: '#ef4444', weight: 2, fillColor: '#ef4444', fillOpacity: 0, opacity: 0, dashArray: '5, 5', interactive: false, className: 'zone-transition'
+                    }).addTo(map);
+                    mapLayers.zonesByKey[zoneKey] = poly;
+                    mapLayers.zones.push(poly);
+
+                    // Animate in with growth
+                    setTimeout(() => {
+                        try { poly.setStyle({ opacity: 1 }); } catch (e) {}
+                    }, 20);
+                    animatePolygon(poly, baseCoords, coords, 1200);
+                }
+            });
+
+            if (special === 'flood') {
+                const floodPoly = L.polygon([[34.9, 113.6], [33.5, 114.5], [33.0, 116.5], [34.5, 117.0], [35.5, 115.0]], {
+                    color: '#3b82f6', weight: 2, fillColor: '#3b82f6', fillOpacity: 0, className: 'zone-transition', interactive: false
+                }).addTo(map);
+                mapLayers.zones.push(floodPoly);
+                setTimeout(() => floodPoly.setStyle({ fillOpacity: 0.5 }), 20);
+            }
+            if (special === 'surrender') {
+                const surrenderIcon = L.divIcon({
+                    html: `<div class="w-64 h-64 bg-green-500/20 rounded-full animate-ping border-4 border-green-500/50 -ml-32 -mt-32 pointer-events-none"></div>`, className: ''
+                });
+                const surrenderRing = L.marker([32.06, 118.80], { icon: surrenderIcon, interactive: false }).addTo(map);
+                mapLayers.markers.push(surrenderRing);
+            }
+
+            if (geoHighlight && GEO_LABELS[geoHighlight]) {
+                const geo = GEO_LABELS[geoHighlight];
+                const labelIcon = L.divIcon({
+                    html: `<div class="text-white/60 font-black tracking-[0.2em] text-sm md:text-xl whitespace-nowrap select-none" style="text-shadow: 0px 4px 15px rgba(0,0,0,0.9);">${geo.text}</div>`,
+                    className: 'pointer-events-none', iconSize: [200, 30]
+                });
+                const labelMarker = L.marker(geo.coords, { icon: labelIcon, interactive: false }).addTo(map);
+                mapLayers.markers.push(labelMarker);
+            }
+
+            markers.forEach(marker => {
+                const color = getMarkerColor(marker.type);
+                const markerIcon = L.divIcon({
+                    html: `<div class="relative flex flex-col items-center justify-center marker-fade">
+                             <div class="absolute w-8 h-8 rounded-full opacity-60 animate-ping pointer-events-none" style="background-color: ${color}"></div>
+                             <div class="relative w-4 h-4 rounded-full border-2 border-white shadow-lg pointer-events-none" style="background-color: ${color}"></div>
+                             <div class="mt-2 bg-zinc-900/90 text-white text-[11px] font-bold px-2 py-1 rounded whitespace-nowrap border border-zinc-700 shadow-xl pointer-events-none">
+                               ${marker.label}
+                             </div>
+                           </div>`,
+                    className: '', iconSize: [20, 20], iconAnchor: [10, 10]
+                });
+                const m = L.marker([marker.lat, marker.lng], { icon: markerIcon, opacity: 0 }).addTo(map);
+                mapLayers.markers.push(m);
+                setTimeout(() => { try { m.setOpacity(1); } catch (e) {} }, 40);
+            });
+
+            // Render troop deployments if enabled
+            if (showTroops) {
+                renderTroopDeployments(currentStep);
+            }
+        }
+
+        function renderTroopDeployments(stepIndex) {
+            if (stepIndex < 0 || stepIndex >= lessonData.length) return;
+            
+            const lesson = lessonData[stepIndex];
+            if (!lesson.troops) return;
+
+            const { japan = [], china = [] } = lesson.troops;
+
+            // Render Japanese troops (red)
+            japan.forEach((troop, idx) => {
+                const strength = troop.strength === 'Heavy' ? 6 : troop.strength === 'Medium' ? 4 : 2.5;
+                const icon = L.divIcon({
+                    html: `<div class="relative flex items-center justify-center">
+                             <div class="w-${Math.round(strength * 2)} h-${Math.round(strength * 2)} rounded-full bg-red-500 border-2 border-red-600 shadow-lg" style="box-shadow: 0 0 ${strength * 2}px rgba(239, 68, 68, 0.8);"></div>
+                             <div class="absolute text-[8px] font-bold text-white" style="text-shadow: 0 0 3px rgba(0,0,0,0.8);">${troop.strength.substring(0, 1)}</div>
+                           </div>`,
+                    className: 'troops-marker', iconSize: [strength * 2.5, strength * 2.5], iconAnchor: [strength * 1.25, strength * 1.25]
+                });
+                const marker = L.marker([troop.lat, troop.lng], { icon: icon, interactive: false }).addTo(map);
+                mapLayers.markers.push(marker);
+            });
+
+            // Render Chinese troops (blue)
+            china.forEach((troop, idx) => {
+                const strength = troop.strength === 'Heavy' ? 6 : troop.strength === 'Medium' ? 4 : 2.5;
+                const icon = L.divIcon({
+                    html: `<div class="relative flex items-center justify-center">
+                             <div class="w-${Math.round(strength * 2)} h-${Math.round(strength * 2)} rounded-full bg-blue-500 border-2 border-blue-600 shadow-lg" style="box-shadow: 0 0 ${strength * 2}px rgba(59, 130, 246, 0.8);"></div>
+                             <div class="absolute text-[8px] font-bold text-white" style="text-shadow: 0 0 3px rgba(0,0,0,0.8);">${troop.strength.substring(0, 1)}</div>
+                           </div>`,
+                    className: 'troops-marker', iconSize: [strength * 2.5, strength * 2.5], iconAnchor: [strength * 1.25, strength * 1.25]
+                });
+                const marker = L.marker([troop.lat, troop.lng], { icon: icon, interactive: false }).addTo(map);
+                mapLayers.markers.push(marker);
+            });
+        }
+
+        // --- PLAYBACK CONTROL ---
+        function setIsPlaying(playing) {
+            isPlaying = playing;
+            if (isPlaying) {
+                els.playIcon.innerHTML = ICONS.pause;
+                els.playText.innerText = "Pause";
+                if (currentStep >= lessonData.length - 1) goToStep(0);
+                
+                // Close analysis to focus on map/text during autoplay
+                if(isAnalysisOpen) toggleAnalysis();
+
+                playInterval = setInterval(() => {
+                    if (currentStep < lessonData.length - 1) goToStep(currentStep + 1);
+                    else setIsPlaying(false);
+                }, 6000); // slightly longer to read
+            } else {
+                els.playIcon.innerHTML = ICONS.play;
+                els.playText.innerText = "Auto-Play";
+                clearInterval(playInterval);
+            }
+        }
+
+        function toggleAnalysis() {
+            isAnalysisOpen = !isAnalysisOpen;
+            els.analysisContent.classList.toggle('open');
+            els.analysisChevron.style.transform = isAnalysisOpen ? 'rotate(0deg)' : 'rotate(-90deg)';
+        }
+
+        // --- EVENT LISTENERS ---
+        function setupEventListeners() {
+            els.btnPrev.addEventListener('click', () => { setIsPlaying(false); if (currentStep > 0) goToStep(currentStep - 1); });
+            els.btnNext.addEventListener('click', () => { setIsPlaying(false); if (currentStep < lessonData.length - 1) goToStep(currentStep + 1); });
+            els.btnPlay.addEventListener('click', () => setIsPlaying(!isPlaying));
+            els.analysisToggle.addEventListener('click', toggleAnalysis);
+            els.btnTroopToggle.addEventListener('click', toggleTroops);
+        }
+
+        function toggleTroops() {
+            showTroops = !showTroops;
+            els.btnTroopToggle.textContent = showTroops ? 'Hide Troops' : 'Show Troops';
+            els.troopInfo.classList.toggle('hidden', !showTroops);
+            goToStep(currentStep); // Re-render current step with/without troops
+        }
+    </script>
+</body>
+</html>

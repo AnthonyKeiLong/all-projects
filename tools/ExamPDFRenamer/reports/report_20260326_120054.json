@@ -1,0 +1,682 @@
+{
+  "timestamp": "20260326_120054",
+  "total_files": 16,
+  "actions": [
+    {
+      "old_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111815.pdf",
+      "new_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\[2025][Pan Lloyds][Mathematics]Mock Exam[6][Paper 2][PAPER 2].pdf"
+    },
+    {
+      "old_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111828.pdf",
+      "new_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\[2025][Pan Lloyds][Mathematics]Mock Exam[6][Paper 1][PAPER 1].pdf"
+    },
+    {
+      "old_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111850.pdf",
+      "new_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\[2025][Pan Lloyds][Mathematics]Mock Exam[5][Paper 2][PAPER 2].pdf"
+    },
+    {
+      "old_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111900.pdf",
+      "new_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\[2025][Pan Lloyds][Mathematics]Mock Exam[5][Paper 1][PAPER 1].pdf"
+    },
+    {
+      "old_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111921.pdf",
+      "new_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\[2025][Pan Lloyds][Mathematics]Mock Exam[4][Paper 2][PAPER 2].pdf"
+    },
+    {
+      "old_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111933.pdf",
+      "new_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\[2025][Pan Lloyds][Mathematics]Mock Exam[4][Paper 1][PAPER 1].pdf"
+    },
+    {
+      "old_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111955.pdf",
+      "new_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\[2025][Pan Lloyds][Mathematics]Mock Exam[3][Paper 2][PAPER 2].pdf"
+    },
+    {
+      "old_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326112008.pdf",
+      "new_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\[2025][Pan Lloyds][Mathematics]Mock Exam[3][Paper 1][PAPER 1].pdf"
+    },
+    {
+      "old_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326112020.pdf",
+      "new_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\[2025][Pan Lloyds][Mathematics]Mock Exam[2][Paper 2][PAPER 2].pdf"
+    },
+    {
+      "old_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326112059.pdf",
+      "new_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\[2025][Pan Lloyds][Mathematics]Mock Exam[2][Paper 1][PAPER 1].pdf"
+    }
+  ],
+  "details": [
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\Common Question Types.pdf",
+      "sha256": "301bea267e50812d4150ba0647be0eb931df04b7f69d5480b4fe564af9bc8c3c",
+      "text_method": "",
+      "fields": {},
+      "suggested_name": "",
+      "skipped": true,
+      "skip_reason": "Already processed"
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111815.pdf",
+      "sha256": "98b455a6883c5f07f29cc9ea8841efef8ec6dbd7f70519b5df9c00ad413dd132",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "2025",
+          "confidence": 0.7,
+          "snippet": "shers Ltd\nAll Rights Reserved 2025 end of the examination sessio"
+        },
+        "publisher": {
+          "value": "Pan Lloyds",
+          "confidence": 0.95,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS C"
+        },
+        "subject": {
+          "value": "Mathematics",
+          "confidence": 0.8,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS Compulsory Part\nMOCK EXAM 6\nP"
+        },
+        "part": {
+          "value": "PAPER 2",
+          "confidence": 0.9,
+          "snippet": "S Compulsory Part\nMOCK EXAM 6\nPAPER 2\n\n(1% hours)\n\nINSTRUCTIONS\n\n1."
+        },
+        "mock_number": {
+          "value": "6",
+          "confidence": 0.9,
+          "snippet": "MATHEMATICS Compulsory Part\nMOCK EXAM 6\nPAPER 2\n\n(1% hours)\n\nINSTRUCT"
+        },
+        "paper": {
+          "value": "Paper 2",
+          "confidence": 0.95,
+          "snippet": "S Compulsory Part\nMOCK EXAM 6\nPAPER 2\n\n(1% hours)\n\nINSTRUCTIONS\n\n1."
+        },
+        "language": "eng",
+        "multi_papers": [
+          {
+            "part": "Paper 2",
+            "offset": "67"
+          },
+          {
+            "part": "Paper A",
+            "offset": "1378"
+          }
+        ],
+        "overall_confidence": 0.867
+      },
+      "suggested_name": "[2025][Pan Lloyds][Mathematics]Mock Exam[6][Paper 2][PAPER 2].pdf",
+      "skipped": false,
+      "skip_reason": ""
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111828.pdf",
+      "sha256": "f603a4d95695d757553b07b991e8a1f126669cf8bb472f91b008a16b90907bfb",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "2025",
+          "confidence": 0.7,
+          "snippet": "shers Ltd\nAll Rights Reserved 2025\n\nAnswers written in the margi"
+        },
+        "publisher": {
+          "value": "Pan Lloyds",
+          "confidence": 0.95,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nPlease stick"
+        },
+        "subject": {
+          "value": "Mathematics",
+          "confidence": 0.8,
+          "snippet": "tick the barcode label here.\n\nMATHEMATICS Compulsory Part\n\nMOCK EXAM 6"
+        },
+        "part": {
+          "value": "PAPER 1",
+          "confidence": 0.9,
+          "snippet": "Compulsory Part\n\nMOCK EXAM 6\nPAPER 1\nQuestion-Answer Book [Candida"
+        },
+        "mock_number": {
+          "value": "6",
+          "confidence": 0.9,
+          "snippet": "MATHEMATICS Compulsory Part\n\nMOCK EXAM 6\nPAPER 1\nQuestion-Answer Book"
+        },
+        "paper": {
+          "value": "Paper 1",
+          "confidence": 0.95,
+          "snippet": "Compulsory Part\n\nMOCK EXAM 6\nPAPER 1\nQuestion-Answer Book [Candida"
+        },
+        "language": "eng",
+        "multi_papers": [
+          {
+            "part": "Paper 1",
+            "offset": "106"
+          },
+          {
+            "part": "Paper M",
+            "offset": "189"
+          },
+          {
+            "part": "Paper C",
+            "offset": "548"
+          },
+          {
+            "part": "Paper A",
+            "offset": "808"
+          },
+          {
+            "part": "Paper\n\nA",
+            "offset": "13784"
+          }
+        ],
+        "overall_confidence": 0.867
+      },
+      "suggested_name": "[2025][Pan Lloyds][Mathematics]Mock Exam[6][Paper 1][PAPER 1].pdf",
+      "skipped": false,
+      "skip_reason": ""
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111850.pdf",
+      "sha256": "1235254568907515e469b39d7cd32d0eae48966d931d7a14b78d1021d78562bf",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "2025",
+          "confidence": 0.7,
+          "snippet": "Ltd cpl :\nAll Rights Reserved 2025 end of the examination sessio"
+        },
+        "publisher": {
+          "value": "Pan Lloyds",
+          "confidence": 0.95,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS C"
+        },
+        "subject": {
+          "value": "Mathematics",
+          "confidence": 0.8,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS Compulsory Part\nMOCK EXAM 5\nP"
+        },
+        "part": {
+          "value": "PAPER 2",
+          "confidence": 0.9,
+          "snippet": "S Compulsory Part\nMOCK EXAM 5\nPAPER 2\n\n(1% hours)\n\nINSTRUCTIONS\n\n1."
+        },
+        "mock_number": {
+          "value": "5",
+          "confidence": 0.9,
+          "snippet": "MATHEMATICS Compulsory Part\nMOCK EXAM 5\nPAPER 2\n\n(1% hours)\n\nINSTRUCT"
+        },
+        "paper": {
+          "value": "Paper 2",
+          "confidence": 0.95,
+          "snippet": "S Compulsory Part\nMOCK EXAM 5\nPAPER 2\n\n(1% hours)\n\nINSTRUCTIONS\n\n1."
+        },
+        "language": "eng",
+        "multi_papers": [
+          {
+            "part": "Paper 2",
+            "offset": "67"
+          },
+          {
+            "part": "Paper A",
+            "offset": "1372"
+          }
+        ],
+        "overall_confidence": 0.867
+      },
+      "suggested_name": "[2025][Pan Lloyds][Mathematics]Mock Exam[5][Paper 2][PAPER 2].pdf",
+      "skipped": false,
+      "skip_reason": ""
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111900.pdf",
+      "sha256": "41c643ddff22cf6e1a2c4fa71486f44a7d103947223d4c213c1abc86110e4799",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "2025",
+          "confidence": 0.7,
+          "snippet": "shers Ltd\nAll Rights Reserved 2025\n\nAnswers written in the margi"
+        },
+        "publisher": {
+          "value": "Pan Lloyds",
+          "confidence": 0.95,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nPlease stick"
+        },
+        "subject": {
+          "value": "Mathematics",
+          "confidence": 0.8,
+          "snippet": "tick the barcode label here.\n\nMATHEMATICS Compulsory Part\nMOCK EXAM 5\nP"
+        },
+        "part": {
+          "value": "PAPER 1",
+          "confidence": 0.9,
+          "snippet": "S Compulsory Part\nMOCK EXAM 5\nPAPER 1\n\nQuestion-Answer Book [Candid"
+        },
+        "mock_number": {
+          "value": "5",
+          "confidence": 0.9,
+          "snippet": "MATHEMATICS Compulsory Part\nMOCK EXAM 5\nPAPER 1\n\nQuestion-Answer Book"
+        },
+        "paper": {
+          "value": "Paper 1",
+          "confidence": 0.95,
+          "snippet": "S Compulsory Part\nMOCK EXAM 5\nPAPER 1\n\nQuestion-Answer Book [Candid"
+        },
+        "language": "chi_tra",
+        "multi_papers": [
+          {
+            "part": "Paper 1",
+            "offset": "105"
+          },
+          {
+            "part": "Paper M",
+            "offset": "189"
+          },
+          {
+            "part": "Paper C",
+            "offset": "479"
+          },
+          {
+            "part": "Paper A",
+            "offset": "739"
+          },
+          {
+            "part": "Paper\n\nA",
+            "offset": "14499"
+          }
+        ],
+        "overall_confidence": 0.867
+      },
+      "suggested_name": "[2025][Pan Lloyds][Mathematics]Mock Exam[5][Paper 1][PAPER 1].pdf",
+      "skipped": false,
+      "skip_reason": ""
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111921.pdf",
+      "sha256": "1eb533a7850a023681de4ab489a85a1a98c399572e2f57e9258180118b7628b5",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "2025",
+          "confidence": 0.7,
+          "snippet": "Ltd : : F\nAll Rights Reserved 2025 end of the examination sessio"
+        },
+        "publisher": {
+          "value": "Pan Lloyds",
+          "confidence": 0.95,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS C"
+        },
+        "subject": {
+          "value": "Mathematics",
+          "confidence": 0.8,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS Compulsory Part\nMOCK EXAM 4\nP"
+        },
+        "part": {
+          "value": "PAPER 2",
+          "confidence": 0.9,
+          "snippet": "S Compulsory Part\nMOCK EXAM 4\nPAPER 2\n\n(1% hours)\n\nINSTRUCTIONS\n\n1."
+        },
+        "mock_number": {
+          "value": "4",
+          "confidence": 0.9,
+          "snippet": "MATHEMATICS Compulsory Part\nMOCK EXAM 4\nPAPER 2\n\n(1% hours)\n\nINSTRUCT"
+        },
+        "paper": {
+          "value": "Paper 2",
+          "confidence": 0.95,
+          "snippet": "S Compulsory Part\nMOCK EXAM 4\nPAPER 2\n\n(1% hours)\n\nINSTRUCTIONS\n\n1."
+        },
+        "language": "eng",
+        "multi_papers": [
+          {
+            "part": "Paper 2",
+            "offset": "67"
+          },
+          {
+            "part": "Paper A",
+            "offset": "1381"
+          }
+        ],
+        "overall_confidence": 0.867
+      },
+      "suggested_name": "[2025][Pan Lloyds][Mathematics]Mock Exam[4][Paper 2][PAPER 2].pdf",
+      "skipped": false,
+      "skip_reason": ""
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111933.pdf",
+      "sha256": "df6a6a6332dd76c321be57392d8e2dcf3241fcc7ffb1d6b88eed7f9c394e2b4d",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "2025",
+          "confidence": 0.7,
+          "snippet": "shers Ltd\nAll Rights Reserved 2025\n\nAnswers written in the margi"
+        },
+        "publisher": {
+          "value": "Pan Lloyds",
+          "confidence": 0.95,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nPlease stick"
+        },
+        "subject": {
+          "value": "Mathematics",
+          "confidence": 0.8,
+          "snippet": "tick the barcode label here.\n\nMATHEMATICS Compulsory Part\nMOCK EXAM 4\nP"
+        },
+        "part": {
+          "value": "PAPER 1",
+          "confidence": 0.9,
+          "snippet": "S Compulsory Part\nMOCK EXAM 4\nPAPER 1\nQuestion-Answer Book\n\n|\n\nCand"
+        },
+        "mock_number": {
+          "value": "4",
+          "confidence": 0.9,
+          "snippet": "MATHEMATICS Compulsory Part\nMOCK EXAM 4\nPAPER 1\nQuestion-Answer Book"
+        },
+        "paper": {
+          "value": "Paper 1",
+          "confidence": 0.95,
+          "snippet": "S Compulsory Part\nMOCK EXAM 4\nPAPER 1\nQuestion-Answer Book\n\n|\n\nCand"
+        },
+        "language": "eng",
+        "multi_papers": [
+          {
+            "part": "Paper 1",
+            "offset": "105"
+          },
+          {
+            "part": "Paper M",
+            "offset": "172"
+          },
+          {
+            "part": "Paper C",
+            "offset": "519"
+          },
+          {
+            "part": "Paper A",
+            "offset": "778"
+          },
+          {
+            "part": "Paper\n\nA",
+            "offset": "13727"
+          }
+        ],
+        "overall_confidence": 0.867
+      },
+      "suggested_name": "[2025][Pan Lloyds][Mathematics]Mock Exam[4][Paper 1][PAPER 1].pdf",
+      "skipped": false,
+      "skip_reason": ""
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326111955.pdf",
+      "sha256": "93bccb774d23a5656040a2e6e9beaf82af7eea019540c88fe12414802206881a",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "2025",
+          "confidence": 0.7,
+          "snippet": "ers Ltd 時\nAll Rights Reserved 2025 end of the examination sessio"
+        },
+        "publisher": {
+          "value": "Pan Lloyds",
+          "confidence": 0.95,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS C"
+        },
+        "subject": {
+          "value": "Mathematics",
+          "confidence": 0.8,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS Compulsory Part\nMOCK EXAM 3\nP"
+        },
+        "part": {
+          "value": "PAPER 2",
+          "confidence": 0.9,
+          "snippet": "S Compulsory Part\nMOCK EXAM 3\nPAPER 2\n\n(1% hours)\n\nINSTRUCTIONS\n\n1."
+        },
+        "mock_number": {
+          "value": "3",
+          "confidence": 0.9,
+          "snippet": "MATHEMATICS Compulsory Part\nMOCK EXAM 3\nPAPER 2\n\n(1% hours)\n\nINSTRUCT"
+        },
+        "paper": {
+          "value": "Paper 2",
+          "confidence": 0.95,
+          "snippet": "S Compulsory Part\nMOCK EXAM 3\nPAPER 2\n\n(1% hours)\n\nINSTRUCTIONS\n\n1."
+        },
+        "language": "eng",
+        "multi_papers": [
+          {
+            "part": "Paper 2",
+            "offset": "67"
+          },
+          {
+            "part": "Paper A",
+            "offset": "1377"
+          }
+        ],
+        "overall_confidence": 0.867
+      },
+      "suggested_name": "[2025][Pan Lloyds][Mathematics]Mock Exam[3][Paper 2][PAPER 2].pdf",
+      "skipped": false,
+      "skip_reason": ""
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326112008.pdf",
+      "sha256": "c088185032f9c41a698de2231aa737ddae84242d4f81209ce1efc874cbfe8779",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "2025",
+          "confidence": 0.7,
+          "snippet": "shers Ltd\nAll Rights Reserved 2025\n\nAnswers written in the margi"
+        },
+        "publisher": {
+          "value": "Pan Lloyds",
+          "confidence": 0.95,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nPlease stick"
+        },
+        "subject": {
+          "value": "Mathematics",
+          "confidence": 0.8,
+          "snippet": "tick the barcode label here.\n\nMATHEMATICS Compulsory Part\nMOCK EXAM 3\nP"
+        },
+        "part": {
+          "value": "PAPER 1",
+          "confidence": 0.9,
+          "snippet": "S Compulsory Part\nMOCK EXAM 3\nPAPER 1\n\nQuestion-Answer Book Candida"
+        },
+        "mock_number": {
+          "value": "3",
+          "confidence": 0.9,
+          "snippet": "MATHEMATICS Compulsory Part\nMOCK EXAM 3\nPAPER 1\n\nQuestion-Answer Book"
+        },
+        "paper": {
+          "value": "Paper 1",
+          "confidence": 0.95,
+          "snippet": "S Compulsory Part\nMOCK EXAM 3\nPAPER 1\n\nQuestion-Answer Book Candida"
+        },
+        "language": "eng",
+        "multi_papers": [
+          {
+            "part": "Paper 1",
+            "offset": "105"
+          },
+          {
+            "part": "Paper M",
+            "offset": "187"
+          },
+          {
+            "part": "Paper C",
+            "offset": "487"
+          },
+          {
+            "part": "Paper A",
+            "offset": "746"
+          },
+          {
+            "part": "Paper\n\nA",
+            "offset": "13048"
+          }
+        ],
+        "overall_confidence": 0.867
+      },
+      "suggested_name": "[2025][Pan Lloyds][Mathematics]Mock Exam[3][Paper 1][PAPER 1].pdf",
+      "skipped": false,
+      "skip_reason": ""
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326112020.pdf",
+      "sha256": "e0e3c6ce50f303a78c6ec4cefdc9de70c11ac2717e2cd22f8de60def795c1f10",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "2025",
+          "confidence": 0.7,
+          "snippet": "Ltd are 3\nAll Rights Reserved 2025 end of the examination sessio"
+        },
+        "publisher": {
+          "value": "Pan Lloyds",
+          "confidence": 0.95,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS C"
+        },
+        "subject": {
+          "value": "Mathematics",
+          "confidence": 0.8,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS Compulsory Part\nMOCK EXAM 2\nP"
+        },
+        "part": {
+          "value": "PAPER 2",
+          "confidence": 0.9,
+          "snippet": "S Compulsory Part\nMOCK EXAM 2\nPAPER 2\n\n(1% hours)\n\nINSTRUCTIONS\n\n1."
+        },
+        "mock_number": {
+          "value": "2",
+          "confidence": 0.9,
+          "snippet": "MATHEMATICS Compulsory Part\nMOCK EXAM 2\nPAPER 2\n\n(1% hours)\n\nINSTRUCT"
+        },
+        "paper": {
+          "value": "Paper 2",
+          "confidence": 0.95,
+          "snippet": "S Compulsory Part\nMOCK EXAM 2\nPAPER 2\n\n(1% hours)\n\nINSTRUCTIONS\n\n1."
+        },
+        "language": "eng",
+        "multi_papers": [
+          {
+            "part": "Paper 2",
+            "offset": "67"
+          },
+          {
+            "part": "Paper A",
+            "offset": "1370"
+          }
+        ],
+        "overall_confidence": 0.867
+      },
+      "suggested_name": "[2025][Pan Lloyds][Mathematics]Mock Exam[2][Paper 2][PAPER 2].pdf",
+      "skipped": false,
+      "skip_reason": ""
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326112059.pdf",
+      "sha256": "f7e2bfb850d56e5295158e619d18f452afe040bb2b9c3fba3660020687f7b01b",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "2025",
+          "confidence": 0.7,
+          "snippet": "shers Ltd\nAll Rights Reserved 2025\n\nPlease stick the barcode lab"
+        },
+        "publisher": {
+          "value": "Pan Lloyds",
+          "confidence": 0.95,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS C"
+        },
+        "subject": {
+          "value": "Mathematics",
+          "confidence": 0.8,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS Compulsory Part\nMOCK EXAM 2\nP"
+        },
+        "part": {
+          "value": "PAPER 1",
+          "confidence": 0.9,
+          "snippet": "S Compulsory Part\nMOCK EXAM 2\nPAPER 1\nQuestion-Answer Book\n\n(2’% ho"
+        },
+        "mock_number": {
+          "value": "2",
+          "confidence": 0.9,
+          "snippet": "MATHEMATICS Compulsory Part\nMOCK EXAM 2\nPAPER 1\nQuestion-Answer Book"
+        },
+        "paper": {
+          "value": "Paper 1",
+          "confidence": 0.95,
+          "snippet": "S Compulsory Part\nMOCK EXAM 2\nPAPER 1\nQuestion-Answer Book\n\n(2’% ho"
+        },
+        "language": "eng",
+        "multi_papers": [
+          {
+            "part": "Paper 1",
+            "offset": "67"
+          },
+          {
+            "part": "Paper M",
+            "offset": "114"
+          },
+          {
+            "part": "Paper C",
+            "offset": "412"
+          },
+          {
+            "part": "Paper A",
+            "offset": "662"
+          },
+          {
+            "part": "Paper\n\nA",
+            "offset": "13227"
+          }
+        ],
+        "overall_confidence": 0.867
+      },
+      "suggested_name": "[2025][Pan Lloyds][Mathematics]Mock Exam[2][Paper 1][PAPER 1].pdf",
+      "skipped": false,
+      "skip_reason": ""
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\Mock 1 [PAPER 1].pdf",
+      "sha256": "d568e8d6f28f7a19a2c8b696cd33b713a6f679480665b25f30e406456cb592cc",
+      "text_method": "",
+      "fields": {},
+      "suggested_name": "",
+      "skipped": true,
+      "skip_reason": "Already processed"
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\Mock 1 [PAPER 2].pdf",
+      "sha256": "349daa7717c87b7dc078493ed4de5e2875feabf2554d4eaa78ee7c2cde32a186",
+      "text_method": "",
+      "fields": {},
+      "suggested_name": "",
+      "skipped": true,
+      "skip_reason": "Already processed"
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\Mock Exam Guidebook.pdf",
+      "sha256": "b4ec7c36588b4e6368ddec9274107b08ffcb6949c69703ac648164904bfe6d05",
+      "text_method": "",
+      "fields": {},
+      "suggested_name": "",
+      "skipped": true,
+      "skip_reason": "Already processed"
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\Prep for DSE.pdf",
+      "sha256": "3140ebf58bdb68e5320be64423cb770f42b66bdd35be0205d82e98afb57988cf",
+      "text_method": "",
+      "fields": {},
+      "suggested_name": "",
+      "skipped": true,
+      "skip_reason": "Already processed"
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\waiting rename\\Mock Exam Papers[Paper I].pdf",
+      "sha256": "301bea267e50812d4150ba0647be0eb931df04b7f69d5480b4fe564af9bc8c3c",
+      "text_method": "",
+      "fields": {},
+      "suggested_name": "",
+      "skipped": true,
+      "skip_reason": "Already processed"
+    }
+  ]
+}

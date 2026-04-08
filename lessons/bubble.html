@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubble Sort Interactive Lesson</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Ensuring dynamic classes are preserved by Tailwind CDN */
+        .safelist-bg { @apply bg-blue-500 bg-emerald-500 bg-red-500 bg-amber-400 bg-emerald-50 bg-red-50 bg-slate-50 bg-blue-50; }
+        .safelist-text { @apply text-emerald-800 text-red-800 text-slate-400 text-blue-800 text-slate-700; }
+        .safelist-border { @apply border-emerald-500 border-red-300 border-slate-200 border-blue-500 border-slate-300; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 font-sans pb-12">
+
+    <!-- Header -->
+    <header class="bg-blue-600 text-white p-6 shadow-md">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl font-bold tracking-tight">HKDSE ICT: Bubble Sort Algorithm</h1>
+            <p class="mt-2 text-blue-100">Interactive tracing, visualization, and exam-focused theory.</p>
+        </div>
+    </header>
+
+    <main id="app-content" class="max-w-6xl mx-auto mt-8 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 hidden">
+        <!-- Left Column: Visualizer & Controls -->
+        <div class="lg:col-span-2 space-y-6">
+            <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <h2 class="text-xl font-semibold mb-4 border-b pb-2">Algorithm Visualizer</h2>
+                
+                <!-- The Array Visualizer -->
+                <div id="visualizer" class="flex justify-center items-end h-64 gap-2 mb-8 bg-slate-100 rounded-lg p-4 border border-slate-200">
+                    <!-- Bars will be injected here -->
+                </div>
+
+                <!-- Status Message -->
+                <div id="status-message" class="bg-blue-50 p-4 rounded-lg text-blue-800 font-medium min-h-[4rem] flex items-center shadow-inner mb-6 border border-blue-100">
+                    <!-- Message will be injected here -->
+                </div>
+
+                <!-- Controls -->
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex gap-2">
+                        <button id="btn-play-pause" class="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700">
+                            <!-- Icon and Text injected via JS -->
+                        </button>
+                        <button id="btn-step" class="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg font-medium disabled:opacity-50 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="4" x2="6" y2="20"></line><polygon points="10,4 20,12 10,20"></polygon></svg> 
+                            Step
+                        </button>
+                        <button id="btn-reset" class="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg font-medium transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg> 
+                            Reset
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-3 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+                        <label class="text-sm font-medium text-slate-600">Speed:</label>
+                        <input id="input-speed" type="range" min="200" max="1500" step="100" dir="rtl" value="800" class="w-24 accent-blue-600" />
+                    </div>
+                </div>
+                
+                <!-- Legend -->
+                <div class="flex gap-4 mt-6 text-sm text-slate-600 justify-center">
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 bg-blue-500 rounded"></div> Unsorted</div>
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 bg-amber-400 rounded"></div> Comparing</div>
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 bg-red-500 rounded"></div> Swapping</div>
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 bg-emerald-500 rounded"></div> Sorted</div>
+                </div>
+            </section>
+
+            <!-- Theory Section -->
+            <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <h2 class="text-xl font-semibold mb-4 border-b pb-2">HKDSE Key Concepts</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-blue-700 mb-2">Algorithm Characteristics</h3>
+                        <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+                            <li><strong>Type:</strong> Exchange Sort.</li>
+                            <li><strong>Mechanism:</strong> Repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order.</li>
+                            <li><strong>Data Movement:</strong> Heavy. Lots of writing to memory.</li>
+                            <li><strong>Stability:</strong> Stable (Equal elements retain their relative order).</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-blue-700 mb-2">Time Complexity</h3>
+                        <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+                            <li><strong>Worst Case: <span class="text-red-600 font-mono">O(n²)</span></strong><br/><span class="ml-5 text-slate-500">Array in reverse order.</span></li>
+                            <li><strong>Average Case: <span class="text-orange-600 font-mono">O(n²)</span></strong></li>
+                            <li><strong>Best Case: <span class="text-emerald-600 font-mono">O(n)</span></strong><br/><span class="ml-5 text-slate-500">Array already sorted (requires the 'swapped' flag optimization).</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Column: Pseudocode & Variables -->
+        <div class="space-y-6">
+            <section class="bg-slate-800 rounded-xl shadow-sm border border-slate-700 p-6 text-slate-100">
+                <h2 class="text-xl font-semibold mb-4 text-white flex justify-between items-center">
+                    Pseudocode Trace
+                    <span class="text-xs bg-slate-700 px-2 py-1 rounded text-slate-300">Optimized</span>
+                </h2>
+                <div id="pseudocode-container" class="font-mono text-sm space-y-1">
+                    <!-- Pseudocode lines will be injected here -->
+                </div>
+
+                <!-- Live Variables Panel -->
+                <div class="mt-6 pt-4 border-t border-slate-600">
+                    <h3 class="text-sm font-bold text-slate-400 mb-3 uppercase tracking-wider">Live Trace Variables</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-700 p-3 rounded-lg text-center">
+                            <div class="text-xs text-slate-400 mb-1">Pass Number</div>
+                            <div id="var-passes" class="text-2xl font-mono text-white">0</div>
+                        </div>
+                        <div class="bg-slate-700 p-3 rounded-lg text-center">
+                            <div class="text-xs text-slate-400 mb-1">Total Comparisons</div>
+                            <div id="var-comparisons" class="text-2xl font-mono text-blue-300">0</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="p-8 text-center text-xl">Loading visualizer...</div>
+
+    <!-- Quiz Section -->
+    <section id="quiz-section" class="max-w-4xl mx-auto mt-8 px-4 hidden">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 class="text-2xl font-semibold mb-6 text-center">HKDSE Exam-Style Mini-Quiz</h2>
+            <div id="quiz-container" class="space-y-8">
+                <!-- Quiz questions will be injected here -->
+            </div>
+            <div id="quiz-actions" class="mt-8 flex justify-center">
+                <!-- Check/Retry button injected here -->
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // SVGs for Icons
+        const icons = {
+            play: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>',
+            pause: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>',
+            check: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>',
+            cross: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg>'
+        };
+
+        // Data & Constants
+        const INITIAL_ARRAY = [25, 12, 45, 8, 32, 18];
+        const pseudocode = [
+            "1. pass = 1",
+            "2. REPEAT",
+            "3.   swapped = FALSE",
+            "4.   FOR j = 0 TO (N - pass - 1)",
+            "5.     IF A[j] > A[j+1] THEN",
+            "6.       SWAP A[j] AND A[j+1]",
+            "7.       swapped = TRUE",
+            "8.   pass = pass + 1",
+            "9. UNTIL swapped == FALSE OR pass >= N",
+            "10. PRINT 'Sorted!'"
+        ];
+        
+        const quizQuestions = [
+            {
+                id: 'q1',
+                question: "What is the worst-case time complexity of the Bubble Sort algorithm?",
+                options: ["O(1)", "O(log n)", "O(n)", "O(n²)"],
+                answer: 3,
+                explanation: "In the worst case (e.g., array is in reverse order), Bubble Sort needs to compare and swap elements n + (n-1) + ... + 1 times, resulting in a quadratic O(n²) time complexity."
+            },
+            {
+                id: 'q2',
+                question: "Why do we use the 'swapped' boolean flag in the optimized Bubble Sort?",
+                options: [
+                    "To allow the algorithm to sort in descending order.",
+                    "To stop the algorithm early if the array is already sorted, saving unnecessary passes.",
+                    "To keep track of how many items have been sorted.",
+                    "It is required by the computer to perform the swap operation."
+                ],
+                answer: 1,
+                explanation: "The 'swapped' flag detects if any swaps were made during a pass. If no swaps were made, the array is perfectly sorted, and we can terminate early to save processing time (Best case becomes O(n))."
+            },
+            {
+                id: 'q3',
+                question: "After the FIRST complete pass of Bubble Sort (ascending), which statement is definitively true?",
+                options: [
+                    "The smallest element is at the beginning of the array.",
+                    "The first two elements are sorted relative to each other.",
+                    "The largest element has 'bubbled up' to the very end of the array.",
+                    "The array is fully sorted."
+                ],
+                answer: 2,
+                explanation: "During each pass, Bubble Sort continuously swaps adjacent elements if they are out of order, pushing the largest unsorted element to its correct final position at the end of the unsorted segment."
+            }
+        ];
+
+        // Generator logic
+        const generateSteps = (initialArray) => {
+            const steps = [];
+            const arr = [...initialArray];
+            const n = arr.length;
+            let passes = 0;
+            let comparisons = 0;
+
+            steps.push({ array: [...arr], compare: [], swap: false, sorted: [], line: 1, passes: 0, comparisons: 0, message: "Ready to start sorting." });
+
+            for (let i = 0; i < n - 1; i++) {
+                let swapped = false;
+                passes++;
+                
+                steps.push({ array: [...arr], compare: [], swap: false, sorted: Array.from({length: i}, (_, idx) => n - 1 - idx), line: 2, passes, comparisons, message: `Starting Pass ${passes}. Initialize swapped flag to FALSE.` });
+
+                for (let j = 0; j < n - i - 1; j++) {
+                    comparisons++;
+                    steps.push({ array: [...arr], compare: [j, j + 1], swap: false, sorted: Array.from({length: i}, (_, idx) => n - 1 - idx), line: 4, passes, comparisons, message: `Comparing elements at index ${j} (${arr[j]}) and ${j+1} (${arr[j+1]}).` });
+
+                    if (arr[j] > arr[j + 1]) {
+                        steps.push({ array: [...arr], compare: [j, j + 1], swap: true, sorted: Array.from({length: i}, (_, idx) => n - 1 - idx), line: 5, passes, comparisons, message: `${arr[j]} > ${arr[j+1]}, so we SWAP them.` });
+                        let temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                        swapped = true;
+                        steps.push({ array: [...arr], compare: [j, j + 1], swap: false, sorted: Array.from({length: i}, (_, idx) => n - 1 - idx), line: 6, passes, comparisons, message: `Set swapped flag to TRUE.` });
+                    } else {
+                        steps.push({ array: [...arr], compare: [j, j + 1], swap: false, sorted: Array.from({length: i}, (_, idx) => n - 1 - idx), line: 4, passes, comparisons, message: `${arr[j]} <= ${arr[j+1]}, no swap needed.` });
+                    }
+                }
+                
+                steps.push({ array: [...arr], compare: [], swap: false, sorted: Array.from({length: i + 1}, (_, idx) => n - 1 - idx), line: 8, passes, comparisons, message: `Pass ${passes} complete. The largest unsorted element is now at its correct final position.` });
+
+                if (!swapped) {
+                    steps.push({ array: [...arr], compare: [], swap: false, sorted: Array.from({length: n}, (_, idx) => idx), line: 9, passes, comparisons, message: `No swaps occurred in Pass ${passes}. The array is fully sorted! (Early Exit)` });
+                    break;
+                }
+            }
+            
+            if (steps[steps.length - 1].sorted.length !== n) {
+                steps.push({ array: [...arr], compare: [], swap: false, sorted: Array.from({length: n}, (_, idx) => idx), line: 10, passes, comparisons, message: `Algorithm finished. All elements are sorted.` });
+            }
+
+            return steps;
+        };
+
+        // State variables
+        let steps = [];
+        let currentStep = 0;
+        let isPlaying = false;
+        let speed = 800;
+        let timer = null;
+        let quizAnswers = {};
+        let showResults = false;
+
+        // DOM Elements
+        const elAppContent = document.getElementById('app-content');
+        const elLoading = document.getElementById('loading-state');
+        const elQuizSection = document.getElementById('quiz-section');
+        const elVisualizer = document.getElementById('visualizer');
+        const elStatusMessage = document.getElementById('status-message');
+        const elBtnPlayPause = document.getElementById('btn-play-pause');
+        const elBtnStep = document.getElementById('btn-step');
+        const elInputSpeed = document.getElementById('input-speed');
+        const elPseudocodeContainer = document.getElementById('pseudocode-container');
+        const elVarPasses = document.getElementById('var-passes');
+        const elVarComparisons = document.getElementById('var-comparisons');
+        const elQuizContainer = document.getElementById('quiz-container');
+        const elQuizActions = document.getElementById('quiz-actions');
+
+        // Initialization
+        function init() {
+            steps = generateSteps(INITIAL_ARRAY);
+            elLoading.classList.add('hidden');
+            elAppContent.classList.remove('hidden');
+            elQuizSection.classList.remove('hidden');
+            
+            renderPseudocode();
+            renderQuiz();
+            updateUI();
+        }
+
+        // Render Functions
+        function updateUI() {
+            if (!steps.length) return;
+            const state = steps[currentStep];
+            const isFinished = currentStep === steps.length - 1;
+
+            // Visualizer array
+            elVisualizer.innerHTML = '';
+            state.array.forEach((num, idx) => {
+                const isComparing = state.compare.includes(idx);
+                const isSwapping = isComparing && state.swap;
+                const isSorted = state.sorted.includes(idx);
+
+                let bgColor = "bg-blue-500";
+                if (isSorted) bgColor = "bg-emerald-500";
+                else if (isSwapping) bgColor = "bg-red-500";
+                else if (isComparing) bgColor = "bg-amber-400";
+
+                const wrapper = document.createElement('div');
+                wrapper.className = "flex flex-col items-center";
+                wrapper.innerHTML = `
+                    <div class="w-12 transition-all duration-300 rounded-t-md shadow-sm ${bgColor} flex items-end justify-center pb-2" style="height: ${(num / 50) * 100}%; min-height: 30px;">
+                        <span class="text-white font-bold text-sm drop-shadow-md">${num}</span>
+                    </div>
+                    <span class="text-xs text-slate-500 mt-2 font-mono">[${idx}]</span>
+                `;
+                elVisualizer.appendChild(wrapper);
+            });
+
+            // Status message
+            elStatusMessage.innerText = state.message;
+
+            // Controls
+            if (isFinished) {
+                elBtnPlayPause.disabled = true;
+                elBtnPlayPause.className = "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors bg-slate-200 text-slate-400 cursor-not-allowed";
+                elBtnPlayPause.innerHTML = `${icons.play} Play`;
+            } else if (isPlaying) {
+                elBtnPlayPause.disabled = false;
+                elBtnPlayPause.className = "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors bg-amber-100 text-amber-700 hover:bg-amber-200";
+                elBtnPlayPause.innerHTML = `${icons.pause} Pause`;
+            } else {
+                elBtnPlayPause.disabled = false;
+                elBtnPlayPause.className = "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700";
+                elBtnPlayPause.innerHTML = `${icons.play} Play`;
+            }
+            
+            elBtnStep.disabled = isPlaying || isFinished;
+
+            // Pseudocode active line
+            Array.from(elPseudocodeContainer.children).forEach((child, idx) => {
+                const lineNum = idx + 1;
+                const isActive = state.line === lineNum;
+                if (isActive) {
+                    child.className = "px-2 py-1 rounded bg-blue-600 text-white font-bold shadow-sm";
+                } else {
+                    child.className = "px-2 py-1 rounded text-slate-400";
+                }
+            });
+
+            // Variables
+            elVarPasses.innerText = state.passes;
+            elVarComparisons.innerText = state.comparisons;
+        }
+
+        function renderPseudocode() {
+            elPseudocodeContainer.innerHTML = '';
+            pseudocode.forEach((code) => {
+                const div = document.createElement('div');
+                div.innerText = code;
+                elPseudocodeContainer.appendChild(div);
+            });
+        }
+
+        function renderQuiz() {
+            elQuizContainer.innerHTML = '';
+            quizQuestions.forEach((q, qIndex) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = "border-b border-slate-100 pb-6 last:border-0 last:pb-0";
+                
+                let optionsHtml = '';
+                q.options.forEach((opt, optIdx) => {
+                    const isSelected = quizAnswers[q.id] === optIdx;
+                    const isCorrect = showResults && q.answer === optIdx;
+                    const isWrong = showResults && isSelected && q.answer !== optIdx;
+                    
+                    let btnClass = "w-full text-left px-4 py-3 rounded-lg border transition-all ";
+                    let iconHtml = '';
+                    
+                    if (showResults) {
+                        if (isCorrect) {
+                            btnClass += "bg-emerald-50 border-emerald-500 text-emerald-800 font-medium";
+                            iconHtml = `<span class="text-emerald-500">${icons.check}</span>`;
+                        } else if (isWrong) {
+                            btnClass += "bg-red-50 border-red-300 text-red-800";
+                            iconHtml = `<span class="text-red-500">${icons.cross}</span>`;
+                        } else {
+                            btnClass += "bg-slate-50 border-slate-200 text-slate-400 opacity-60";
+                        }
+                    } else {
+                        btnClass += isSelected 
+                            ? "bg-blue-50 border-blue-500 text-blue-800 font-medium" 
+                            : "bg-white border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300";
+                    }
+
+                    optionsHtml += `
+                        <button ${showResults ? 'disabled' : ''} onclick="handleQuizChange('${q.id}', ${optIdx})" class="${btnClass}">
+                            <div class="flex items-center justify-between">
+                                <span>${opt}</span>
+                                ${iconHtml}
+                            </div>
+                        </button>
+                    `;
+                });
+
+                let explanationHtml = '';
+                if (showResults) {
+                    explanationHtml = `
+                        <div class="mt-3 p-4 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-800">
+                            <strong>Explanation:</strong> ${q.explanation}
+                        </div>
+                    `;
+                }
+
+                qDiv.innerHTML = `
+                    <p class="font-medium text-lg mb-4">
+                        <span class="text-blue-600 font-bold mr-2">Q${qIndex + 1}.</span>
+                        ${q.question}
+                    </p>
+                    <div class="space-y-2">
+                        ${optionsHtml}
+                    </div>
+                    ${explanationHtml}
+                `;
+                elQuizContainer.appendChild(qDiv);
+            });
+
+            const allAnswered = Object.keys(quizAnswers).length === quizQuestions.length;
+            
+            if (!showResults) {
+                elQuizActions.innerHTML = `
+                    <button onclick="checkAnswers()" ${!allAnswered ? 'disabled' : ''} 
+                        class="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
+                        Check Answers
+                    </button>
+                `;
+            } else {
+                elQuizActions.innerHTML = `
+                    <button onclick="resetQuiz()" class="bg-slate-200 text-slate-800 px-8 py-3 rounded-lg font-bold hover:bg-slate-300 transition-colors shadow-sm">
+                        Retry Quiz
+                    </button>
+                `;
+            }
+        }
+
+        // Logic & Event Handlers
+        function handlePlayPause() {
+            if (currentStep >= steps.length - 1) return;
+            isPlaying = !isPlaying;
+            updateUI();
+            if (isPlaying) runLoop();
+            else clearTimeout(timer);
+        }
+
+        function runLoop() {
+            if (isPlaying && currentStep < steps.length - 1) {
+                timer = setTimeout(() => {
+                    currentStep++;
+                    updateUI();
+                    runLoop();
+                }, speed);
+            } else if (currentStep >= steps.length - 1) {
+                isPlaying = false;
+                updateUI();
+            }
+        }
+
+        function handleStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                updateUI();
+            }
+        }
+
+        function handleReset() {
+            isPlaying = false;
+            clearTimeout(timer);
+            currentStep = 0;
+            updateUI();
+        }
+
+        function handleSpeedChange(e) {
+            speed = Number(e.target.value);
+        }
+
+        // Global functions for inline HTML event handlers
+        window.handleQuizChange = (qId, optionIdx) => {
+            quizAnswers[qId] = optionIdx;
+            renderQuiz();
+        };
+
+        window.checkAnswers = () => {
+            showResults = true;
+            renderQuiz();
+        };
+
+        window.resetQuiz = () => {
+            showResults = false;
+            quizAnswers = {};
+            renderQuiz();
+        };
+
+        // Event Listeners
+        elBtnPlayPause.addEventListener('click', handlePlayPause);
+        elBtnStep.addEventListener('click', handleStep);
+        document.getElementById('btn-reset').addEventListener('click', handleReset);
+        elInputSpeed.addEventListener('input', handleSpeedChange);
+
+        // Start
+        window.onload = init;
+    </script>
+</body>
+</html>

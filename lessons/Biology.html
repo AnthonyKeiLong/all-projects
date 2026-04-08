@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE Biology Masterclass Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; 
+            color: #0f172a;
+        }
+        
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* High Contrast Framework Styles */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 4px solid #0f172a;
+        }
+
+        .page-view {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        .page-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Distinct Framing Styles */
+        .concept-box { 
+            background-color: #ffffff; 
+            padding: 1.5rem; 
+            border-radius: 1rem; 
+            border: 4px solid #0f172a; 
+            box-shadow: 8px 8px 0px 0px #0f172a; 
+            margin-bottom: 3rem; 
+        }
+        .box-title { 
+            font-size: 1.5rem; 
+            font-weight: 900; 
+            margin-bottom: 1.5rem; 
+            border-bottom: 4px solid #0f172a; 
+            padding-bottom: 0.5rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em;
+        }
+        .dse-tip { 
+            background-color: #fde047; /* yellow-300 */
+            border: 4px solid #0f172a; 
+            padding: 1rem; 
+            border-radius: 0.75rem; 
+            font-weight: 800; 
+            color: #0f172a; 
+            margin: 1.5rem 0; 
+            display: flex; 
+            gap: 0.75rem; 
+            box-shadow: 4px 4px 0px 0px #0f172a;
+        }
+        .def-term { font-weight: 900; color: #0f172a; font-size: 1.1rem; }
+        .term-pill {
+            display: inline-block;
+            line-height: 1.2;
+        }
+        .step-card-active {
+            background-color: #fef08a;
+            border-color: #0f172a;
+            transform: translateY(-2px);
+        }
+        .step-card-done {
+            background-color: #dcfce7;
+            border-color: #166534;
+        }
+        .dna-segment {
+            min-height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .biotech-copy-bar {
+            height: 0.9rem;
+            border: 3px solid #0f172a;
+            border-radius: 9999px;
+            background-color: #e2e8f0;
+            transition: all 0.25s ease;
+        }
+        .biotech-copy-bar.active {
+            background-color: #22c55e;
+            box-shadow: 3px 3px 0 0 #0f172a;
+        }
+        .biotech-mini-label {
+            min-height: 3.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.72rem;
+            line-height: 1.1;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            padding: 0.5rem 0.35rem;
+        }
+        .sticky-end {
+            position: relative;
+        }
+        .sticky-end::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -12px;
+            width: 16px;
+            height: 10px;
+            border-top: 4px solid #facc15;
+            border-right: 4px solid #facc15;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .sticky-end.visible::after {
+            opacity: 1;
+        }
+        
+        /* Table Framing */
+        table { 
+            width: 100%; 
+            text-align: left; 
+            border-collapse: collapse; 
+            margin-bottom: 1.5rem; 
+            background-color: #ffffff; 
+            border-radius: 0.5rem; 
+            border: 4px solid #0f172a; 
+        }
+        th { 
+            background-color: #e2e8f0; 
+            padding: 1rem; 
+            font-weight: 900; 
+            border-bottom: 4px solid #0f172a; 
+            border-right: 4px solid #0f172a; 
+            text-transform: uppercase; 
+        }
+        td { 
+            padding: 1rem; 
+            border-bottom: 4px solid #0f172a; 
+            border-right: 4px solid #0f172a; 
+            font-weight: 600; 
+        }
+        th:last-child, td:last-child { border-right: none; }
+        tr:last-child td { border-bottom: none; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative">
+
+    <nav class="sticky top-0 z-50 glass-nav">
+        <div class="max-w-[1600px] mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <button id="nav-back-btn" class="hidden text-slate-900 border-4 border-slate-900 bg-white hover:bg-slate-200 px-3 py-1 rounded-lg font-bold transition shadow-[2px_2px_0_0_#0f172a]" onclick="navigate('home')">
+                    <i class="fas fa-arrow-left mr-2"></i> Menu
+                </button>
+                <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('home')">
+                    <div class="bg-emerald-400 p-2 border-4 border-slate-900 rounded-xl shadow-[4px_4px_0_0_#0f172a] transform -rotate-3">
+                        <i class="fas fa-book-medical text-slate-900 text-2xl"></i>
+                    </div>
+                    <span class="font-black text-2xl text-slate-900 tracking-tight uppercase">DSE Bio<span class="text-emerald-600">Master</span></span>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="navigate('mock-exam')" class="hidden md:flex items-center gap-2 font-black text-slate-900 bg-yellow-400 border-4 border-slate-900 px-4 py-2 rounded-xl shadow-[4px_4px_0_0_#0f172a] hover:translate-y-1 hover:shadow-none transition-all uppercase">
+                    <i class="fas fa-clipboard-list"></i> Mock Exam
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-[1600px] mx-auto px-4 py-10 w-full relative">
+
+        <div id="home" class="page-view active space-y-12">
+            <header class="text-center py-16 bg-indigo-600 rounded-3xl text-white border-4 border-slate-900 shadow-[12px_12px_0_0_#0f172a] relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.8) 2px, transparent 0); background-size: 40px 40px;"></div>
+                <h1 class="text-5xl md:text-7xl font-black mb-6 relative z-10 tracking-tight uppercase text-shadow">Interactive Syllabus</h1>
+                <p class="text-xl md:text-2xl font-bold text-indigo-100 max-w-3xl mx-auto relative z-10 px-4">Master HKDSE Biology with framed visual notes, dynamic simulators, and built-in topic quizzes.</p>
+                <button onclick="navigate('mock-exam')" class="md:hidden mt-8 items-center gap-2 font-black text-slate-900 bg-yellow-400 border-4 border-slate-900 px-6 py-3 rounded-xl shadow-[4px_4px_0_0_#0f172a] uppercase relative z-10">
+                    <i class="fas fa-clipboard-list"></i> Take Full Mock Exam
+                </button>
+            </header>
+
+            <div class="space-y-8">
+                <h2 class="text-4xl font-black text-slate-900 bg-blue-200 inline-block px-4 py-2 border-4 border-slate-900 shadow-[4px_4px_0_0_#0f172a] uppercase">Compulsory Part</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div onclick="navigate('topic1')" class="bg-white p-8 rounded-2xl shadow-[8px_8px_0_0_#0f172a] hover:translate-y-1 hover:shadow-[4px_4px_0_0_#0f172a] transition-all cursor-pointer border-4 border-slate-900 group flex gap-6 items-center">
+                        <div class="w-20 h-20 bg-blue-400 text-slate-900 border-4 border-slate-900 rounded-2xl flex items-center justify-center text-4xl shrink-0 group-hover:rotate-6 transition-transform shadow-[4px_4px_0_0_#0f172a]"><i class="fas fa-microscope"></i></div>
+                        <div>
+                            <h3 class="font-black text-2xl text-slate-900 mb-2 uppercase">I. Cells & Molecules</h3>
+                            <p class="font-semibold text-slate-600 text-lg">Chemicals, Cell structure, Transport, Enzymes.</p>
+                        </div>
+                    </div>
+                    <div onclick="navigate('topic2')" class="bg-white p-8 rounded-2xl shadow-[8px_8px_0_0_#0f172a] hover:translate-y-1 hover:shadow-[4px_4px_0_0_#0f172a] transition-all cursor-pointer border-4 border-slate-900 group flex gap-6 items-center">
+                        <div class="w-20 h-20 bg-purple-400 text-slate-900 border-4 border-slate-900 rounded-2xl flex items-center justify-center text-4xl shrink-0 group-hover:rotate-6 transition-transform shadow-[4px_4px_0_0_#0f172a]"><i class="fas fa-dna"></i></div>
+                        <div>
+                            <h3 class="font-black text-2xl text-slate-900 mb-2 uppercase">II. Genetics</h3>
+                            <p class="font-semibold text-slate-600 text-lg">Inheritance, DNA, Protein synthesis, Evolution.</p>
+                        </div>
+                    </div>
+                    <div onclick="navigate('topic3')" class="bg-white p-8 rounded-2xl shadow-[8px_8px_0_0_#0f172a] hover:translate-y-1 hover:shadow-[4px_4px_0_0_#0f172a] transition-all cursor-pointer border-4 border-slate-900 group flex gap-6 items-center">
+                        <div class="w-20 h-20 bg-green-400 text-slate-900 border-4 border-slate-900 rounded-2xl flex items-center justify-center text-4xl shrink-0 group-hover:rotate-6 transition-transform shadow-[4px_4px_0_0_#0f172a]"><i class="fas fa-tree"></i></div>
+                        <div>
+                            <h3 class="font-black text-2xl text-slate-900 mb-2 uppercase">III. Organisms & Env</h3>
+                            <p class="font-semibold text-slate-600 text-lg">Photosynthesis, Transpiration, Ecology cycles.</p>
+                        </div>
+                    </div>
+                    <div onclick="navigate('topic4')" class="bg-white p-8 rounded-2xl shadow-[8px_8px_0_0_#0f172a] hover:translate-y-1 hover:shadow-[4px_4px_0_0_#0f172a] transition-all cursor-pointer border-4 border-slate-900 group flex gap-6 items-center">
+                        <div class="w-20 h-20 bg-red-400 text-slate-900 border-4 border-slate-900 rounded-2xl flex items-center justify-center text-4xl shrink-0 group-hover:rotate-6 transition-transform shadow-[4px_4px_0_0_#0f172a]"><i class="fas fa-shield-virus"></i></div>
+                        <div>
+                            <h3 class="font-black text-2xl text-slate-900 mb-2 uppercase">IV. Health & Diseases</h3>
+                            <p class="font-semibold text-slate-600 text-lg">Pathogens, Defense lines, Immunological memory.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-8 pt-8">
+                <h2 class="text-4xl font-black text-slate-900 bg-teal-200 inline-block px-4 py-2 border-4 border-slate-900 shadow-[4px_4px_0_0_#0f172a] uppercase">Elective Part</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div onclick="navigate('topic5')" class="bg-white p-8 rounded-2xl shadow-[8px_8px_0_0_#0f172a] hover:translate-y-1 hover:shadow-[4px_4px_0_0_#0f172a] transition-all cursor-pointer border-4 border-slate-900 group flex gap-6 items-center">
+                        <div class="w-20 h-20 bg-rose-400 text-slate-900 border-4 border-slate-900 rounded-2xl flex items-center justify-center text-4xl shrink-0 group-hover:rotate-6 transition-transform shadow-[4px_4px_0_0_#0f172a]"><i class="fas fa-brain"></i></div>
+                        <div>
+                            <h3 class="font-black text-2xl text-slate-900 mb-2 uppercase">V. Physiology</h3>
+                            <p class="font-semibold text-slate-600 text-lg">Nervous vs Endocrine, Osmoregulation.</p>
+                        </div>
+                    </div>
+                    <div onclick="navigate('topic8')" class="bg-white p-8 rounded-2xl shadow-[8px_8px_0_0_#0f172a] hover:translate-y-1 hover:shadow-[4px_4px_0_0_#0f172a] transition-all cursor-pointer border-4 border-slate-900 group flex gap-6 items-center">
+                        <div class="w-20 h-20 bg-cyan-400 text-slate-900 border-4 border-slate-900 rounded-2xl flex items-center justify-center text-4xl shrink-0 group-hover:rotate-6 transition-transform shadow-[4px_4px_0_0_#0f172a]"><i class="fas fa-vial"></i></div>
+                        <div>
+                            <h3 class="font-black text-2xl text-slate-900 mb-2 uppercase">VIII. Biotech</h3>
+                            <p class="font-semibold text-slate-600 text-lg">Recombinant DNA, PCR, Fingerprinting.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="topic1" class="page-view space-y-8">
+            <div class="bg-blue-500 text-slate-900 p-10 rounded-3xl relative overflow-hidden border-4 border-slate-900 shadow-[12px_12px_0_0_#0f172a]">
+                <i class="fas fa-microscope absolute -right-10 -bottom-10 text-9xl text-white opacity-40"></i>
+                <h2 class="text-4xl md:text-5xl font-black mb-4 relative z-10 uppercase tracking-tight bg-white inline-block px-4 py-2 border-4 border-slate-900 shadow-[4px_4px_0_0_#0f172a] -rotate-1">I. Cells & Molecules</h2>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-blue-800 border-slate-900">1. Molecules of Life</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 border-4 border-blue-600 rounded-xl shadow-[6px_6px_0_0_#2563eb]">
+                        <h4 class="font-black text-2xl text-blue-800 mb-4 uppercase">Carbohydrates</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-slate-700 space-y-2">
+                            <li><strong class="text-slate-900">Monosaccharides:</strong> Glucose (C₆H₁₂O₆), Fructose - building blocks</li>
+                            <li><strong class="text-slate-900">Disaccharides:</strong> Sucrose (glucose + fructose), Lactose (glucose + galactose)</li>
+                            <li><strong class="text-slate-900">Polysaccharides:</strong> Starch (energy storage), Glycogen (animal starch), Cellulose (plant cell wall)</li>
+                            <li><strong class="text-slate-900 bg-yellow-200 px-1">Test:</strong> Benedict's test (blue → brick red for reducing sugars)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-100 p-6 border-4 border-slate-900 rounded-xl shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl text-slate-800 mb-4 uppercase">Proteins</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-slate-700 space-y-2">
+                            <li><strong class="text-slate-900">Amino acids:</strong> 20 types, linked by peptide bonds</li>
+                            <li><strong class="text-slate-900">Structure:</strong> Primary (sequence), Secondary (α-helix/β-pleated), Tertiary (3D shape), Quaternary (multiple polypeptides)</li>
+                            <li><strong class="text-slate-900">Functions:</strong> Enzymes, structural (collagen), transport (haemoglobin), hormones</li>
+                            <li><strong class="text-slate-900 bg-yellow-200 px-1">Test:</strong> Biuret test (blue → purple)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 mt-8">
+                    <div class="bg-green-100 p-6 border-4 border-green-600 rounded-xl shadow-[6px_6px_0_0_#16a34a]">
+                        <h4 class="font-black text-2xl text-green-800 mb-4 uppercase">Lipids</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-green-700 space-y-2">
+                            <li><strong class="text-green-900">Triglycerides:</strong> Glycerol + 3 fatty acids (saturated/unsaturated)</li>
+                            <li><strong class="text-green-900">Phospholipids:</strong> Hydrophilic head, hydrophobic tails - form cell membranes</li>
+                            <li><strong class="text-green-900">Functions:</strong> Energy storage, insulation, waterproofing</li>
+                            <li><strong class="text-green-900 bg-yellow-200 px-1">Test:</strong> Sudan III (red stain), Emulsion test</li>
+                        </ul>
+                    </div>
+                    <div class="bg-purple-100 p-6 border-4 border-purple-600 rounded-xl shadow-[6px_6px_0_0_#7c3aed]">
+                        <h4 class="font-black text-2xl text-purple-800 mb-4 uppercase">Nucleic Acids</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-purple-700 space-y-2">
+                            <li><strong class="text-purple-900">DNA:</strong> Deoxyribonucleic acid - double helix, stores genetic info</li>
+                            <li><strong class="text-purple-900">RNA:</strong> Ribonucleic acid - single strand, involved in protein synthesis</li>
+                            <li><strong class="text-purple-900">Nucleotides:</strong> Phosphate + Sugar + Base (A,T,C,G for DNA; A,U,C,G for RNA)</li>
+                            <li><strong class="text-purple-900 bg-yellow-200 px-1">Test:</strong> Dische's test (blue color)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-blue-800 border-slate-900">2. Cell Structure & Function</h3>
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Organelle</th>
+                                <th>Structure</th>
+                                <th>Function</th>
+                                <th>Present in Plant/Animal/Both</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover:bg-blue-50 transition-colors">
+                                <td><span class="term-pill bg-blue-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-xl text-blue-900">Nucleus</span></td>
+                                <td>Nuclear envelope, nucleoplasm, nucleolus, chromatin</td>
+                                <td>Controls cell activities, contains DNA</td>
+                                <td class="font-black text-blue-700">Both</td>
+                            </tr>
+                            <tr class="hover:bg-green-50 transition-colors">
+                                <td><span class="term-pill bg-green-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-xl text-green-900">Mitochondria</span></td>
+                                <td>Double membrane, cristae, matrix</td>
+                                <td>Aerobic respiration, ATP production</td>
+                                <td class="font-black text-green-700">Both</td>
+                            </tr>
+                            <tr class="hover:bg-yellow-50 transition-colors">
+                                <td><span class="term-pill bg-yellow-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-xl text-yellow-900">Endoplasmic Reticulum</span></td>
+                                <td>Rough (with ribosomes) / Smooth (no ribosomes)</td>
+                                <td>Protein synthesis (rough), lipid synthesis/detoxification (smooth)</td>
+                                <td class="font-black text-yellow-700">Both</td>
+                            </tr>
+                            <tr class="hover:bg-red-50 transition-colors">
+                                <td><span class="term-pill bg-red-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-xl text-red-900">Golgi Apparatus</span></td>
+                                <td>Stack of membrane-bound sacs</td>
+                                <td>Modifies, sorts, packages proteins and lipids</td>
+                                <td class="font-black text-red-700">Both</td>
+                            </tr>
+                            <tr class="hover:bg-purple-50 transition-colors">
+                                <td><span class="term-pill bg-purple-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-xl text-purple-900">Lysosomes</span></td>
+                                <td>Membrane-bound organelles with hydrolytic enzymes</td>
+                                <td>Break down waste materials and cellular debris</td>
+                                <td class="font-black text-purple-700">Animal</td>
+                            </tr>
+                            <tr class="hover:bg-teal-50 transition-colors">
+                                <td><span class="term-pill bg-teal-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-xl text-teal-900">Vacuoles</span></td>
+                                <td>Large central vacuole in plants, small in animals</td>
+                                <td>Storage, maintains turgor pressure, waste storage</td>
+                                <td class="font-black text-teal-700">Both (large in plants)</td>
+                            </tr>
+                            <tr class="hover:bg-orange-50 transition-colors">
+                                <td><span class="term-pill bg-orange-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-xl text-orange-900">Cell Wall</span></td>
+                                <td>Made of cellulose microfibrils in pectin matrix</td>
+                                <td>Provides structural support and protection</td>
+                                <td class="font-black text-orange-700">Plant</td>
+                            </tr>
+                            <tr class="hover:bg-pink-50 transition-colors">
+                                <td><span class="term-pill bg-pink-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-xl text-pink-900">Chloroplasts</span></td>
+                                <td>Double membrane, thylakoids in stacks (grana), stroma</td>
+                                <td>Photosynthesis - converts light energy to chemical energy</td>
+                                <td class="font-black text-pink-700">Plant</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-blue-800 border-slate-900">3. Movement Across Membranes</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 border-4 border-blue-600 rounded-xl shadow-[6px_6px_0_0_#2563eb]">
+                        <h4 class="font-black text-2xl text-blue-800 mb-4 uppercase">Passive Transport</h4>
+                        <ul class="space-y-4 font-bold text-lg text-slate-700">
+                            <li class="bg-blue-50 p-3 border-2 border-blue-300 rounded-lg">
+                                <strong class="text-blue-900 uppercase">Diffusion:</strong> Movement of particles from high to low concentration. <span class="text-blue-700 font-black">Factors:</span> Concentration gradient, temperature, surface area, distance.
+                            </li>
+                            <li class="bg-blue-50 p-3 border-2 border-blue-300 rounded-lg">
+                                <strong class="text-blue-900 uppercase">Osmosis:</strong> Diffusion of water across semi-permeable membrane. <span class="text-blue-700 font-black">Isotonic:</span> No net movement. <span class="text-red-700 font-black">Hypotonic:</span> Water enters. <span class="text-green-700 font-black">Hypertonic:</span> Water leaves.
+                            </li>
+                            <li class="bg-blue-50 p-3 border-2 border-blue-300 rounded-lg">
+                                <strong class="text-blue-900 uppercase">Facilitated Diffusion:</strong> Uses carrier/channel proteins for polar/large molecules.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-100 p-6 border-4 border-slate-900 rounded-xl shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl text-slate-800 mb-4 uppercase">Active Transport</h4>
+                        <ul class="space-y-4 font-bold text-lg text-slate-700">
+                            <li class="bg-slate-200 p-3 border-2 border-slate-400 rounded-lg">
+                                <strong class="text-slate-900 uppercase">Requires ATP:</strong> Movement against concentration gradient.
+                            </li>
+                            <li class="bg-slate-200 p-3 border-2 border-slate-400 rounded-lg">
+                                <strong class="text-slate-900 uppercase">Examples:</strong> Sodium-potassium pump, glucose absorption in intestines.
+                            </li>
+                            <li class="bg-slate-200 p-3 border-2 border-slate-400 rounded-lg">
+                                <strong class="text-slate-900 uppercase">Endocytosis:</strong> Bulk uptake (phagocytosis/pinocytosis). <strong class="text-slate-900 uppercase">Exocytosis:</strong> Bulk release.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box bg-slate-800">
+                <h3 class="box-title text-white border-white flex justify-between items-center">
+                    <span>4. Enzyme Action Simulator</span>
+                    <span class="text-sm bg-yellow-400 text-slate-900 px-3 py-1 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] uppercase font-black transform rotate-2">Simulator</span>
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white p-6 rounded-xl border-4 border-slate-900 shadow-[6px_6px_0_0_#000000]">
+                    <div class="space-y-6">
+                        <div class="bg-yellow-100 p-4 border-4 border-slate-900 rounded-xl shadow-[4px_4px_0_0_#0f172a]">
+                            <div class="text-sm font-black uppercase tracking-widest text-slate-500 mb-1">Demonstration Enzyme</div>
+                            <div class="text-2xl font-black text-slate-900">Human Salivary Amylase</div>
+                            <p class="font-bold text-slate-700 mt-2">Substrate shown: starch fragments. Best activity is around body temperature and about pH 7 in the mouth.</p>
+                        </div>
+                        <div class="bg-blue-100 p-4 border-4 border-slate-900 rounded-xl shadow-[4px_4px_0_0_#0f172a]">
+                            <label class="block text-lg font-black text-slate-900 uppercase mb-2">Starch Concentration:</label>
+                            <input type="range" id="substrate-slider" min="0" max="100" value="50" class="w-full h-4 bg-blue-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="text-center mt-2 font-bold text-blue-700" id="substrate-value">50%</div>
+                        </div>
+                        <div class="bg-red-100 p-4 border-4 border-slate-900 rounded-xl shadow-[4px_4px_0_0_#0f172a]">
+                            <label class="block text-lg font-black text-slate-900 uppercase mb-2">Temperature (°C):</label>
+                            <input type="range" id="temp-slider" min="0" max="100" value="37" class="w-full h-4 bg-red-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="text-center mt-2 font-bold text-red-700" id="temp-value">37°C</div>
+                        </div>
+                        <div class="bg-green-100 p-4 border-4 border-slate-900 rounded-xl shadow-[4px_4px_0_0_#0f172a]">
+                            <label class="block text-lg font-black text-slate-900 uppercase mb-2">pH (saliva model):</label>
+                            <input type="range" id="ph-slider" min="1" max="14" value="7" class="w-full h-4 bg-green-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="text-center mt-2 font-bold text-green-700" id="ph-value">pH 7</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center w-full">
+                        <div class="w-full flex flex-col lg:flex-row items-center justify-center gap-6">
+                            <div id="enzyme-stage" class="relative w-72 h-72 bg-slate-100 border-4 border-slate-900 rounded-full shadow-[6px_6px_0_0_#0f172a] flex items-center justify-center overflow-hidden transition-all duration-500 shrink-0">
+                                <div id="enzyme-shape" class="w-36 h-36 bg-blue-500 rounded-[1rem] transform rotate-45 transition-all duration-500 shadow-[4px_4px_0_0_#0f172a] relative">
+                                    <div id="enzyme-active-site" class="absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-16 bg-slate-100 border-4 border-slate-900 rounded-r-[1rem] transition-all duration-500"></div>
+                                </div>
+                                <div id="substrate-dots" class="absolute inset-0">
+                                    <div class="w-4 h-4 bg-yellow-400 rounded-full absolute top-8 left-8 animate-pulse"></div>
+                                    <div class="w-4 h-4 bg-yellow-400 rounded-full absolute top-16 right-12 animate-pulse animation-delay-100"></div>
+                                    <div class="w-4 h-4 bg-yellow-400 rounded-full absolute bottom-12 left-16 animate-pulse animation-delay-200"></div>
+                                    <div class="w-4 h-4 bg-yellow-400 rounded-full absolute bottom-8 right-8 animate-pulse animation-delay-300"></div>
+                                </div>
+                            </div>
+                            <div id="enzyme-visual-state" class="bg-emerald-100 px-5 py-4 rounded-2xl border-4 border-slate-900 font-black text-emerald-900 shadow-[4px_4px_0_0_#0f172a] max-w-[220px] text-center leading-tight">Active site ready for starch</div>
+                        </div>
+                        <div class="mt-6 text-center bg-slate-100 p-4 border-4 border-slate-900 rounded-xl shadow-[4px_4px_0_0_#0f172a] w-full">
+                            <span class="text-sm font-black text-slate-500 uppercase tracking-widest block mb-2">Reaction Rate</span>
+                            <div id="reaction-rate" class="text-3xl font-black text-blue-700">Optimal</div>
+                            <div id="enzyme-state-copy" class="text-base font-bold text-slate-600 mt-3">Salivary amylase keeps its active site shape, so starch can bind efficiently.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="quiz-topic1"></div>
+        </div>
+
+        <div id="topic2" class="page-view space-y-8">
+            <div class="bg-purple-500 text-slate-900 p-10 rounded-3xl relative overflow-hidden border-4 border-slate-900 shadow-[12px_12px_0_0_#0f172a]">
+                <i class="fas fa-dna absolute -right-10 -bottom-10 text-9xl text-white opacity-40"></i>
+                <h2 class="text-4xl md:text-5xl font-black mb-4 relative z-10 uppercase tracking-tight bg-white inline-block px-4 py-2 border-4 border-slate-900 shadow-[4px_4px_0_0_#0f172a] rotate-1">II. Genetics & Evolution</h2>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-purple-800 border-slate-900">1. DNA Structure & Replication</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-purple-50 p-6 rounded-xl border-4 border-slate-900 shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl mb-4 text-purple-900 uppercase border-b-4 border-purple-200 pb-2">DNA Structure</h4>
+                        <div class="bg-white border-4 border-slate-900 p-4 rounded-xl text-center shadow-[4px_4px_0_0_#0f172a] transform -rotate-2 mb-6">
+                            <span class="font-black text-xl text-slate-900">Nucleotide =</span><br/>
+                            <span class="font-bold text-lg text-purple-700">Phosphate + Deoxyribose Sugar + Nitrogenous Base</span>
+                        </div>
+                        <ul class="font-bold text-lg text-slate-700 space-y-2">
+                            <li><strong class="text-purple-800">Double Helix:</strong> Two strands wound around each other</li>
+                            <li><strong class="text-purple-800">Base Pairing:</strong> A pairs with T (2 H-bonds), C pairs with G (3 H-bonds)</li>
+                            <li><strong class="text-purple-800">Antiparallel:</strong> Strands run in opposite directions (5' to 3' and 3' to 5')</li>
+                            <li><strong class="text-purple-800">Location:</strong> Nucleus (chromosomes), mitochondria, chloroplasts</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border-4 border-slate-900 shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl mb-4 text-purple-900 uppercase border-b-4 border-purple-200 pb-2">Semi-Conservative Replication</h4>
+                        <ol class="list-decimal pl-6 font-bold text-lg text-slate-700 space-y-3">
+                            <li class="bg-slate-50 p-3 border-2 border-purple-200 rounded-lg"><strong class="text-purple-800">Unwinding:</strong> Helicase breaks H-bonds, separating the two strands</li>
+                            <li class="bg-slate-50 p-3 border-2 border-purple-200 rounded-lg"><strong class="text-purple-800">3' to 5':</strong> DNA polymerase adds nucleotides (leading strand, continuous)</li>
+                            <li class="bg-slate-50 p-3 border-2 border-purple-200 rounded-lg"><strong class="text-purple-800">5' to 3':</strong> Requires Okazaki fragments (lagging strand, discontinuous)</li>
+                            <li class="bg-slate-50 p-3 border-2 border-purple-200 rounded-lg"><strong class="text-purple-800">Result:</strong> Two identical DNA molecules, each with one original strand</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-purple-800 border-slate-900">2. Protein Synthesis & Genetic Code</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-xl border-4 border-slate-900 shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl mb-4 text-purple-900 uppercase border-b-4 border-purple-200 pb-2">Transcription</h4>
+                        <ul class="space-y-3 font-bold text-lg text-slate-700">
+                            <li class="bg-purple-50 p-2 border-2 border-purple-300 rounded"><strong class="text-purple-800">Location:</strong> Nucleus</li>
+                            <li class="bg-purple-50 p-2 border-2 border-purple-300 rounded"><strong class="text-purple-800">Template:</strong> DNA (coding strand)</li>
+                            <li class="bg-purple-50 p-2 border-2 border-purple-300 rounded"><strong class="text-purple-800">Enzyme:</strong> RNA polymerase unzips DNA, builds mRNA</li>
+                            <li class="bg-purple-50 p-2 border-2 border-purple-300 rounded"><strong class="text-purple-800">Product:</strong> Single-stranded mRNA (U replaces T)</li>
+                            <li class="bg-purple-50 p-2 border-2 border-purple-300 rounded"><strong class="text-purple-800">Processing:</strong> 5' cap added, 3' poly-A tail added, introns removed</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-100 p-6 rounded-xl border-4 border-slate-900 shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl mb-4 text-slate-800 uppercase border-b-4 border-slate-300 pb-2">Translation</h4>
+                        <ul class="space-y-3 font-bold text-lg text-slate-700">
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Location:</strong> Ribosomes (rough ER or free in cytoplasm)</li>
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Initiation:</strong> Start codon (AUG) signals ribosome to begin</li>
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">tRNA:</strong> Anticodons match mRNA codons, bring amino acids</li>
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Elongation:</strong> Peptide bonds link amino acids (dipeptides → polypeptide)</li>
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Termination:</strong> Stop codon releases polypeptide chain</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bg-yellow-100 p-6 border-4 border-slate-900 rounded-xl shadow-[6px_6px_0_0_#0f172a] mt-6">
+                    <h4 class="font-black text-2xl mb-4 text-yellow-900 uppercase">Genetic Code Key Features</h4>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div><strong class="text-yellow-900 text-lg">Triplet Code:</strong> Each codon (3 nucleotides) codes for 1 amino acid</div>
+                        <div><strong class="text-yellow-900 text-lg">Degenerate:</strong> Multiple codons may code for same amino acid (64 codons, 20 amino acids)</div>
+                        <div><strong class="text-yellow-900 text-lg">Universal:</strong> Same code used across all organisms (with rare exceptions)</div>
+                        <div><strong class="text-yellow-900 text-lg">Overlapping:</strong> Codons cannot overlap; read in correct reading frame</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-purple-800 border-slate-900">3. Inheritance Patterns</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-purple-50 p-6 rounded-xl border-4 border-slate-900 shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl mb-4 text-purple-900 uppercase">Dominant & Recessive</h4>
+                        <ul class="space-y-3 font-bold text-lg text-purple-800">
+                            <li class="bg-white p-2 border-2 border-purple-400 rounded"><strong>Homozygous Dominant (AA):</strong> Both alleles are dominant = Dominant phenotype</li>
+                            <li class="bg-white p-2 border-2 border-purple-400 rounded"><strong>Heterozygous (Aa):</strong> One dominant, one recessive = Dominant phenotype</li>
+                            <li class="bg-white p-2 border-2 border-purple-400 rounded"><strong>Homozygous Recessive (aa):</strong> Both alleles recessive = Recessive phenotype</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border-4 border-slate-900 shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl mb-4 text-purple-900 uppercase">Key Crosses</h4>
+                        <ul class="space-y-3 font-bold text-lg text-slate-700">
+                            <li class="bg-slate-50 p-2 border-2 border-purple-200 rounded"><strong class="text-purple-800">AA × aa:</strong> All Aa offspring (100% dominant phenotype)</li>
+                            <li class="bg-slate-50 p-2 border-2 border-purple-200 rounded"><strong class="text-purple-800">Aa × Aa:</strong> 1AA : 2Aa : 1aa <strong class="text-red-600">(3:1 ratio)</strong></li>
+                            <li class="bg-slate-50 p-2 border-2 border-purple-200 rounded"><strong class="text-purple-800">Aa × aa:</strong> 1Aa : 1aa (1:1 test cross ratio)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-purple-800 border-slate-900">4. Evolution & Natural Selection</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-xl border-4 border-slate-900 shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl mb-4 text-purple-900 uppercase">Evidence for Evolution</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-slate-700 space-y-2">
+                            <li><strong class="text-purple-800">Fossil Record:</strong> Shows progression of species over time, transitional forms (e.g., archaeopteryx - bird-reptile)</li>
+                            <li><strong class="text-purple-800">Comparative Anatomy:</strong> Analogous structures (similar function - bat wing/insect wing), Homologous structures (similar origin - human arm, whale flipper, bird wing)</li>
+                            <li><strong class="text-purple-800">Comparative Embryology:</strong> Similar embryonic development suggests common ancestry</li>
+                            <li><strong class="text-purple-800">Molecular Biology:</strong> Similar DNA/protein sequences in different species; more similar = closer evolutionary relationship</li>
+                        </ul>
+                    </div>
+                    <div class="bg-yellow-100 p-6 rounded-xl border-4 border-slate-900 shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl mb-4 text-yellow-900 uppercase">Natural Selection Process</h4>
+                        <ol class="list-decimal pl-6 font-bold text-lg text-yellow-800 space-y-3">
+                            <li class="bg-white p-2 border-2 border-yellow-400 rounded"><strong>Variation:</strong> Genetic diversity within population</li>
+                            <li class="bg-white p-2 border-2 border-yellow-400 rounded"><strong>Competition:</strong> Limited resources cause "survival of the fittest"</li>
+                            <li class="bg-white p-2 border-2 border-yellow-400 rounded"><strong>Adaptation:</strong> Beneficial traits become more frequent (gene frequency increases)</li>
+                            <li class="bg-white p-2 border-2 border-yellow-400 rounded"><strong>Speciation:</strong> Accumulated changes lead to new species formation over time</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box bg-slate-800">
+                <h3 class="box-title text-white border-white flex justify-between items-center">
+                    <span>5. Mendelian Simulator</span>
+                    <span class="text-sm bg-yellow-400 text-slate-900 px-3 py-1 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] uppercase font-black transform rotate-2">Simulator</span>
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white p-6 rounded-xl border-4 border-slate-900 shadow-[6px_6px_0_0_#000000]">
+                    <div class="space-y-6">
+                        <div class="bg-purple-100 p-4 border-4 border-slate-900 rounded-xl shadow-[4px_4px_0_0_#0f172a]">
+                            <label class="block text-lg font-black text-slate-900 uppercase mb-2">Parent 1 (♂):</label>
+                            <select id="p1-genotype" class="w-full p-3 text-xl font-bold border-4 border-slate-900 rounded-lg cursor-pointer bg-white">
+                                <option value="AA">AA (Dominant)</option>
+                                <option value="Aa" selected>Aa (Heterozygous)</option>
+                                <option value="aa">aa (Recessive)</option>
+                            </select>
+                        </div>
+                        <div class="bg-pink-100 p-4 border-4 border-slate-900 rounded-xl shadow-[4px_4px_0_0_#0f172a]">
+                            <label class="block text-lg font-black text-slate-900 uppercase mb-2">Parent 2 (♀):</label>
+                            <select id="p2-genotype" class="w-full p-3 text-xl font-bold border-4 border-slate-900 rounded-lg cursor-pointer bg-white">
+                                <option value="AA">AA (Dominant)</option>
+                                <option value="Aa" selected>Aa (Heterozygous)</option>
+                                <option value="aa">aa (Recessive)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center">
+                        <table class="w-auto border-collapse text-center text-2xl bg-white mb-6 border-4 border-slate-900 shadow-[6px_6px_0_0_#0f172a]">
+                            <tr>
+                                <td class="p-4 border-4 border-slate-900 bg-slate-200 font-black text-slate-600">♂ \ ♀</td>
+                                <td id="gamete-p2-1" class="p-4 border-4 border-slate-900 font-black text-pink-700 w-24 bg-pink-50">A</td>
+                                <td id="gamete-p2-2" class="p-4 border-4 border-slate-900 font-black text-pink-700 w-24 bg-pink-50">a</td>
+                            </tr>
+                            <tr>
+                                <td id="gamete-p1-1" class="p-4 border-4 border-slate-900 font-black text-blue-700 bg-blue-50">A</td>
+                                <td id="child-1" class="p-4 border-4 border-slate-900 font-mono text-3xl w-24 h-24 font-black transition-colors">AA</td>
+                                <td id="child-2" class="p-4 border-4 border-slate-900 font-mono text-3xl w-24 h-24 font-black transition-colors">Aa</td>
+                            </tr>
+                            <tr>
+                                <td id="gamete-p1-2" class="p-4 border-4 border-slate-900 font-black text-blue-700 bg-blue-50">a</td>
+                                <td id="child-3" class="p-4 border-4 border-slate-900 font-mono text-3xl w-24 h-24 font-black transition-colors">Aa</td>
+                                <td id="child-4" class="p-4 border-4 border-slate-900 font-mono text-3xl w-24 h-24 font-black transition-colors">aa</td>
+                            </tr>
+                        </table>
+                        <div class="text-center w-full bg-slate-100 p-4 border-4 border-slate-900 rounded-xl shadow-[4px_4px_0_0_#0f172a]">
+                            <span class="text-sm font-black text-slate-500 uppercase tracking-widest block mb-2">Phenotypic Ratio</span>
+                            <div id="pheno-ratio" class="text-2xl font-black text-purple-700">3 Dominant : 1 Recessive</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-topic2"></div>
+        </div>
+
+        <div id="topic3" class="page-view space-y-8">
+            <div class="bg-green-500 text-slate-900 p-10 rounded-3xl relative overflow-hidden border-4 border-slate-900 shadow-[12px_12px_0_0_#0f172a]">
+                <i class="fas fa-tree absolute -right-10 -bottom-10 text-9xl text-white opacity-40"></i>
+                <h2 class="text-4xl md:text-5xl font-black mb-4 relative z-10 uppercase tracking-tight bg-white inline-block px-4 py-2 border-4 border-slate-900 shadow-[4px_4px_0_0_#0f172a] -rotate-1">III. Organisms & Env</h2>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-green-800 border-slate-900">1. Photosynthesis in Detail</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 border-4 border-green-600 rounded-xl shadow-[6px_6px_0_0_#166534]">
+                        <h4 class="font-black text-2xl text-green-800 mb-4 uppercase">Light-Dependent Reactions</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-slate-700 space-y-2">
+                            <li><strong class="text-slate-900">Location:</strong> Thylakoid membranes in granum</li>
+                            <li><strong class="text-slate-900">Light Energy:</strong> Absorbed by chlorophyll in Photosystem II</li>
+                            <li><strong class="text-slate-900 bg-yellow-200 px-1 border-2 border-slate-900">Photolysis:</strong> H₂O → 2H⁺ + ½O₂ + 2e⁻ (oxygen released)</li>
+                            <li><strong class="text-slate-900">Products:</strong> ATP (energy), NADPH (reducing power), O₂</li>
+                            <li><strong class="text-slate-900 text-red-600">Summary:</strong> Light energy → Chemical energy</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-100 p-6 border-4 border-slate-900 rounded-xl shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl text-slate-800 mb-4 uppercase">Light-Independent Reactions (Calvin Cycle)</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-slate-700 space-y-2">
+                            <li><strong class="text-slate-900">Location:</strong> Stroma of chloroplast</li>
+                            <li><strong class="text-slate-900">CO₂ Fixation:</strong> CO₂ combines with RuBP (5-carbon) → 3-PG (3-carbon) via enzyme RuBisCO</li>
+                            <li><strong class="text-slate-900">Reduction:</strong> 3-PG reduced to G3P using ATP & NADPH from light reactions</li>
+                            <li><strong class="text-slate-900">Regeneration:</strong> Some G3P regenerates RuBP to continue cycle</li>
+                            <li><strong class="text-slate-900">Product:</strong> Net glucose synthesis (6CO₂ → 1 glucose)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bg-green-50 p-6 border-4 border-green-600 rounded-xl shadow-[6px_6px_0_0_#166534] mt-6">
+                    <h4 class="font-black text-2xl text-green-900 uppercase mb-4">Overall Equation</h4>
+                    <div class="text-center font-bold text-lg text-green-800 bg-white p-4 border-2 border-green-600 rounded-lg">
+                        6CO₂ + 6H₂O + Light Energy → C₆H₁₂O₆ + 6O₂
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-green-800 border-slate-900">2. Transpiration & Translocation</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 border-4 border-green-600 rounded-xl shadow-[6px_6px_0_0_#166534]">
+                        <h4 class="font-black text-2xl text-green-800 mb-4 uppercase">Transpiration</h4>
+                        <ul class="space-y-3 font-bold text-lg text-slate-700">
+                            <li class="bg-green-50 p-2 border-2 border-green-300 rounded"><strong class="text-green-800">Definition:</strong> Loss of water vapor from plant leaves/stems</li>
+                            <li class="bg-green-50 p-2 border-2 border-green-300 rounded"><strong class="text-green-800">Route:</strong> Root uptake → Xylem → Leaves → Stomata → Atmosphere</li>
+                            <li class="bg-green-50 p-2 border-2 border-green-300 rounded"><strong class="text-green-800">INCREASES:</strong> High temperature, low humidity, high wind speed, high light intensity</li>
+                            <li class="bg-green-50 p-2 border-2 border-green-300 rounded"><strong class="text-green-800">DECREASES:</strong> Low temperature, high humidity, still air, darkness, closed stomata</li>
+                            <li class="bg-green-50 p-2 border-2 border-green-300 rounded"><strong class="text-green-800">Function:</strong> Cools plant, maintains water uptake, transport of minerals</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-100 p-6 border-4 border-slate-900 rounded-xl shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl text-slate-800 mb-4 uppercase">Translocation</h4>
+                        <ul class="space-y-3 font-bold text-lg text-slate-700">
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Definition:</strong> Transport of sugars from sources to sinks via phloem</li>
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Source:</strong> Leaves (photosynthesis) and storage organs</li>
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Sink:</strong> Growing tissues, roots, flowers, fruits (storage/growth)</li>
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Mechanism:</strong> Active transport loads sugars at source, creates osmotic gradient, drives flow to sink</li>
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Vessels:</strong> Sieve tube elements with companion cells in phloem</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-green-800 border-slate-900">3. Nutrient Cycles & Ecology</h3>
+                <div class="grid md:grid-cols-2 gap-8 mb-6">
+                    <div class="bg-white p-6 border-4 border-green-600 rounded-xl shadow-[6px_6px_0_0_#166534]">
+                        <h4 class="font-black text-2xl text-green-800 mb-4 uppercase">Carbon Cycle</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-green-700 space-y-2">
+                            <li><strong class="text-green-900">Photosynthesis:</strong> Plants convert CO₂ to glucose</li>
+                            <li><strong class="text-green-900">Respiration:</strong> Organisms release CO₂ back to atmosphere</li>
+                            <li><strong class="text-green-900">Decomposition:</strong> Bacteria/fungi break down dead matter → CO₂</li>
+                            <li><strong class="text-green-900">Combustion:</strong> Fossil fuels burn → CO₂ released</li>
+                            <li><strong class="text-green-900">Sinks:</strong> Oceans absorb CO₂, sedimentary rocks (fossil fuels) store carbon</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-100 p-6 border-4 border-slate-900 rounded-xl shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl text-slate-800 mb-4 uppercase">Energy Flow in Ecosystems</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-slate-700 space-y-2">
+                            <li><strong class="text-slate-900">Trophic Levels:</strong> Producers (plants) → Consumers (herbivores, carnivores, omnivores) → Decomposers</li>
+                            <li><strong class="text-slate-900">Energy Transfer:</strong> Only ~10% of energy passes to next trophic level</li>
+                            <li><strong class="text-slate-900">Food Chains:</strong> Linear path (grass → rabbit → fox)</li>
+                            <li><strong class="text-slate-900">Food Webs:</strong> Complex interconnected food chains</li>
+                            <li><strong class="text-slate-900">Pyramid of Numbers:</strong> Usually decreases up trophic levels (exceptions: oak tree/parasites)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-green-800 border-slate-900">4. The Nitrogen Cycle</h3>
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Bacteria Type</th>
+                                <th>Process / Function</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover:bg-green-50 transition-colors">
+                                <td><span class="term-pill bg-green-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-xl text-green-900">Nitrogen-fixing</span></td>
+                                <td>Converts <strong class="text-lg">N₂ gas</strong> into ammonium/nitrates. <span class="text-green-700 font-black block mt-1 uppercase text-sm">Brings N into food chain.</span></td>
+                            </tr>
+                            <tr class="hover:bg-blue-50 transition-colors">
+                                <td><span class="term-pill bg-blue-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-xl text-blue-900">Nitrifying</span></td>
+                                <td>Converts ammonium &rarr; nitrites &rarr; <strong class="text-lg bg-yellow-300 px-1 border-2 border-slate-900">Nitrates</strong>.</td>
+                            </tr>
+                            <tr class="hover:bg-red-50 transition-colors">
+                                <td><span class="term-pill bg-red-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-xl text-red-900">Denitrifying</span></td>
+                                <td>Converts nitrates back into <strong class="text-lg">N₂ gas</strong>. <span class="text-red-700 font-black block mt-1 uppercase text-sm">Depletes soil fertility.</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="quiz-topic3"></div>
+        </div>
+
+        <div id="topic4" class="page-view space-y-8">
+            <div class="bg-red-500 text-white p-10 rounded-3xl relative overflow-hidden border-4 border-slate-900 shadow-[12px_12px_0_0_#0f172a]">
+                <i class="fas fa-shield-virus absolute -right-10 -bottom-10 text-9xl text-slate-900 opacity-20"></i>
+                <h2 class="text-4xl md:text-5xl font-black mb-4 relative z-10 uppercase tracking-tight bg-slate-900 text-white inline-block px-4 py-2 border-4 border-white shadow-[4px_4px_0_0_#ffffff] rotate-1">IV. Health & Diseases</h2>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-red-800 border-slate-900">1. Pathogens & Transmission</h3>
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Pathogen Type</th>
+                                <th>Examples</th>
+                                <th>Structure / Features</th>
+                                <th>Transmission Routes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover:bg-red-50 transition-colors">
+                                <td><span class="term-pill bg-red-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-lg text-red-900">Bacteria</span></td>
+                                <td>E. coli, TB bacillus, cholera</td>
+                                <td>Prokaryotic, cell wall, flagella, extracellular toxins</td>
+                                <td>Droplets, contaminated food/water, wounds</td>
+                            </tr>
+                            <tr class="hover:bg-orange-50 transition-colors">
+                                <td><span class="term-pill bg-orange-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-lg text-orange-900">Viruses</span></td>
+                                <td>HIV, influenza, COVID-19, measles</td>
+                                <td>Nucleic acid core + protein coat (capsid), oblige intracellular parasites</td>
+                                <td>Respiratory droplets, blood, sexual contact, insect vectors</td>
+                            </tr>
+                            <tr class="hover:bg-yellow-50 transition-colors">
+                                <td><span class="term-pill bg-yellow-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-lg text-yellow-900">Fungi</span></td>
+                                <td>Candida (thrush), Aspergillus, ringworm</td>
+                                <td>Eukaryotic, chitin cell wall, spores, dimorphic species</td>
+                                <td>Inhalation of spores, skin contact, opportunistic infection</td>
+                            </tr>
+                            <tr class="hover:bg-green-50 transition-colors">
+                                <td><span class="term-pill bg-green-200 border-2 border-slate-900 px-2 py-1 rounded font-black text-lg text-green-900">Protozoa</span></td>
+                                <td>Plasmodium (malaria), Giardia, trypanosomes</td>
+                                <td>Eukaryotic, motile (cilia/flagella), some with life cycles</td>
+                                <td>Insect vectors (mosquitoes, ticks), contaminated water</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-red-800 border-slate-900">2. Defense Mechanisms - Three Lines</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-slate-100 p-6 border-4 border-slate-900 rounded-xl shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl text-slate-900 mb-4 uppercase border-b-4 border-slate-300 pb-2">1st Line: Barriers</h4>
+                        <ul class="space-y-3 font-bold text-lg text-slate-700">
+                            <li class="bg-white p-2 border-2 border-slate-300 rounded text-sm"><strong class="text-slate-900">Physical:</strong> Skin (keratinized barrier), mucous membranes, cilia</li>
+                            <li class="bg-white p-2 border-2 border-slate-300 rounded text-sm"><strong class="text-slate-900">Chemical:</strong> Lysozyme (tears, saliva), gastric acid (kills pathogens), sebum (antimicrobial)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-orange-100 p-6 border-4 border-orange-600 rounded-xl shadow-[6px_6px_0_0_#92400e]">
+                        <h4 class="font-black text-2xl text-orange-900 mb-4 uppercase border-b-4 border-orange-300 pb-2">2nd Line: Innate Immunity</h4>
+                        <ul class="space-y-3 font-bold text-lg text-orange-800">
+                            <li class="bg-white p-2 border-2 border-orange-300 rounded text-sm"><strong class="text-orange-900">Phagocytosis:</strong> WBCs (neutrophils, macrophages) engulf & digest</li>
+                            <li class="bg-white p-2 border-2 border-orange-300 rounded text-sm"><strong class="text-orange-900">Inflammation:</strong> Histamine → vasodilation, increased permeability, redness/swelling/heat</li>
+                            <li class="bg-white p-2 border-2 border-orange-300 rounded text-sm"><strong class="text-orange-900">Complement:</strong> Proteins cascade, mark pathogens for destruction</li>
+                        </ul>
+                    </div>
+                    <div class="bg-red-100 p-6 border-4 border-red-900 rounded-xl shadow-[6px_6px_0_0_#7f1d1d]">
+                        <h4 class="font-black text-2xl text-red-900 mb-4 uppercase border-b-4 border-red-300 pb-2">3rd Line: Specific Immunity</h4>
+                        <ul class="space-y-3 font-bold text-lg text-red-800">
+                            <li class="bg-white p-2 border-2 border-red-300 rounded text-sm"><strong class="text-red-950">B Cells:</strong> Recognize antigen → plasma cells produce antibodies (humoral immunity)</li>
+                            <li class="bg-white p-2 border-2 border-red-300 rounded text-sm"><strong class="text-red-950">T Cells:</strong> Cytotoxic T cells kill infected cells (cell-mediated immunity)</li>
+                            <li class="bg-white p-2 border-2 border-red-300 rounded text-sm"><strong class="text-red-950">Memory:</strong> Long-lived B/T cells remember antigens</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-red-800 border-slate-900">3. Immunological Memory & Vaccination</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 border-4 border-red-600 rounded-xl shadow-[6px_6px_0_0_#991b1b]">
+                        <h4 class="font-black text-2xl text-red-900 mb-4 uppercase">Primary vs Secondary Response</h4>
+                        <div class="space-y-3">
+                            <div class="bg-blue-50 p-3 border-2 border-blue-300 rounded-lg font-bold text-slate-700">
+                                <strong class="text-blue-800">Primary:</strong> First exposure, long latent period (days), low antibody peak (IgM), fades quickly
+                            </div>
+                            <div class="bg-green-50 p-3 border-2 border-green-400 rounded-lg font-bold text-slate-700">
+                                <strong class="text-green-800">Secondary:</strong> Re-exposure, SHORT latent period (hours), HIGH antibody peak (IgG), LONG-lasting immunity, faster response
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-100 p-6 border-4 border-slate-900 rounded-xl shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl text-slate-800 mb-4 uppercase">Vaccination Strategy</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-slate-700 space-y-2">
+                            <li><strong class="text-slate-900">Live attenuated:</strong> Weakened pathogen (e.g., MMR) - strong immunity</li>
+                            <li><strong class="text-slate-900">Inactivated:</strong> Dead pathogen (e.g., flu) - safer, needs boosters</li>
+                            <li><strong class="text-slate-900">Subunit:</strong> Isolated antigen (e.g., COVID mRNA/protein subunits)</li>
+                            <li><strong class="text-slate-900">Goal:</strong> Prime immune system without causing disease</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dse-tip">
+                <i class="fas fa-chart-line mt-1 text-2xl"></i>
+                <div class="text-lg"><strong>Secondary Response Graph:</strong> Must show "shorter latent period", "steeper rise in antibody production", "higher peak concentration", and "sustained elevated levels" compared to primary response. IgG dominates instead of IgM.</div>
+            </div>
+
+            <div id="quiz-topic4"></div>
+        </div>
+
+        <div id="topic5" class="page-view space-y-8">
+            <div class="bg-teal-500 text-slate-900 p-10 rounded-3xl relative overflow-hidden border-4 border-slate-900 shadow-[12px_12px_0_0_#0f172a]">
+                <div class="inline-block bg-slate-900 text-white font-black px-3 py-1 border-4 border-white mb-4 uppercase tracking-widest text-sm shadow-[4px_4px_0_0_#ffffff]">Elective</div>
+                <h2 class="text-4xl md:text-5xl font-black mb-4 relative z-10 uppercase tracking-tight bg-white inline-block px-4 py-2 border-4 border-slate-900 shadow-[4px_4px_0_0_#0f172a] -rotate-1">V. Physiology</h2>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-teal-800 border-slate-900">1. Nervous vs Endocrine Systems</h3>
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Nervous System</th>
+                                <th>Endocrine System</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover:bg-blue-50 transition-colors">
+                                <td><strong class="text-slate-900">Message Type</strong></td>
+                                <td class="font-black text-blue-900">Electrical impulses (action potentials)</td>
+                                <td class="font-black text-red-900">Chemical hormones via bloodstream</td>
+                            </tr>
+                            <tr class="hover:bg-blue-50 transition-colors">
+                                <td><strong class="text-slate-900">Target Cells</strong></td>
+                                <td>Specific neurons / effectors</td>
+                                <td>ANY cell with matching receptors</td>
+                            </tr>
+                            <tr class="hover:bg-blue-50 transition-colors">
+                                <td><strong class="text-slate-900">Speed</strong></td>
+                                <td class="font-black text-blue-700">Very Fast (milliseconds)</td>
+                                <td>Slow (seconds to minutes)</td>
+                            </tr>
+                            <tr class="hover:bg-blue-50 transition-colors">
+                                <td><strong class="text-slate-900">Duration</strong></td>
+                                <td>Short-lived (immediate)</td>
+                                <td class="font-black text-red-700">Long-lasting (hours to days/weeks)</td>
+                            </tr>
+                            <tr class="hover:bg-blue-50 transition-colors">
+                                <td><strong class="text-slate-900">Best For</strong></td>
+                                <td>Rapid responses (reflex arc, muscle contraction)</td>
+                                <td>Sustained changes (growth, reproduction, metabolism)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-teal-800 border-slate-900">2. Kidney & Osmoregulation</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 border-4 border-teal-600 rounded-xl shadow-[6px_6px_0_0_#0d9488]">
+                        <h4 class="font-black text-2xl text-teal-800 mb-4 uppercase">Nephron Structure</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-slate-700 space-y-2">
+                            <li><strong class="text-teal-800">Renal Corpuscle:</strong> Bowman's capsule + Glomerulus (blood capillary)</li>
+                            <li><strong class="text-teal-800">First Convoluted Tubule:</strong> Selective reabsorption of useful substances</li>
+                            <li><strong class="text-teal-800">Loop of Henle:</strong> Descending (permeable to water), Ascending (permeable to solutes)</li>
+                            <li><strong class="text-teal-800">Second Convoluted Tubule:</strong> Fine-tuning reabsorption</li>
+                            <li><strong class="text-teal-800">Collecting Duct:</strong> ADH-regulated water reabsorption</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-100 p-6 border-4 border-slate-900 rounded-xl shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl text-slate-800 mb-4 uppercase">Three-Stage Filtration</h4>
+                        <ol class="list-decimal pl-6 font-bold text-lg text-slate-700 space-y-3">
+                            <li class="bg-white p-2 border-2 border-slate-300 rounded"><strong class="text-slate-900">Ultrafiltration (Bowman's capsule):</strong> High BP forces small molecules (glucose, urea, water, ions) through, but NOT large proteins/blood cells</li>
+                            <li class="bg-white p-2 border-2 border-slate-300 rounded"><strong class="text-slate-900">Selective Reabsorption (Tubules):</strong> Active transport + passive transport reclaims glucose, ions, amino acids, SOME water</li>
+                            <li class="bg-white p-2 border-2 border-slate-300 rounded"><strong class="text-slate-900">Osmoregulation (Collecting Duct):</strong> ADH controls water reabsorption for final urine concentration</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-teal-800 border-slate-900">3. ADH Control Loop</h3>
+                <div class="bg-teal-50 p-6 border-4 border-teal-600 rounded-xl shadow-[6px_6px_0_0_#0d9488]">
+                    <div class="space-y-4 font-bold text-lg">
+                        <div class="bg-white p-3 border-2 border-teal-400 rounded-lg">
+                            <strong class="text-teal-800">Normal Blood Water Potential:</strong> Hypothalamus has osmoreceptors at set point
+                        </div>
+                        <div class="bg-blue-50 p-3 border-2 border-blue-300 rounded-lg">
+                            <strong class="text-blue-800 uppercase">If Water Loss (e.g., Sweating):</strong> Blood becomes hypertonic → Osmoreceptors detect → Pituitary releases MORE ADH → Collecting duct becomes MORE permeable → MORE water reabsorption → Urine becomes concentrated & reduced in volume → Water potential restored
+                        </div>
+                        <div class="bg-green-50 p-3 border-2 border-green-400 rounded-lg">
+                            <strong class="text-green-800 uppercase">If Water Intake (e.g., Drinking 1L):</strong> Blood becomes hypotonic → Osmoreceptors detect → Pituitary releases LESS ADH → Collecting duct becomes LESS permeable → LESS water reabsorption → Urine becomes dilute & large in volume → Water potential restored
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-teal-800 border-slate-900">4. Reproduction & Hormonal Control</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 border-4 border-pink-600 rounded-xl shadow-[6px_6px_0_0_#831843]">
+                        <h4 class="font-black text-2xl text-pink-900 mb-4 uppercase">Female Menstrual Cycle (28 days)</h4>
+                        <ul class="space-y-2 font-bold text-lg text-slate-700">
+                            <li class="bg-pink-50 p-2 border-2 border-pink-300 rounded"><strong class="text-pink-900">Menstruation (Days 1-4):</strong> FSH ↓, Estrogen ↓ → Uterine lining breaks down</li>
+                            <li class="bg-pink-50 p-2 border-2 border-pink-300 rounded"><strong class="text-pink-900">Follicular (Days 5-14):</strong> FSH ↑ → Ovarian follicles develop → Estrogen ↑ → Uterine lining thickens</li>
+                            <li class="bg-pink-50 p-2 border-2 border-pink-300 rounded"><strong class="text-pink-900">Ovulation (Day 14):</strong> LH surge → Egg released from ovary</li>
+                            <li class="bg-pink-50 p-2 border-2 border-pink-300 rounded"><strong class="text-pink-900">Luteal (Days 15-28):</strong> Progesterone ↑ (corpus luteum) → Uterium ready for implantation → If no fertilization, hormones ↓ → cycle repeats</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-100 p-6 border-4 border-slate-900 rounded-xl shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl text-slate-800 mb-4 uppercase">Male Control (Continuous)</h4>
+                        <ul class="space-y-2 font-bold text-lg text-slate-700">
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Hypothalamus:</strong> Releases GnRH (constant)</li>
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Anterior Pituitary:</strong> FSH → Spermatogenesis in seminiferous tubules</li>
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Testis:</strong> Produces Testosterone (Leydig cells) → Secondary sexual characteristics, maintains sperm production</li>
+                            <li class="bg-blue-50 p-2 border-2 border-blue-300 rounded"><strong class="text-blue-800">Feedback:</strong> Testosterone inhibits GnRH/FSH if high (negative feedback loop)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box bg-slate-800 text-white">
+                <h3 class="box-title text-white border-white flex justify-between items-center">
+                    <span>5. Osmoregulation Simulator</span>
+                    <span class="text-sm bg-yellow-400 text-slate-900 px-3 py-1 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] uppercase font-black transform rotate-2">Simulator</span>
+                </h3>
+                
+                <div class="bg-white text-slate-900 p-6 rounded-xl border-4 border-slate-900 shadow-[6px_6px_0_0_#000000]">
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+                        <button onclick="setOsmoregulation('sweat')" class="bg-orange-400 hover:bg-orange-500 border-4 border-slate-900 px-6 py-3 rounded-xl font-black text-xl uppercase transition shadow-[4px_4px_0_0_#0f172a] active:translate-y-1 active:shadow-none">Heavy Sweating</button>
+                        <button onclick="setOsmoregulation('drink')" class="bg-blue-400 hover:bg-blue-500 border-4 border-slate-900 px-6 py-3 rounded-xl font-black text-xl uppercase transition shadow-[4px_4px_0_0_#0f172a] active:translate-y-1 active:shadow-none">Drink 1L Water</button>
+                    </div>
+
+                    <div class="space-y-4 max-w-2xl mx-auto font-bold text-lg relative pb-4">
+                        <div class="absolute left-1/2 top-0 bottom-0 w-2 bg-slate-900 -translate-x-1/2 z-0"></div>
+                        
+                        <div class="osmo-card bg-slate-100 border-4 border-slate-900 p-4 rounded-xl text-center relative z-10 shadow-[4px_4px_0_0_#0f172a]">
+                            <h4 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-1">Blood Water Potential</h4>
+                            <p id="osmo-text1" class="text-xl">Normal</p>
+                        </div>
+                        
+                        <div class="osmo-card bg-slate-100 border-4 border-slate-900 p-4 rounded-xl text-center relative z-10 shadow-[4px_4px_0_0_#0f172a]">
+                            <h4 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-1">Pituitary Gland</h4>
+                            <p id="osmo-text3" class="text-xl">Releases normal ADH</p>
+                        </div>
+
+                        <div class="osmo-card bg-slate-100 border-4 border-slate-900 p-4 rounded-xl text-center relative z-10 shadow-[4px_4px_0_0_#0f172a]">
+                            <h4 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-1">Collecting Duct Permeability</h4>
+                            <p id="osmo-text4" class="text-xl">Normal permeability</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-topic5"></div>
+        </div>
+
+        <div id="topic8" class="page-view space-y-8">
+            <div class="bg-cyan-500 text-slate-900 p-10 rounded-3xl relative overflow-hidden border-4 border-slate-900 shadow-[12px_12px_0_0_#0f172a]">
+                <div class="inline-block bg-slate-900 text-white font-black px-3 py-1 border-4 border-white mb-4 uppercase tracking-widest text-sm shadow-[4px_4px_0_0_#ffffff]">Elective</div>
+                <h2 class="text-4xl md:text-5xl font-black mb-4 relative z-10 uppercase tracking-tight bg-white inline-block px-4 py-2 border-4 border-slate-900 shadow-[4px_4px_0_0_#0f172a] rotate-1">VIII. Biotechnology</h2>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-cyan-800 border-slate-900">1. Gene Cloning & Recombinant DNA</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 border-4 border-cyan-600 rounded-xl shadow-[6px_6px_0_0_#06b6d4]">
+                        <h4 class="font-black text-2xl text-cyan-800 mb-4 uppercase">Steps in Gene Cloning</h4>
+                        <ol class="list-decimal pl-6 font-bold text-lg text-slate-700 space-y-3">
+                            <li class="bg-cyan-50 p-2 border-2 border-cyan-300 rounded"><strong class="text-cyan-800">Isolate:</strong> Extract target gene from source DNA</li>
+                            <li class="bg-cyan-50 p-2 border-2 border-cyan-300 rounded"><strong class="text-cyan-800">Cut:</strong> Use SAME restriction enzyme on target DNA AND plasmid vector → Sticky ends (cohesive ends)</li>
+                            <li class="bg-cyan-50 p-2 border-2 border-cyan-300 rounded"><strong class="text-cyan-800">Ligate:</strong> DNA ligase seals phosphodiester bonds → Recombinant plasmid formed</li>
+                            <li class="bg-cyan-50 p-2 border-2 border-cyan-300 rounded"><strong class="text-cyan-800">Transform:</strong> Insert into host cell (usually bacteria like E. coli)</li>
+                            <li class="bg-cyan-50 p-2 border-2 border-cyan-300 rounded"><strong class="text-cyan-800">Identify:</strong> Select clones with desired gene (antibiotic resistance markers)</li>
+                        </ol>
+                    </div>
+                    <div class="bg-slate-100 p-6 border-4 border-slate-900 rounded-xl shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl text-slate-800 mb-4 uppercase">Applications of Gene Technology</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-slate-700 space-y-2">
+                            <li><strong class="text-slate-900">Medicine:</strong> Insulin production (diabetics), growth hormone, blood clotting factors</li>
+                            <li><strong class="text-slate-900">Pharming:</strong> Transgenic animals/plants produce therapeutic proteins in milk/seeds</li>
+                            <li><strong class="text-slate-900">Agriculture:</strong> Disease resistance, herbicide tolerance (Bt corn, herbicide-resistant soybeans)</li>
+                            <li><strong class="text-slate-900">Diagnostics:</strong> Genetic screening, pathogen detection</li>
+                            <li><strong class="text-slate-900">Gene Therapy:</strong> Replace defective genes (SCID, cystic fibrosis - in development)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box">
+                <h3 class="box-title text-cyan-800 border-slate-900">2. DNA Fingerprinting</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 border-4 border-cyan-600 rounded-xl shadow-[6px_6px_0_0_#06b6d4]">
+                        <h4 class="font-black text-2xl text-cyan-800 mb-4 uppercase">Method: RFLP Analysis</h4>
+                        <ol class="list-decimal pl-6 font-bold text-lg text-slate-700 space-y-2">
+                            <li class="bg-cyan-50 p-2 border-2 border-cyan-300 rounded"><strong class="text-cyan-800">Extract DNA:</strong> From blood, semen, hair, saliva (any cell with nucleus)</li>
+                            <li class="bg-cyan-50 p-2 border-2 border-cyan-300 rounded"><strong class="text-cyan-800">Restriction Enzymes:</strong> Cut at recognition sites (VNTR regions - Variable Number Tandem Repeats)</li>
+                            <li class="bg-cyan-50 p-2 border-2 border-cyan-300 rounded"><strong class="text-cyan-800">Gel Electrophoresis:</strong> Fragments separated by size (smaller = migrate faster/further)</li>
+                            <li class="bg-cyan-50 p-2 border-2 border-cyan-300 rounded"><strong class="text-cyan-800">Southern Blot:</strong> Transfer to membrane, probe with radioactive DNA, create band pattern</li>
+                            <li class="bg-cyan-50 p-2 border-2 border-cyan-300 rounded"><strong class="text-cyan-800">Compare:</strong> Each person has unique fingerprint (except identical twins)</li>
+                        </ol>
+                    </div>
+                    <div class="bg-slate-100 p-6 border-4 border-slate-900 rounded-xl shadow-[6px_6px_0_0_#0f172a]">
+                        <h4 class="font-black text-2xl text-slate-800 mb-4 uppercase">Applications</h4>
+                        <ul class="list-disc pl-5 font-bold text-lg text-slate-700 space-y-2">
+                            <li><strong class="text-slate-900">Forensic Science:</strong> Match suspects to crime scenes (99.99% accuracy)</li>
+                            <li><strong class="text-slate-900">Paternity Testing:</strong> Establish biological relationships (child must match alleles from both parents)</li>
+                            <li><strong class="text-slate-900">Wildlife Conservation:</strong> Track genetic diversity in endangered populations</li>
+                            <li><strong class="text-slate-900">Animal Breeding:</strong> Verify breed authenticity, prevent inbreeding</li>
+                            <li><strong class="text-slate-900">Immigration:</strong> Identify family relationships for visa purposes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-box bg-slate-800 text-white">
+                <h3 class="box-title text-white border-white flex justify-between items-center">
+                    <span>3. Recombinant DNA + PCR Workflow</span>
+                    <span class="text-sm bg-yellow-400 text-slate-900 px-3 py-1 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0_0_#0f172a] uppercase font-black transform rotate-2">Simulator</span>
+                </h3>
+
+                <div class="bg-white text-slate-900 p-6 md:p-8 rounded-xl border-4 border-slate-900 shadow-[6px_6px_0_0_#000000] space-y-6">
+                    <div class="grid xl:grid-cols-[1.7fr_0.85fr] gap-6">
+                        <div class="space-y-6">
+                            <div class="grid xl:grid-cols-[minmax(0,1.2fr)_240px_minmax(0,1.2fr)] gap-4 items-stretch">
+                                <div class="bg-cyan-50 border-4 border-cyan-700 rounded-xl p-4 shadow-[4px_4px_0_0_#0f172a]">
+                                    <div class="text-sm font-black uppercase tracking-widest text-cyan-900 mb-2">Donor DNA</div>
+                                    <div class="flex items-center gap-2 flex-wrap mb-3">
+                                        <div id="clone-donor-left" class="dna-segment sticky-end bg-blue-100 border-4 border-slate-900 rounded-xl px-4 font-black text-blue-900">GAATTC</div>
+                                        <div id="clone-insert" class="dna-segment bg-blue-500 text-white border-4 border-slate-900 rounded-xl px-4 font-black">Target gene</div>
+                                        <div id="clone-donor-right" class="dna-segment bg-blue-100 border-4 border-slate-900 rounded-xl px-4 font-black text-blue-900">CTTAAG</div>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-3 text-center font-black uppercase tracking-normal">
+                                        <div class="biotech-mini-label bg-white border-2 border-slate-900 rounded-lg">Recognition site</div>
+                                        <div class="biotech-mini-label bg-white border-2 border-slate-900 rounded-lg">Desired gene</div>
+                                        <div class="biotech-mini-label bg-white border-2 border-slate-900 rounded-lg">Recognition site</div>
+                                    </div>
+                                    <p class="mt-3 font-bold text-slate-700">Restriction enzyme cuts on both sides of the desired gene.</p>
+                                </div>
+
+                                <div class="flex flex-col items-center justify-center gap-3 px-2 py-2">
+                                    <div id="biotech-enzyme-chip" class="bg-yellow-300 border-4 border-slate-900 px-4 py-2 rounded-xl font-black uppercase shadow-[4px_4px_0_0_#0f172a] text-center">Restriction enzyme</div>
+                                    <div class="text-3xl font-black text-slate-900">↓</div>
+                                    <div id="biotech-action-label" class="bg-slate-900 text-white border-4 border-slate-900 px-4 py-2 rounded-xl font-black text-center uppercase">Cut both DNA samples</div>
+                                </div>
+
+                                <div class="bg-teal-50 border-4 border-teal-700 rounded-xl p-4 shadow-[4px_4px_0_0_#0f172a]">
+                                    <div class="text-sm font-black uppercase tracking-widest text-teal-900 mb-2">Plasmid Vector</div>
+                                    <div class="flex items-center gap-2 flex-wrap mb-3">
+                                        <div id="clone-plasmid-left" class="dna-segment sticky-end bg-emerald-100 border-4 border-slate-900 rounded-xl px-4 font-black text-emerald-900">ori + marker</div>
+                                        <div id="clone-plasmid-gap" class="dna-segment bg-slate-100 border-4 border-dashed border-slate-400 rounded-xl px-4 font-black text-slate-500">cut site</div>
+                                        <div id="clone-plasmid-right" class="dna-segment bg-emerald-100 border-4 border-slate-900 rounded-xl px-4 font-black text-emerald-900">ampR</div>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-3 text-center font-black uppercase tracking-normal">
+                                        <div class="biotech-mini-label bg-white border-2 border-slate-900 rounded-lg">Origin</div>
+                                        <div class="biotech-mini-label bg-white border-2 border-slate-900 rounded-lg">Insertion site</div>
+                                        <div class="biotech-mini-label bg-white border-2 border-slate-900 rounded-lg">Selectable marker</div>
+                                    </div>
+                                    <p class="mt-3 font-bold text-slate-700">The same restriction enzyme creates matching sticky ends in the plasmid.</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 border-4 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0_0_#0f172a]">
+                                <div class="flex items-center justify-between gap-4 flex-wrap mb-4">
+                                    <div>
+                                        <div id="biotech-stage-title" class="text-2xl font-black text-slate-900 uppercase">Stage 1: Restriction Digestion</div>
+                                        <p id="biotech-stage-copy" class="font-bold text-slate-700 mt-2">Use the same restriction enzyme on the donor DNA and plasmid to generate complementary sticky ends.</p>
+                                    </div>
+                                    <div id="biotech-copy-counter" class="bg-slate-900 text-white px-4 py-2 rounded-xl border-4 border-slate-900 font-black shadow-[4px_4px_0_0_#cbd5e1]">PCR copies: 1</div>
+                                </div>
+
+                                <div class="grid md:grid-cols-3 gap-3 mb-4">
+                                    <div class="bg-white border-4 border-slate-900 rounded-xl p-3 shadow-[4px_4px_0_0_#cbd5e1]">
+                                        <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-1">Molecular Event</div>
+                                        <div id="biotech-bond-state" class="font-black text-lg text-slate-900">No sticky ends exposed yet</div>
+                                    </div>
+                                    <div class="bg-white border-4 border-slate-900 rounded-xl p-3 shadow-[4px_4px_0_0_#cbd5e1]">
+                                        <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-1">Vector Status</div>
+                                        <div id="biotech-vector-state" class="font-black text-lg text-slate-900">Closed plasmid</div>
+                                    </div>
+                                    <div class="bg-white border-4 border-slate-900 rounded-xl p-3 shadow-[4px_4px_0_0_#cbd5e1]">
+                                        <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-1">Visible Outcome</div>
+                                        <div id="biotech-output-state" class="font-black text-lg text-slate-900">Ready to begin cloning</div>
+                                    </div>
+                                </div>
+
+                                <div id="recombinant-panel" class="hidden bg-white border-4 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0_0_#0f172a] mb-4">
+                                    <div class="text-sm font-black uppercase tracking-widest text-cyan-800 mb-3">Recombinant Plasmid</div>
+                                    <div class="grid md:grid-cols-[auto_1fr] gap-4 items-center">
+                                        <div class="mx-auto w-48 h-48 rounded-full border-[10px] border-cyan-500 relative flex items-center justify-center bg-cyan-50">
+                                            <div class="absolute -top-2 bg-white px-2 font-black text-xs border-2 border-slate-900 rounded">ori</div>
+                                            <div class="absolute right-2 top-12 bg-white px-2 font-black text-xs border-2 border-slate-900 rounded">ampR</div>
+                                            <div class="absolute bottom-5 bg-yellow-200 px-3 py-1 font-black text-sm border-2 border-slate-900 rounded">Inserted gene</div>
+                                            <div class="text-center font-black text-cyan-900">Ligated plasmid</div>
+                                        </div>
+                                        <div class="grid gap-3">
+                                            <div class="bg-cyan-50 border-4 border-cyan-700 rounded-xl p-3 font-bold">The target gene is now physically inside the plasmid, making one recombinant DNA molecule.</div>
+                                            <div class="bg-emerald-50 border-4 border-emerald-700 rounded-xl p-3 font-bold">The antibiotic marker stays on the plasmid so transformed bacteria can be selected later.</div>
+                                            <div class="bg-yellow-50 border-4 border-yellow-600 rounded-xl p-3 font-bold">Ligase has sealed the backbone. The plasmid behaves as one continuous circular DNA molecule.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="host-panel" class="hidden bg-emerald-50 border-4 border-emerald-700 rounded-xl p-4 shadow-[4px_4px_0_0_#0f172a] mb-4">
+                                    <div class="text-sm font-black uppercase tracking-widest text-emerald-900 mb-2">Transformation + Selection</div>
+                                    <div class="grid md:grid-cols-[1.1fr_1fr] gap-4 items-center">
+                                        <div class="bg-white border-4 border-slate-900 rounded-xl p-4 font-bold space-y-3">
+                                            <div class="w-40 h-40 mx-auto rounded-full bg-emerald-100 border-4 border-slate-900 relative flex items-center justify-center">
+                                                <div id="clone-host-cell" class="w-24 h-24 rounded-full bg-emerald-300 border-4 border-slate-900 flex items-center justify-center text-center font-black text-sm">Bacterial cell</div>
+                                                <div id="clone-host-plasmid" class="absolute bottom-6 right-6 w-12 h-12 rounded-full border-[6px] border-cyan-500 bg-white hidden"></div>
+                                            </div>
+                                            <div class="grid grid-cols-3 gap-2 text-center font-black uppercase tracking-normal">
+                                                <div class="biotech-mini-label bg-slate-100 border-2 border-slate-900 rounded-lg">Heat shock</div>
+                                                <div class="biotech-mini-label bg-slate-100 border-2 border-slate-900 rounded-lg">Membrane opens</div>
+                                                <div class="biotech-mini-label bg-slate-100 border-2 border-slate-900 rounded-lg">Plasmid enters</div>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-4">
+                                            <div class="bg-white border-4 border-slate-900 rounded-xl p-4 font-bold">
+                                            Calcium chloride or electroporation opens the bacterial membrane so the recombinant plasmid can enter.
+                                            </div>
+                                            <div class="bg-white border-4 border-slate-900 rounded-xl p-4 font-bold">
+                                            Antibiotic agar kills non-transformants. Only cells carrying the plasmid survive to form colonies.
+                                            </div>
+                                            <div id="clone-colony-count" class="bg-emerald-200 border-4 border-slate-900 rounded-xl p-3 font-black text-center">Colonies surviving: 0</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="pcr-panel" class="hidden bg-amber-50 border-4 border-amber-700 rounded-xl p-4 shadow-[4px_4px_0_0_#0f172a]">
+                                    <div class="text-sm font-black uppercase tracking-widest text-amber-900 mb-3">PCR Amplification After Cloning</div>
+                                    <div class="grid md:grid-cols-3 gap-4 mb-4">
+                                        <div class="bg-red-100 border-4 border-slate-900 rounded-xl p-4">
+                                            <div class="text-2xl font-black text-red-700">95°C</div>
+                                            <div class="font-bold">Denaturation</div>
+                                            <div class="text-sm font-semibold text-slate-600 mt-1">Hydrogen bonds break and the DNA strands separate.</div>
+                                        </div>
+                                        <div class="bg-yellow-100 border-4 border-slate-900 rounded-xl p-4">
+                                            <div class="text-2xl font-black text-yellow-700">55°C</div>
+                                            <div class="font-bold">Annealing</div>
+                                            <div class="text-sm font-semibold text-slate-600 mt-1">Primers bind next to the inserted target sequence.</div>
+                                        </div>
+                                        <div class="bg-green-100 border-4 border-slate-900 rounded-xl p-4">
+                                            <div class="text-2xl font-black text-green-700">72°C</div>
+                                            <div class="font-bold">Extension</div>
+                                            <div class="text-sm font-semibold text-slate-600 mt-1">Taq polymerase extends from the primers to copy the target gene.</div>
+                                        </div>
+                                    </div>
+                                    <div class="grid md:grid-cols-[0.95fr_1.05fr] gap-4 items-center">
+                                        <div class="grid md:grid-cols-4 gap-3">
+                                            <div class="bg-white border-4 border-slate-900 rounded-xl p-3 text-center font-black">Cycle 0<br><span class="text-slate-500">1 copy</span></div>
+                                            <div class="bg-white border-4 border-slate-900 rounded-xl p-3 text-center font-black">Cycle 1<br><span class="text-cyan-700">2 copies</span></div>
+                                            <div class="bg-white border-4 border-slate-900 rounded-xl p-3 text-center font-black">Cycle 2<br><span class="text-cyan-700">4 copies</span></div>
+                                            <div class="bg-white border-4 border-slate-900 rounded-xl p-3 text-center font-black">Cycle 3<br><span class="text-cyan-700">8 copies</span></div>
+                                        </div>
+                                        <div class="bg-white border-4 border-slate-900 rounded-xl p-4 space-y-3 shadow-[4px_4px_0_0_#cbd5e1]">
+                                            <div class="text-xs font-black uppercase tracking-widest text-slate-500">Observed amplification</div>
+                                            <div class="grid grid-cols-4 gap-2 items-end h-20">
+                                                <div id="pcr-copy-bar-1" class="biotech-copy-bar"></div>
+                                                <div id="pcr-copy-bar-2" class="biotech-copy-bar"></div>
+                                                <div id="pcr-copy-bar-3" class="biotech-copy-bar"></div>
+                                                <div id="pcr-copy-bar-4" class="biotech-copy-bar"></div>
+                                            </div>
+                                            <div id="pcr-growth-note" class="font-bold text-slate-700">Each PCR cycle doubles the number of DNA molecules containing the target insert.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="bg-slate-100 border-4 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0_0_#0f172a]">
+                                <div class="text-sm font-black uppercase tracking-widest text-slate-500 mb-3">Workflow Steps</div>
+                                <div id="biotech-step-1" class="border-4 border-slate-300 rounded-xl p-3 font-black mb-3 transition-all">1. Restriction enzyme cuts donor DNA and plasmid</div>
+                                <div id="biotech-step-2" class="border-4 border-slate-300 rounded-xl p-3 font-black mb-3 transition-all">2. Sticky ends pair by complementary base pairing</div>
+                                <div id="biotech-step-3" class="border-4 border-slate-300 rounded-xl p-3 font-black mb-3 transition-all">3. DNA ligase seals the sugar-phosphate backbone</div>
+                                <div id="biotech-step-4" class="border-4 border-slate-300 rounded-xl p-3 font-black mb-3 transition-all">4. Bacteria take up plasmid and are selected</div>
+                                <div id="biotech-step-5" class="border-4 border-slate-300 rounded-xl p-3 font-black transition-all">5. PCR amplifies the inserted gene exponentially</div>
+                            </div>
+
+                            <div class="grid gap-3">
+                                <button onclick="runBiotechStep(1)" id="btn-biotech-1" class="bg-cyan-100 border-4 border-slate-900 p-4 rounded-xl shadow-[4px_4px_0_0_#0f172a] hover:translate-y-1 hover:shadow-none transition text-left font-black">Cut donor DNA and plasmid</button>
+                                <button onclick="runBiotechStep(2)" id="btn-biotech-2" class="bg-yellow-100 border-4 border-slate-900 p-4 rounded-xl shadow-[4px_4px_0_0_#0f172a] opacity-50 pointer-events-none transition text-left font-black">Match sticky ends</button>
+                                <button onclick="runBiotechStep(3)" id="btn-biotech-3" class="bg-emerald-100 border-4 border-slate-900 p-4 rounded-xl shadow-[4px_4px_0_0_#0f172a] opacity-50 pointer-events-none transition text-left font-black">Ligate recombinant plasmid</button>
+                                <button onclick="runBiotechStep(4)" id="btn-biotech-4" class="bg-lime-100 border-4 border-slate-900 p-4 rounded-xl shadow-[4px_4px_0_0_#0f172a] opacity-50 pointer-events-none transition text-left font-black">Transform bacteria and select colonies</button>
+                                <button onclick="runBiotechStep(5)" id="btn-biotech-5" class="bg-orange-100 border-4 border-slate-900 p-4 rounded-xl shadow-[4px_4px_0_0_#0f172a] opacity-50 pointer-events-none transition text-left font-black">Run PCR on the cloned insert</button>
+                            </div>
+
+                            <button onclick="resetBiotechSimulator()" id="btn-biotech-reset" class="w-full bg-slate-900 text-white px-6 py-3 rounded-xl font-black border-4 border-slate-900 shadow-[4px_4px_0_0_#cbd5e1] hover:translate-y-1 hover:shadow-none transition uppercase">Reset Workflow</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-topic8"></div>
+        </div>
+
+        <div id="mock-exam" class="page-view space-y-8">
+            <div class="bg-yellow-400 text-slate-900 p-10 rounded-3xl border-4 border-slate-900 shadow-[12px_12px_0_0_#0f172a] text-center mb-12 transform rotate-1">
+                <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter bg-white inline-block px-6 py-3 border-4 border-slate-900 shadow-[6px_6px_0_0_#0f172a] -rotate-2">Full Mock Exam</h2>
+                <p class="font-bold text-2xl mt-8">10 Questions • All Topics</p>
+            </div>
+            <div id="mock-container"></div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- Navigation Routing ---
+        function navigate(pageId) {
+            document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+
+            const backBtn = document.getElementById('nav-back-btn');
+            if (pageId === 'home') {
+                backBtn.classList.add('hidden');
+            } else {
+                backBtn.classList.remove('hidden');
+            }
+
+            // Cleanup previous simulators
+            cleanupAllSimulators();
+
+            // Initialize quiz only for the topic being viewed
+            if(pageId.startsWith('topic')) {
+                if(quizData[pageId]) {
+                    renderQuizBlock(`quiz-${pageId}`, pageId, quizData[pageId], false);
+                }
+            }
+
+            // Initialize topic-specific simulators ONLY when that topic is active
+            if(pageId === 'topic1') {
+                setTimeout(() => initTopic1Simulator(), 100);
+            } else if(pageId === 'topic2') {
+                setTimeout(() => initTopic2Simulator(), 100);
+            } else if(pageId === 'topic5') {
+                setTimeout(() => initTopic5Simulator(), 100);
+            } else if(pageId === 'topic8') {
+                setTimeout(() => initTopic8Simulator(), 100);
+            }
+
+            if(pageId === 'mock-exam') startMockExam();
+        }
+
+        // Cleanup function to remove simulator event listeners
+        function cleanupAllSimulators() {
+            const substrateSlider = document.getElementById('substrate-slider');
+            const tempSlider = document.getElementById('temp-slider');
+            const phSlider = document.getElementById('ph-slider');
+
+            if(substrateSlider) substrateSlider.removeEventListener('input', updateEnzymeSimulator);
+            if(tempSlider) tempSlider.removeEventListener('input', updateEnzymeSimulator);
+            if(phSlider) phSlider.removeEventListener('input', updateEnzymeSimulator);
+
+            // Remove Punnett square listeners if they exist
+            const p1Sel = document.getElementById('p1-genotype');
+            const p2Sel = document.getElementById('p2-genotype');
+            if(p1Sel) p1Sel.removeEventListener('change', updatePunnett);
+            if(p2Sel) p2Sel.removeEventListener('change', updatePunnett);
+        }
+
+        // --- Quizzes Data ---
+        const quizData = {
+            topic1: [
+                { q: "What is the monomer of proteins?", options: ["Monosaccharides", "Glycerol", "Amino Acids", "Nucleotides"], answer: 2 },
+                { q: "Which test identifies reducing sugars?", options: ["Iodine", "Benedict's", "Biuret", "Grease spot"], answer: 1 },
+                { q: "Which organelle is the site of aerobic respiration?", options: ["Nucleus", "Mitochondrion", "Chloroplast", "Vacuole"], answer: 1 },
+                { q: "Why is water a good solvent?", options: ["Thermal insulation", "Provides reaction medium", "Energy storage", "Structural support"], answer: 1 },
+                { q: "Net movement of water from higher to lower water potential is called:", options: ["Diffusion", "Active Transport", "Osmosis", "Transpiration"], answer: 2 }
+            ],
+            topic2: [
+                { q: "In DNA, Adenine pairs with:", options: ["Cytosine", "Guanine", "Uracil", "Thymine"], answer: 3 },
+                { q: "Where does translation occur?", options: ["Nucleus", "Ribosome", "Mitochondrion", "Chloroplast"], answer: 1 },
+                { q: "What brings amino acids to the ribosome?", options: ["mRNA", "DNA", "tRNA", "Enzymes"], answer: 2 },
+                { q: "Why does DNA move to the positive electrode?", options: ["Positively charged", "Negatively charged", "Neutral", "Repelled by gel"], answer: 1 },
+                { q: "Which DNA fragments travel furthest in the gel?", options: ["Longest", "Shortest", "Heaviest", "Most charged"], answer: 1 }
+            ],
+            topic3: [
+                { q: "What is the product of photolysis of water?", options: ["CO2", "Glucose", "Oxygen gas", "Nitrates"], answer: 2 },
+                { q: "Which condition DECREASES transpiration rate?", options: ["High Temp", "High Light", "High Wind", "High Humidity"], answer: 3 },
+                { q: "Nitrogen-fixing bacteria convert N2 gas into:", options: ["Nitrates/Ammonium", "Nitrites", "Proteins", "Oxygen"], answer: 0 },
+                { q: "Denitrifying bacteria are most active in:", options: ["Dry soil", "Waterlogged soil", "Plant roots", "Air"], answer: 1 },
+                { q: "Plants absorb nitrogen primarily as:", options: ["N2 gas", "Nitrites", "Nitrates", "Urea"], answer: 2 }
+            ],
+            topic4: [
+                { q: "Which is a 1st line of defense?", options: ["Phagocytes", "Antibodies", "Gastric juice", "T cells"], answer: 2 },
+                { q: "How do phagocytes destroy pathogens?", options: ["Engulf and digest", "Shoot perforins", "Release histamine", "Block entry"], answer: 0 },
+                { q: "What causes vasodilation in the inflammatory response?", options: ["Antibodies", "Antigens", "Histamine", "Plasma cells"], answer: 2 },
+                { q: "What triggers the specific immune response?", options: ["Histamine", "Antigens", "Mucus", "Sebum"], answer: 1 },
+                { q: "A characteristic of the secondary response is:", options: ["Longer latent period", "Slower rise", "Lower peak", "Shorter latent period"], answer: 3 }
+            ],
+            topic5: [
+                { q: "The nature of the endocrine message is:", options: ["Electrical", "Chemical hormones", "Reflex arc", "Enzymes"], answer: 1 },
+                { q: "The speed of the nervous system is:", options: ["Slow", "Very rapid", "Gradual", "Long-lasting"], answer: 1 },
+                { q: "Which hormone surge triggers ovulation?", options: ["FSH", "Oestrogen", "LH", "Progesterone"], answer: 2 },
+                { q: "Heavy sweating causes ADH release to:", options: ["Decrease", "Increase", "Stop completely", "Remain unchanged"], answer: 1 },
+                { q: "Reflex arcs allow for responses that are:", options: ["Slow and conscious", "Rapid and involuntary", "Hormonal", "Long-lasting"], answer: 1 }
+            ],
+            topic8: [
+                { q: "Which enzyme cuts target DNA?", options: ["DNA ligase", "Taq polymerase", "Restriction enzyme", "Helicase"], answer: 2 },
+                { q: "What enzyme seals the DNA backbone?", options: ["Restriction enzyme", "DNA ligase", "Taq polymerase", "Amylase"], answer: 1 },
+                { q: "What happens at 95°C in PCR?", options: ["Annealing", "Extension", "Denaturation", "Ligation"], answer: 2 },
+                { q: "What happens at 55°C in PCR?", options: ["Primers bind", "Strands separate", "Taq copies DNA", "DNA is cut"], answer: 0 },
+                { q: "What is a special property of Taq polymerase?", options: ["Cuts DNA", "Heat-stable", "Seals backbone", "RNA specific"], answer: 1 }
+            ]
+        };
+
+        window.quizState = {};
+        let mockQuestions = [];
+
+        function renderQuizBlock(containerId, quizKey, questionsArray, isMock = false) {
+            let html = '';
+            if(!isMock) {
+                html += `<div class="bg-indigo-100 border-4 border-slate-900 p-8 rounded-2xl shadow-[8px_8px_0_0_#0f172a] mt-12">
+                            <h3 class="text-3xl font-black text-slate-900 mb-8 uppercase tracking-widest border-b-4 border-slate-900 pb-2 inline-block bg-white px-4 py-2 transform -rotate-1 shadow-[4px_4px_0_0_#0f172a]">Topic Quiz</h3>`;
+            }
+
+            let score = 0;
+            let allAnswered = true;
+
+            questionsArray.forEach((q, qIndex) => {
+                let qId = isMock ? `mock_${qIndex}` : `${quizKey}_${qIndex}`;
+                let selectedAns = window.quizState[qId];
+                let isSubmitted = window.quizState[isMock ? 'mock_submitted' : `${quizKey}_submitted`];
+                let isCorrect = selectedAns === q.answer;
+                
+                if (selectedAns === undefined) allAnswered = false;
+                if (isSubmitted && isCorrect) score++;
+
+                html += `
+                <div class="bg-white border-4 border-slate-900 rounded-xl p-6 mb-8 shadow-[6px_6px_0_0_#0f172a]">
+                    <p class="font-black text-xl mb-6 text-slate-900 leading-tight">
+                        <span class="bg-slate-900 text-white px-3 py-1 rounded-lg mr-2">${qIndex + 1}</span> ${q.q}
+                    </p>
+                    <div class="space-y-4">`;
+
+                q.options.forEach((opt, optIndex) => {
+                    let isSelected = selectedAns === optIndex;
+                    let btnClass = "border-4 rounded-xl p-4 cursor-pointer font-bold text-lg flex items-center gap-4 transition-all ";
+
+                    if (!isSubmitted) {
+                        btnClass += isSelected ? "border-slate-900 bg-slate-200 shadow-inner translate-x-1" : "border-slate-300 hover:border-slate-900 hover:shadow-[4px_4px_0_0_#0f172a]";
+                    } else {
+                        btnClass += "shadow-[4px_4px_0_0_#0f172a] ";
+                        if (optIndex === q.answer) {
+                            btnClass += "border-green-600 bg-green-100 text-green-900";
+                        } else if (isSelected && !isCorrect) {
+                            btnClass += "border-red-600 bg-red-100 text-red-900";
+                        } else {
+                            btnClass += "border-slate-300 bg-slate-50 opacity-60 shadow-none";
+                        }
+                    }
+
+                    html += `
+                        <div class="${btnClass}" onclick="handleQuizSelect('${isMock ? 'mock' : quizKey}', ${qIndex}, ${optIndex}, ${isSubmitted})">
+                            <div class="w-8 h-8 rounded-lg border-4 flex-shrink-0 flex items-center justify-center ${isSelected ? 'border-slate-900' : 'border-slate-400'} ${isSubmitted && optIndex === q.answer ? 'border-green-600 bg-green-600' : ''} ${isSubmitted && isSelected && !isCorrect ? 'border-red-600 bg-red-600' : ''}">
+                                ${isSelected && !isSubmitted ? '<div class="w-4 h-4 bg-slate-900 rounded-sm"></div>' : ''}
+                                ${isSubmitted && optIndex === q.answer ? '<i class="fas fa-check text-white"></i>' : ''}
+                                ${isSubmitted && isSelected && !isCorrect ? '<i class="fas fa-times text-white"></i>' : ''}
+                            </div>
+                            ${opt}
+                        </div>`;
+                });
+
+                if (isSubmitted) {
+                    html += `
+                    <div class="mt-6 p-5 rounded-xl border-4 font-black text-xl flex items-center gap-4 shadow-[4px_4px_0_0_#0f172a] ${isCorrect ? 'bg-green-100 border-green-600 text-green-900' : 'bg-red-100 border-red-600 text-red-900'}">
+                        <div class="bg-white rounded-full p-1 border-4 border-current">
+                            <i class="fas ${isCorrect ? 'fa-check' : 'fa-times'} text-2xl"></i>
+                        </div>
+                        <div>
+                            <div>${isCorrect ? 'Correct!' : 'Incorrect'}</div>
+                            ${!isCorrect ? `<div class="text-base mt-1">Answer: <span class="bg-white px-2 py-1 rounded border-2 border-current">${q.options[q.answer]}</span></div>` : ''}
+                        </div>
+                    </div>`;
+                }
+
+                html += `</div></div>`;
+            });
+
+            let isSubmitted = window.quizState[isMock ? 'mock_submitted' : `${quizKey}_submitted`];
+
+            if (!isSubmitted) {
+                html += `
+                <div class="text-center mt-8">
+                    <button onclick="submitQuiz('${isMock ? 'mock' : quizKey}', '${containerId}')" 
+                        class="w-full max-w-lg py-5 rounded-xl font-black text-2xl border-4 uppercase transition-all 
+                        ${allAnswered ? 'bg-slate-900 text-white border-black shadow-[6px_6px_0_0_#000000] hover:translate-y-1 hover:shadow-none' : 'bg-slate-200 text-slate-400 border-slate-300 cursor-not-allowed'}" 
+                        ${allAnswered ? '' : 'disabled'}>
+                        Submit Answers
+                    </button>
+                </div>`;
+            } else {
+                html += `
+                <div class="bg-slate-900 text-white p-8 rounded-2xl border-4 border-black text-center shadow-[8px_8px_0_0_#000000] mt-10">
+                    <h4 class="text-3xl font-black uppercase mb-4 text-emerald-400 tracking-widest">Results</h4>
+                    <p class="text-2xl font-bold mb-8">Score: <span class="text-6xl font-black ml-4 ${score >= (questionsArray.length * 0.6) ? 'text-green-400' : 'text-red-400'}">${score}</span> / ${questionsArray.length}</p>
+                    <button onclick="resetQuiz('${isMock ? 'mock' : quizKey}', '${containerId}')" 
+                        class="bg-yellow-400 text-slate-900 px-10 py-4 rounded-xl font-black text-xl border-4 border-slate-950 shadow-[4px_4px_0_0_#000000] hover:translate-y-1 hover:shadow-none uppercase">
+                        Retry
+                    </button>
+                </div>`;
+            }
+
+            if(!isMock) html += `</div>`;
+            document.getElementById(containerId).innerHTML = html;
+        }
+
+        function handleQuizSelect(quizKey, qIndex, optIndex, isSubmitted) {
+            if (isSubmitted) return;
+            let qId = `${quizKey}_${qIndex}`;
+            window.quizState[qId] = optIndex;
+            
+            if(quizKey === 'mock') {
+                renderQuizBlock('mock-container', 'mock', mockQuestions, true);
+            } else {
+                renderQuizBlock(`quiz-${quizKey}`, quizKey, quizData[quizKey], false);
+            }
+        }
+
+        function submitQuiz(quizKey, containerId) {
+            window.quizState[`${quizKey}_submitted`] = true;
+            if(quizKey === 'mock') {
+                renderQuizBlock(containerId, 'mock', mockQuestions, true);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                renderQuizBlock(containerId, quizKey, quizData[quizKey], false);
+            }
+        }
+
+        function resetQuiz(quizKey, containerId) {
+            // clear state
+            for (let key in window.quizState) {
+                if (key.startsWith(quizKey)) delete window.quizState[key];
+            }
+            if(quizKey === 'mock') {
+                startMockExam();
+            } else {
+                renderQuizBlock(containerId, quizKey, quizData[quizKey], false);
+            }
+        }
+
+        function initQuizzes() {
+            Object.keys(quizData).forEach(key => {
+                renderQuizBlock(`quiz-${key}`, key, quizData[key], false);
+            });
+        }
+
+        function startMockExam() {
+            // Generate 10 random questions from all topics
+            mockQuestions = [];
+            Object.keys(quizData).forEach(topic => {
+                let shuffled = [...quizData[topic]].sort(() => 0.5 - Math.random());
+                mockQuestions = mockQuestions.concat(shuffled.slice(0, 2)); // 2 per topic = 10 questions
+            });
+            mockQuestions = mockQuestions.sort(() => 0.5 - Math.random());
+            
+            // clear mock state
+            for (let key in window.quizState) {
+                if (key.startsWith('mock')) delete window.quizState[key];
+            }
+            
+            renderQuizBlock('mock-container', 'mock', mockQuestions, true);
+            window.scrollTo(0, 0);
+        }
+
+        // Initialize page when DOM is ready
+        // Quizzes now render on-demand when topics are opened
+
+        // --- Topic 1: Enzyme Kinetics Simulator ---
+        
+        function initTopic1Simulator() {
+            const sliders = ['substrate-slider', 'temp-slider', 'ph-slider']
+                .map(id => document.getElementById(id))
+                .filter(Boolean);
+
+            if(!sliders.length) return;
+
+            sliders.forEach(slider => {
+                slider.removeEventListener('input', updateEnzymeSimulator);
+                slider.addEventListener('input', updateEnzymeSimulator);
+            });
+
+            updateEnzymeSimulator();
+        }
+
+        function updateEnzymeSimulator() {
+            const substrateSlider = document.getElementById('substrate-slider');
+            const tempSlider = document.getElementById('temp-slider');
+            const phSlider = document.getElementById('ph-slider');
+            const substrateValue = document.getElementById('substrate-value');
+            const tempValue = document.getElementById('temp-value');
+            const phValue = document.getElementById('ph-value');
+            const reactionRate = document.getElementById('reaction-rate');
+            const stateCopy = document.getElementById('enzyme-state-copy');
+            const stage = document.getElementById('enzyme-stage');
+            const enzymeShape = document.getElementById('enzyme-shape');
+            const activeSite = document.getElementById('enzyme-active-site');
+            const visualState = document.getElementById('enzyme-visual-state');
+            const dots = document.querySelectorAll('#substrate-dots > div');
+
+            if(!substrateSlider || !tempSlider || !phSlider || !reactionRate || !enzymeShape || !activeSite || !visualState || !stage || !stateCopy) return;
+
+            const substrate = Number(substrateSlider.value);
+            const temperature = Number(tempSlider.value);
+            const ph = Number(phSlider.value);
+
+            substrateValue.innerText = `${substrate}%`;
+            tempValue.innerText = `${temperature}°C`;
+            phValue.innerText = `pH ${ph}`;
+
+            const substrateFactor = Math.min(substrate / 65, 1);
+            let tempFactor = 0;
+            if (temperature <= 5) tempFactor = 0.08;
+            else if (temperature <= 37) tempFactor = 0.08 + ((temperature - 5) / 32) * 0.92;
+            else if (temperature <= 45) tempFactor = 1 - ((temperature - 37) / 8) * 0.2;
+            else if (temperature <= 60) tempFactor = 0.8 - ((temperature - 45) / 15) * 0.75;
+            else tempFactor = 0.02;
+
+            const phFactor = Math.max(0.05, 1 - Math.abs(ph - 7) / 6);
+            const overall = Math.max(0, Math.min(1, substrateFactor * tempFactor * phFactor));
+            const score = Math.round(overall * 100);
+
+            let statusText = 'Low activity';
+            let statusClass = 'text-blue-700';
+            let rotation = 30;
+            let scale = 0.9;
+            let radius = '1.5rem';
+            let shapeColor = '#60a5fa';
+            let activeSiteWidth = '1.8rem';
+            let activeSiteHeight = '3.6rem';
+            let activeSiteOffset = '-0.6rem';
+            let stageTint = '#e2e8f0';
+            let visualLabel = 'Slow collisions with starch';
+            let stateDescription = 'At low temperature, salivary amylase still has the correct shape, but molecules move slowly so fewer enzyme-substrate collisions occur.';
+
+            if (temperature >= 55 || ph <= 2 || ph >= 12) {
+                statusText = 'Denatured';
+                statusClass = 'text-red-700';
+                rotation = 12;
+                scale = 0.82;
+                radius = '2.2rem 0.8rem 2.5rem 1rem';
+                shapeColor = '#f87171';
+                activeSiteWidth = '0.7rem';
+                activeSiteHeight = '1.6rem';
+                activeSiteOffset = '-0.1rem';
+                stageTint = '#fee2e2';
+                visualLabel = 'Active site distorted';
+                stateDescription = 'Extreme heat or very acidic/alkaline conditions change salivary amylase\'s tertiary structure, so the starch substrate no longer fits the active site.';
+            } else if (score >= 75) {
+                statusText = 'Optimal';
+                statusClass = 'text-green-700';
+                rotation = 45;
+                scale = 1.05;
+                radius = '0.8rem';
+                shapeColor = '#3b82f6';
+                activeSiteWidth = '2.5rem';
+                activeSiteHeight = '4.5rem';
+                activeSiteOffset = '-1rem';
+                stageTint = '#dcfce7';
+                visualLabel = 'Active site fits starch';
+                stateDescription = 'Near 37°C and pH 7, salivary amylase keeps the best active-site shape for starch, so binding and catalysis are fastest.';
+            } else if (score >= 40) {
+                statusText = 'Moderate';
+                statusClass = 'text-yellow-700';
+                rotation = 40;
+                scale = 0.96;
+                radius = '1rem';
+                shapeColor = '#60a5fa';
+                activeSiteWidth = '2.1rem';
+                activeSiteHeight = '4rem';
+                activeSiteOffset = '-0.8rem';
+                stageTint = '#fef3c7';
+                visualLabel = 'Partial fit, slower binding';
+                stateDescription = 'Salivary amylase still works, but conditions are not ideal, so the rate falls and fewer starch molecules fit the active site each second.';
+            }
+
+            reactionRate.innerHTML = `${statusText}<div class="text-base font-bold text-slate-500 mt-2">Rate score: ${score}%</div>`;
+            reactionRate.className = `text-3xl font-black ${statusClass}`;
+            enzymeShape.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+            enzymeShape.style.borderRadius = radius;
+            enzymeShape.style.background = `linear-gradient(145deg, ${shapeColor}, #1d4ed8)`;
+            stage.style.background = `radial-gradient(circle at 50% 40%, #ffffff 0%, ${stageTint} 72%)`;
+            activeSite.style.width = activeSiteWidth;
+            activeSite.style.height = activeSiteHeight;
+            activeSite.style.right = activeSiteOffset;
+            activeSite.style.borderColor = statusText === 'Denatured' ? '#991b1b' : '#0f172a';
+            visualState.innerText = visualLabel;
+            stateCopy.innerText = stateDescription;
+
+            dots.forEach((dot, index) => {
+                const visibleCount = Math.max(1, Math.round(substrate / 25));
+                dot.style.opacity = index < visibleCount ? '1' : '0.15';
+                dot.style.transform = score >= 75 ? 'scale(1.2)' : temperature >= 55 || ph <= 2 || ph >= 12 ? 'scale(0.85)' : 'scale(1)';
+                dot.style.backgroundColor = statusText === 'Denatured' ? '#f59e0b' : '#facc15';
+
+                if (temperature >= 55 || ph <= 2 || ph >= 12) {
+                    const denaturedPositions = [
+                        { top: '12%', left: '14%' },
+                        { top: '18%', right: '10%' },
+                        { bottom: '16%', left: '20%' },
+                        { bottom: '8%', right: '12%' }
+                    ];
+                    const position = denaturedPositions[index];
+                    dot.style.top = position.top || 'auto';
+                    dot.style.left = position.left || 'auto';
+                    dot.style.right = position.right || 'auto';
+                    dot.style.bottom = position.bottom || 'auto';
+                } else if (score >= 75) {
+                    const optimalPositions = [
+                        { top: '16%', left: '16%' },
+                        { top: '30%', right: '18%' },
+                        { top: '52%', right: '8%' },
+                        { bottom: '20%', left: '28%' }
+                    ];
+                    const position = optimalPositions[index];
+                    dot.style.top = position.top || 'auto';
+                    dot.style.left = position.left || 'auto';
+                    dot.style.right = position.right || 'auto';
+                    dot.style.bottom = position.bottom || 'auto';
+                } else {
+                    const lowPositions = [
+                        { top: '10%', left: '8%' },
+                        { top: '14%', right: '8%' },
+                        { bottom: '14%', left: '10%' },
+                        { bottom: '10%', right: '10%' }
+                    ];
+                    const position = lowPositions[index];
+                    dot.style.top = position.top || 'auto';
+                    dot.style.left = position.left || 'auto';
+                    dot.style.right = position.right || 'auto';
+                    dot.style.bottom = position.bottom || 'auto';
+                }
+            });
+        }
+
+        // --- Topic 2: Punnett Square Logic ---
+        
+        function initTopic2Simulator() {
+            const p1Sel = document.getElementById('p1-genotype');
+            const p2Sel = document.getElementById('p2-genotype');
+
+            if(!p1Sel || !p2Sel) return;
+
+            // Remove existing listeners
+            p1Sel.removeEventListener('change', updatePunnett);
+            p2Sel.removeEventListener('change', updatePunnett);
+            
+            // Add fresh listeners
+            p1Sel.addEventListener('change', updatePunnett);
+            p2Sel.addEventListener('change', updatePunnett);
+            
+            // Initialize display
+            updatePunnett();
+        }
+
+        function updatePunnett() {
+            const p1Sel = document.getElementById('p1-genotype');
+            const p2Sel = document.getElementById('p2-genotype');
+
+            if(!p1Sel || !p2Sel) return;
+
+            const p1 = p1Sel.value;
+            const p2 = p2Sel.value;
+
+            document.getElementById('gamete-p1-1').innerText = p1[0];
+            document.getElementById('gamete-p1-2').innerText = p1[1];
+            document.getElementById('gamete-p2-1').innerText = p2[0];
+            document.getElementById('gamete-p2-2').innerText = p2[1];
+
+            const children = [
+                (p1[0] === 'a' && p2[0] === 'A') ? 'Aa' : p1[0] + p2[0],
+                (p1[0] === 'a' && p2[1] === 'A') ? 'Aa' : p1[0] + p2[1],
+                (p1[1] === 'a' && p2[0] === 'A') ? 'Aa' : p1[1] + p2[0],
+                (p1[1] === 'a' && p2[1] === 'A') ? 'Aa' : p1[1] + p2[1]
+            ];
+            
+            let domCt = 0;
+            children.forEach((child, i) => {
+                const el = document.getElementById(`child-${i+1}`);
+                el.innerText = child;
+                if(child.includes('A')) {
+                    el.className = "p-4 border-4 border-slate-900 font-mono text-3xl w-24 h-24 font-black bg-purple-200 text-purple-900";
+                    domCt++;
+                } else {
+                    el.className = "p-4 border-4 border-slate-900 font-mono text-3xl w-24 h-24 font-black bg-slate-100 text-slate-400";
+                }
+            });
+
+            const ratioEl = document.getElementById('pheno-ratio');
+            const recCt = 4 - domCt;
+            if(domCt === 4) ratioEl.innerText = "100% Dominant";
+            else if(recCt === 4) ratioEl.innerText = "100% Recessive";
+            else {
+                let d = domCt, r = recCt;
+                if(d % 2 === 0 && r % 2 === 0) { d/=2; r/=2; }
+                ratioEl.innerText = `${d} Dominant : ${r} Recessive`;
+            }
+        }
+
+        // --- Topic 5: Osmoregulation Logic ---
+        
+        function initTopic5Simulator() {
+            // Initialize osmoregulation simulator
+            // Buttons are already inline in HTML, just ensure they work
+        }
+
+        function setOsmoregulation(state) {
+            const cards = document.querySelectorAll('.osmo-card');
+            
+            if (state === 'sweat') {
+                document.getElementById('osmo-text1').innerHTML = "<span class='text-red-600 font-black'>Decreases</span> (Conc. Blood)";
+                document.getElementById('osmo-text3').innerHTML = "<span class='text-red-600 font-black'>More ADH released</span>";
+                document.getElementById('osmo-text4').innerHTML = "<span class='text-red-600 font-black'>Increases</span> (Water reabsorbed)";
+                cards.forEach(el => el.className = "osmo-card bg-orange-100 border-4 border-slate-900 p-4 rounded-xl text-center relative z-10 shadow-[4px_4px_0_0_#0f172a] transition-all");
+            } else if (state === 'drink') {
+                document.getElementById('osmo-text1').innerHTML = "<span class='text-blue-600 font-black'>Increases</span> (Diluted Blood)";
+                document.getElementById('osmo-text3').innerHTML = "<span class='text-blue-600 font-black'>Less ADH released</span>";
+                document.getElementById('osmo-text4').innerHTML = "<span class='text-blue-600 font-black'>Decreases</span> (Water NOT reabsorbed)";
+                cards.forEach(el => el.className = "osmo-card bg-blue-100 border-4 border-slate-900 p-4 rounded-xl text-center relative z-10 shadow-[4px_4px_0_0_#0f172a] transition-all");
+            }
+        }
+
+        // --- Topic 8: Recombinant DNA + PCR Workflow ---
+
+        let biotechStep = 0;
+
+        function initTopic8Simulator() {
+            resetBiotechSimulator();
+        }
+
+        function setBiotechButtonState(buttonId, enabled) {
+            const button = document.getElementById(buttonId);
+            if(!button) return;
+
+            if(enabled) button.classList.remove('opacity-50', 'pointer-events-none');
+            else button.classList.add('opacity-50', 'pointer-events-none');
+        }
+
+        function updateBiotechStepCards() {
+            for (let step = 1; step <= 5; step++) {
+                const card = document.getElementById(`biotech-step-${step}`);
+                if(!card) continue;
+
+                card.classList.remove('step-card-active', 'step-card-done');
+                if (biotechStep === 0 && step === 1) {
+                    card.classList.add('step-card-active');
+                    continue;
+                }
+                if (step < biotechStep) card.classList.add('step-card-done');
+                if (step === biotechStep) card.classList.add('step-card-active');
+            }
+        }
+
+        function runBiotechStep(step) {
+            if (step > biotechStep + 1) return;
+
+            biotechStep = step;
+            updateBiotechStepCards();
+
+            const stageTitle = document.getElementById('biotech-stage-title');
+            const stageCopy = document.getElementById('biotech-stage-copy');
+            const copyCounter = document.getElementById('biotech-copy-counter');
+            const actionLabel = document.getElementById('biotech-action-label');
+            const enzymeChip = document.getElementById('biotech-enzyme-chip');
+            const bondState = document.getElementById('biotech-bond-state');
+            const vectorState = document.getElementById('biotech-vector-state');
+            const outputState = document.getElementById('biotech-output-state');
+            const donorLeft = document.getElementById('clone-donor-left');
+            const plasmidLeft = document.getElementById('clone-plasmid-left');
+            const plasmidGap = document.getElementById('clone-plasmid-gap');
+            const insert = document.getElementById('clone-insert');
+            const hostPlasmid = document.getElementById('clone-host-plasmid');
+            const hostCell = document.getElementById('clone-host-cell');
+            const colonyCount = document.getElementById('clone-colony-count');
+            const growthNote = document.getElementById('pcr-growth-note');
+            const recombinantPanel = document.getElementById('recombinant-panel');
+            const hostPanel = document.getElementById('host-panel');
+            const pcrPanel = document.getElementById('pcr-panel');
+            const copyBars = [1, 2, 3, 4].map(index => document.getElementById(`pcr-copy-bar-${index}`));
+
+            copyBars.forEach(bar => bar?.classList.remove('active'));
+
+            if (step === 1) {
+                stageTitle.innerText = 'Stage 1: Restriction Digestion';
+                stageCopy.innerText = 'The same restriction enzyme cuts donor DNA and plasmid, exposing complementary sticky ends that can pair later.';
+                actionLabel.innerText = 'Cut both DNA samples';
+                enzymeChip.innerText = 'Restriction enzyme';
+                bondState.innerText = 'Sticky ends are now exposed';
+                vectorState.innerText = 'Plasmid opened at cloning site';
+                outputState.innerText = 'Insert and vector are ready to meet';
+                donorLeft.classList.add('visible');
+                plasmidLeft.classList.add('visible');
+                plasmidGap.innerText = 'sticky ends exposed';
+                plasmidGap.className = 'dna-segment bg-yellow-100 border-4 border-slate-900 rounded-xl px-4 font-black text-yellow-800';
+                setBiotechButtonState('btn-biotech-2', true);
+            }
+
+            if (step === 2) {
+                stageTitle.innerText = 'Stage 2: Sticky Ends Pair';
+                stageCopy.innerText = 'The insert is positioned into the opened plasmid because the single-stranded overhangs are complementary and hydrogen-bond together.';
+                actionLabel.innerText = 'Pair complementary sticky ends';
+                enzymeChip.innerText = 'Base pairing';
+                bondState.innerText = 'Hydrogen bonds hold the insert in place';
+                vectorState.innerText = 'Open vector aligned with target gene';
+                outputState.innerText = 'A temporary recombinant structure has formed';
+                insert.className = 'dna-segment bg-yellow-300 text-slate-900 border-4 border-slate-900 rounded-xl px-4 font-black';
+                plasmidGap.innerText = 'insert aligned';
+                setBiotechButtonState('btn-biotech-3', true);
+            }
+
+            if (step === 3) {
+                stageTitle.innerText = 'Stage 3: DNA Ligase Seals Backbone';
+                stageCopy.innerText = 'DNA ligase forms phosphodiester bonds so the sugar-phosphate backbone becomes continuous and stable.';
+                actionLabel.innerText = 'Seal the DNA backbone';
+                enzymeChip.innerText = 'DNA ligase';
+                bondState.innerText = 'Phosphodiester bonds completed';
+                vectorState.innerText = 'Stable recombinant plasmid';
+                outputState.innerText = 'One closed plasmid now carries the target gene';
+                recombinantPanel.classList.remove('hidden');
+                setBiotechButtonState('btn-biotech-4', true);
+            }
+
+            if (step === 4) {
+                stageTitle.innerText = 'Stage 4: Transformation and Selection';
+                stageCopy.innerText = 'Bacteria take up the recombinant plasmid. Antibiotic selection removes cells without the plasmid so only successful transformants grow.';
+                actionLabel.innerText = 'Move plasmid into host cells';
+                enzymeChip.innerText = 'Heat shock / electroporation';
+                bondState.innerText = 'Plasmid protected inside bacteria';
+                vectorState.innerText = 'Selectable marker remains functional';
+                outputState.innerText = 'Only transformed colonies survive on antibiotic agar';
+                hostPanel.classList.remove('hidden');
+                hostPlasmid.classList.remove('hidden');
+                hostCell.innerText = 'Transformed cell';
+                colonyCount.innerText = 'Colonies surviving: many';
+                copyCounter.innerText = 'PCR copies: clone selected';
+                setBiotechButtonState('btn-biotech-5', true);
+            }
+
+            if (step === 5) {
+                stageTitle.innerText = 'Stage 5: PCR Amplification';
+                stageCopy.innerText = 'PCR repeatedly denatures DNA, anneals primers, and extends strands with Taq polymerase, doubling the target each cycle.';
+                actionLabel.innerText = 'Amplify the cloned insert';
+                enzymeChip.innerText = 'Taq polymerase';
+                bondState.innerText = 'Insert copied by repeated denaturation, annealing, and extension';
+                vectorState.innerText = 'Template now used for rapid amplification';
+                outputState.innerText = 'Target gene quantity rises exponentially';
+                pcrPanel.classList.remove('hidden');
+                copyBars.forEach(bar => bar?.classList.add('active'));
+                growthNote.innerText = 'After 3 cycles, 1 target template becomes 8 copies. In real PCR, 30 cycles yield millions of copies.';
+                copyCounter.innerText = 'PCR copies: 8 after 3 cycles';
+            }
+        }
+
+        function resetBiotechSimulator() {
+            biotechStep = 0;
+
+            const stageTitle = document.getElementById('biotech-stage-title');
+            const stageCopy = document.getElementById('biotech-stage-copy');
+            const copyCounter = document.getElementById('biotech-copy-counter');
+            const actionLabel = document.getElementById('biotech-action-label');
+            const enzymeChip = document.getElementById('biotech-enzyme-chip');
+            const bondState = document.getElementById('biotech-bond-state');
+            const vectorState = document.getElementById('biotech-vector-state');
+            const outputState = document.getElementById('biotech-output-state');
+            const donorLeft = document.getElementById('clone-donor-left');
+            const plasmidLeft = document.getElementById('clone-plasmid-left');
+            const plasmidGap = document.getElementById('clone-plasmid-gap');
+            const insert = document.getElementById('clone-insert');
+            const hostPlasmid = document.getElementById('clone-host-plasmid');
+            const hostCell = document.getElementById('clone-host-cell');
+            const colonyCount = document.getElementById('clone-colony-count');
+            const growthNote = document.getElementById('pcr-growth-note');
+            const copyBars = [1, 2, 3, 4].map(index => document.getElementById(`pcr-copy-bar-${index}`));
+
+            if(stageTitle) stageTitle.innerText = 'Stage 1: Restriction Digestion';
+            if(stageCopy) stageCopy.innerText = 'Use the same restriction enzyme on the donor DNA and plasmid to generate complementary sticky ends.';
+            if(copyCounter) copyCounter.innerText = 'PCR copies: 1';
+            if(actionLabel) actionLabel.innerText = 'Cut both DNA samples';
+            if(enzymeChip) enzymeChip.innerText = 'Restriction enzyme';
+            if(bondState) bondState.innerText = 'No sticky ends exposed yet';
+            if(vectorState) vectorState.innerText = 'Closed plasmid';
+            if(outputState) outputState.innerText = 'Ready to begin cloning';
+            if(donorLeft) donorLeft.classList.remove('visible');
+            if(plasmidLeft) plasmidLeft.classList.remove('visible');
+            if(plasmidGap) {
+                plasmidGap.innerText = 'cut site';
+                plasmidGap.className = 'dna-segment bg-slate-100 border-4 border-dashed border-slate-400 rounded-xl px-4 font-black text-slate-500';
+            }
+            if(insert) insert.className = 'dna-segment bg-blue-500 text-white border-4 border-slate-900 rounded-xl px-4 font-black';
+            if(hostPlasmid) hostPlasmid.classList.add('hidden');
+            if(hostCell) hostCell.innerText = 'Bacterial cell';
+            if(colonyCount) colonyCount.innerText = 'Colonies surviving: 0';
+            if(growthNote) growthNote.innerText = 'Each PCR cycle doubles the number of DNA molecules containing the target insert.';
+            copyBars.forEach(bar => bar?.classList.remove('active'));
+
+            ['recombinant-panel', 'host-panel', 'pcr-panel'].forEach(id => {
+                const panel = document.getElementById(id);
+                if(panel) panel.classList.add('hidden');
+            });
+
+            setBiotechButtonState('btn-biotech-1', true);
+            setBiotechButtonState('btn-biotech-2', false);
+            setBiotechButtonState('btn-biotech-3', false);
+            setBiotechButtonState('btn-biotech-4', false);
+            setBiotechButtonState('btn-biotech-5', false);
+            updateBiotechStepCards();
+        }
+
+    </script>
+</body>
+</html>

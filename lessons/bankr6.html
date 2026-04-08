@@ -1,0 +1,2489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Rainbow Six Siege: Bank Interactive Lesson</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #08111b;
+			--panel: rgba(13, 28, 43, 0.88);
+			--panel-strong: #0f2233;
+			--card: rgba(255, 255, 255, 0.05);
+			--line: rgba(160, 199, 222, 0.18);
+			--text: #e8f2fb;
+			--muted: #9cb5c7;
+			--accent: #f4b73f;
+			--attack: #61dafb;
+			--defense: #ff7a59;
+			--success: #6ee7b7;
+			--danger: #ff8b8b;
+			--shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+			min-height: 100vh;
+			font-family: 'IBM Plex Sans', sans-serif;
+			color: var(--text);
+			background:
+				radial-gradient(circle at top left, rgba(97, 218, 251, 0.16), transparent 26%),
+				radial-gradient(circle at top right, rgba(244, 183, 63, 0.12), transparent 30%),
+				linear-gradient(160deg, #050b12 0%, #091523 45%, #05090f 100%);
+		}
+
+		body::before {
+			content: "";
+			position: fixed;
+			inset: 0;
+			background-image:
+				linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+			background-size: 28px 28px;
+			pointer-events: none;
+			opacity: 0.35;
+		}
+
+		.shell {
+			width: min(1500px, calc(100% - 32px));
+			margin: 24px auto 48px;
+			position: relative;
+			z-index: 1;
+		}
+
+		.hero {
+			display: grid;
+			grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.95fr);
+			gap: 22px;
+			margin-bottom: 22px;
+		}
+
+		.panel {
+			background: var(--panel);
+			border: 1px solid var(--line);
+			border-radius: 28px;
+			box-shadow: var(--shadow);
+			backdrop-filter: blur(14px);
+		}
+
+		.hero-card {
+			padding: 32px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.hero-card::after {
+			content: "BANK";
+			position: absolute;
+			right: 18px;
+			top: 10px;
+			font-family: 'JetBrains Mono', monospace;
+			font-size: clamp(60px, 12vw, 140px);
+			color: rgba(255, 255, 255, 0.03);
+			pointer-events: none;
+			letter-spacing: 0.08em;
+		}
+
+		.eyebrow,
+		.micro-label {
+			display: inline-flex;
+			align-items: center;
+			gap: 10px;
+			padding: 8px 14px;
+			border-radius: 999px;
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			background: rgba(255, 255, 255, 0.04);
+			color: var(--muted);
+			font-size: 0.82rem;
+			text-transform: uppercase;
+			letter-spacing: 0.12em;
+			font-family: 'JetBrains Mono', monospace;
+		}
+
+		h1,
+		h2,
+		h3,
+		h4 {
+			font-family: 'Space Grotesk', sans-serif;
+			margin: 0;
+		}
+
+		h1 {
+			margin-top: 18px;
+			font-size: clamp(2.6rem, 5vw, 4.9rem);
+			line-height: 0.97;
+			max-width: 11ch;
+		}
+
+		.lead {
+			color: #d1e4f3;
+			max-width: 64ch;
+			font-size: 1.04rem;
+			line-height: 1.7;
+			margin: 18px 0 26px;
+		}
+
+		.hero-grid {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 12px;
+		}
+
+		.hero-stat {
+			padding: 18px;
+			border-radius: 18px;
+			background: rgba(255, 255, 255, 0.05);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		.hero-stat strong {
+			display: block;
+			font-family: 'Space Grotesk', sans-serif;
+			font-size: 1.45rem;
+			margin-bottom: 8px;
+		}
+
+		.hero-stat span {
+			color: var(--muted);
+			font-size: 0.92rem;
+			line-height: 1.5;
+		}
+
+		.status-card {
+			padding: 28px;
+			display: flex;
+			flex-direction: column;
+			gap: 18px;
+			justify-content: space-between;
+		}
+
+		.status-chip-row,
+		.tab-row,
+		.scenario-grid,
+		.control-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+
+		.status-chip,
+		.side-tab,
+		.scenario-btn,
+		.mini-btn {
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			background: rgba(255, 255, 255, 0.04);
+			color: var(--text);
+			border-radius: 14px;
+			padding: 12px 14px;
+			font: inherit;
+			cursor: pointer;
+			transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+		}
+
+		.status-chip {
+			cursor: default;
+			min-width: 130px;
+		}
+
+		.status-chip .label,
+		.legend-item small,
+		.section-subtitle,
+		.pill-note,
+		.reaction-meta,
+		.footer-note {
+			display: block;
+			color: var(--muted);
+			font-size: 0.84rem;
+			line-height: 1.45;
+		}
+
+		.status-chip strong,
+		.map-summary strong,
+		.timeline-card strong,
+		.reaction-box strong,
+		.focus-card strong,
+		.lesson-card strong {
+			display: block;
+			font-size: 1rem;
+			margin-bottom: 6px;
+			font-family: 'Space Grotesk', sans-serif;
+		}
+
+		.surface {
+			display: grid;
+			grid-template-columns: minmax(0, 1.28fr) minmax(340px, 0.92fr);
+			gap: 22px;
+			align-items: start;
+		}
+
+		.map-panel,
+		.info-panel {
+			padding: 24px;
+		}
+
+		.map-header,
+		.section-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			gap: 14px;
+			margin-bottom: 18px;
+		}
+
+		.section-header {
+			margin-bottom: 20px;
+		}
+
+		.section-title {
+			font-size: clamp(1.6rem, 3vw, 2.3rem);
+			margin-top: 8px;
+		}
+
+		.section-subtitle {
+			max-width: 62ch;
+			margin-top: 10px;
+			font-size: 0.95rem;
+		}
+
+		.legend {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+			margin-bottom: 18px;
+		}
+
+		.legend-item {
+			display: inline-flex;
+			align-items: center;
+			gap: 10px;
+			padding: 10px 12px;
+			border-radius: 14px;
+			background: rgba(255, 255, 255, 0.04);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		.legend-dot {
+			width: 12px;
+			height: 12px;
+			border-radius: 999px;
+			flex: 0 0 auto;
+			box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+		}
+
+		.map-control-bar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 14px;
+			flex-wrap: wrap;
+			margin-bottom: 16px;
+		}
+
+		.floor-tabs {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+
+		.floor-tab {
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			background: rgba(255, 255, 255, 0.04);
+			color: var(--text);
+			border-radius: 14px;
+			padding: 12px 14px;
+			font: inherit;
+			cursor: pointer;
+			transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+		}
+
+		.floor-tab strong {
+			display: block;
+			font-family: 'Space Grotesk', sans-serif;
+			font-size: 0.98rem;
+			margin-bottom: 4px;
+		}
+
+		.floor-tab span {
+			display: block;
+			color: var(--muted);
+			font-size: 0.78rem;
+			line-height: 1.4;
+		}
+
+		.floor-tab.active {
+			background: rgba(97, 218, 251, 0.14);
+			border-color: rgba(97, 218, 251, 0.4);
+			transform: translateY(-2px);
+		}
+
+		.map-tools {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			flex-wrap: wrap;
+		}
+
+		.floor-hint {
+			padding: 10px 14px;
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.04);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 0.78rem;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: var(--muted);
+		}
+
+		.mini-btn.active {
+			background: rgba(244, 183, 63, 0.16);
+			border-color: rgba(244, 183, 63, 0.42);
+		}
+
+		.map-stage {
+			position: relative;
+			border-radius: 24px;
+			background:
+				radial-gradient(circle at 14% 10%, rgba(97, 218, 251, 0.09), transparent 22%),
+				radial-gradient(circle at 88% 14%, rgba(255, 122, 89, 0.09), transparent 22%),
+				linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+				#091421;
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			overflow: hidden;
+			padding: 16px;
+		}
+
+		.map-viewport {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+			touch-action: none;
+			cursor: grab;
+		}
+
+		.map-viewport.dragging {
+			cursor: grabbing;
+		}
+
+		.map-canvas {
+			position: absolute;
+			inset: 0;
+			transform-origin: center center;
+			will-change: transform;
+		}
+
+		.map-blueprint {
+			position: relative;
+			aspect-ratio: 16 / 10;
+			min-height: 620px;
+			border-radius: 22px;
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			background:
+				linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+				linear-gradient(180deg, rgba(12, 26, 39, 0.95), rgba(8, 18, 28, 0.96));
+			background-size: 26px 26px, 26px 26px, auto;
+			overflow: hidden;
+		}
+
+		.floor-plan,
+		.map-marker-layer,
+		.route-layer {
+			position: absolute;
+			inset: 0;
+		}
+
+		.floor-plan {
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 0.2s ease;
+		}
+
+		.floor-plan.active {
+			opacity: 1;
+			pointer-events: auto;
+		}
+
+		.floor-plan svg,
+		.floor-plan {
+			width: 100%;
+			height: 100%;
+			display: block;
+		}
+
+		.building-shell {
+			fill: rgba(11, 25, 37, 0.96);
+			stroke: rgba(193, 225, 243, 0.15);
+			stroke-width: 8;
+		}
+
+		.room {
+			fill: rgba(215, 240, 255, 0.04);
+			stroke: rgba(179, 214, 233, 0.18);
+			stroke-width: 4;
+			stroke-linejoin: round;
+		}
+
+		.room-label {
+			fill: rgba(235, 245, 252, 0.94);
+			font-size: 22px;
+			font-weight: 600;
+			text-anchor: middle;
+			dominant-baseline: middle;
+			font-family: 'IBM Plex Sans', sans-serif;
+		}
+
+		.hallway {
+			fill: rgba(255, 255, 255, 0.018);
+			stroke: rgba(255, 255, 255, 0.08);
+			stroke-width: 4;
+			stroke-linejoin: round;
+		}
+
+		.stairs,
+		.special-zone,
+		.spawn-zone {
+			fill: rgba(244, 183, 63, 0.08);
+			stroke: rgba(244, 183, 63, 0.34);
+			stroke-width: 4;
+			stroke-linejoin: round;
+		}
+
+		.spawn-zone {
+			fill: rgba(97, 218, 251, 0.06);
+			stroke: rgba(97, 218, 251, 0.32);
+		}
+
+		.room-hotspot-layer {
+			position: absolute;
+			inset: 0;
+			z-index: 3;
+		}
+
+		.room-hotspot {
+			position: absolute;
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			background: rgba(255, 255, 255, 0.02);
+			border-radius: 16px;
+			cursor: pointer;
+			transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+		}
+
+		.room-hotspot:hover,
+		.room-hotspot.active {
+			background: rgba(97, 218, 251, 0.08);
+			border-color: rgba(97, 218, 251, 0.4);
+			box-shadow: inset 0 0 0 1px rgba(97, 218, 251, 0.2);
+		}
+
+		.room-hotspot.active {
+			transform: scale(1.02);
+		}
+
+		.map-marker-layer,
+		.route-layer {
+			pointer-events: none;
+		}
+
+		.marker {
+			position: absolute;
+			width: 18px;
+			height: 18px;
+			transform: translate(-50%, -50%);
+			border-radius: 999px;
+			border: 3px solid rgba(255, 255, 255, 0.9);
+			box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.05), 0 10px 20px rgba(0, 0, 0, 0.35);
+			animation: pulse 1.8s infinite;
+		}
+
+		.marker::after {
+			content: attr(data-label);
+			position: absolute;
+			top: 50%;
+			left: calc(100% + 10px);
+			transform: translateY(-50%);
+			white-space: nowrap;
+			padding: 6px 10px;
+			border-radius: 999px;
+			background: rgba(3, 9, 15, 0.88);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			color: var(--text);
+			font-size: 0.75rem;
+			letter-spacing: 0.03em;
+			font-family: 'JetBrains Mono', monospace;
+		}
+
+		.marker.attack {
+			background: var(--attack);
+		}
+
+		.marker.defense {
+			background: var(--defense);
+		}
+
+		.marker.utility {
+			background: var(--accent);
+		}
+
+		.marker.warning {
+			background: var(--danger);
+		}
+
+		.route-line {
+			fill: none;
+			stroke-width: 4;
+			stroke-linecap: round;
+			stroke-linejoin: round;
+			stroke-dasharray: 10 12;
+			animation: dash 8s linear infinite;
+			opacity: 0.9;
+		}
+
+		.route-line.attack {
+			stroke: rgba(97, 218, 251, 0.96);
+		}
+
+		.route-line.defense {
+			stroke: rgba(255, 122, 89, 0.96);
+		}
+
+		.route-line.warning {
+			stroke: rgba(255, 139, 139, 0.96);
+		}
+
+		.map-summary {
+			padding: 18px;
+			background: rgba(255, 255, 255, 0.04);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			border-radius: 18px;
+			margin-bottom: 16px;
+		}
+
+		.tab-row {
+			margin-bottom: 18px;
+		}
+
+		.side-tab.active {
+			box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.08);
+			transform: translateY(-2px);
+		}
+
+		.side-tab[data-side="attacker"].active {
+			background: rgba(97, 218, 251, 0.18);
+			border-color: rgba(97, 218, 251, 0.45);
+		}
+
+		.side-tab[data-side="defender"].active {
+			background: rgba(255, 122, 89, 0.18);
+			border-color: rgba(255, 122, 89, 0.45);
+		}
+
+		.scenario-btn.active {
+			background: rgba(244, 183, 63, 0.16);
+			border-color: rgba(244, 183, 63, 0.55);
+			transform: translateY(-2px);
+		}
+
+		.scenario-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 10px;
+			margin-bottom: 20px;
+		}
+
+		.scenario-btn {
+			min-height: 72px;
+			text-align: left;
+		}
+
+		.scenario-btn strong {
+			display: block;
+			margin-bottom: 6px;
+			font-size: 0.98rem;
+			font-family: 'Space Grotesk', sans-serif;
+		}
+
+		.info-stack {
+			display: grid;
+			gap: 16px;
+		}
+
+		.timeline-card,
+		.reaction-box,
+		.focus-card,
+		.lesson-card,
+		.callout-card {
+			padding: 18px;
+			border-radius: 18px;
+			background: rgba(255, 255, 255, 0.04);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		.timeline-list,
+		.focus-list,
+		.reaction-list,
+		.lesson-list,
+		.coach-list {
+			margin: 12px 0 0;
+			padding-left: 18px;
+			color: #d7e8f4;
+			line-height: 1.65;
+		}
+
+		.timeline-list li,
+		.focus-list li,
+		.reaction-list li,
+		.lesson-list li,
+		.coach-list li {
+			margin-bottom: 8px;
+		}
+
+		.pill-note {
+			margin-top: 8px;
+		}
+
+		.split-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 16px;
+			margin-top: 22px;
+		}
+
+		.lesson-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 16px;
+			margin-top: 18px;
+		}
+
+		.focus-card {
+			position: relative;
+			overflow: hidden;
+		}
+
+		.focus-card::after {
+			content: attr(data-tag);
+			position: absolute;
+			right: 14px;
+			bottom: 14px;
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 0.72rem;
+			color: rgba(255, 255, 255, 0.16);
+			letter-spacing: 0.15em;
+			text-transform: uppercase;
+		}
+
+		.callout-card {
+			background: linear-gradient(135deg, rgba(244, 183, 63, 0.18), rgba(255, 255, 255, 0.04));
+		}
+
+		.reaction-meta {
+			margin-top: 4px;
+		}
+
+		.footer-note {
+			margin-top: 18px;
+			text-align: center;
+		}
+
+		.map-detail-grid {
+			display: grid;
+			grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.9fr);
+			gap: 16px;
+			margin-top: 16px;
+		}
+
+		.room-inspector,
+		.playback-card {
+			padding: 18px;
+			border-radius: 18px;
+			background: rgba(255, 255, 255, 0.04);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		.room-visual {
+			position: relative;
+			min-height: 220px;
+			border-radius: 18px;
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			overflow: hidden;
+			background:
+				linear-gradient(135deg, rgba(11, 21, 34, 0.2), rgba(11, 21, 34, 0.7)),
+				var(--room-visual, linear-gradient(135deg, #1b2c3f, #0e151f));
+		}
+
+		.room-visual::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background:
+				linear-gradient(transparent 0%, rgba(0, 0, 0, 0.28) 100%),
+				repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 6px);
+			mix-blend-mode: screen;
+		}
+
+		.room-visual-badge,
+		.playback-badge {
+			position: absolute;
+			top: 14px;
+			left: 14px;
+			padding: 7px 10px;
+			border-radius: 999px;
+			background: rgba(3, 9, 15, 0.72);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 0.72rem;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+		}
+
+		.room-visual-copy {
+			position: absolute;
+			left: 18px;
+			right: 18px;
+			bottom: 18px;
+			z-index: 1;
+		}
+
+		.room-visual-copy strong {
+			display: block;
+			font-family: 'Space Grotesk', sans-serif;
+			font-size: 1.5rem;
+			margin-bottom: 6px;
+		}
+
+		.room-visual-copy span,
+		.camera-note,
+		.playback-meta,
+		.phase-body,
+		.phase-timer {
+			display: block;
+			color: var(--muted);
+			line-height: 1.55;
+		}
+
+		.room-callout-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 14px;
+			margin-top: 16px;
+		}
+
+		.callout-subcard {
+			padding: 14px;
+			border-radius: 16px;
+			background: rgba(255, 255, 255, 0.035);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		.callout-subcard strong,
+		.phase-title {
+			display: block;
+			font-family: 'Space Grotesk', sans-serif;
+			margin-bottom: 10px;
+		}
+
+		.callout-subcard ul {
+			margin: 0;
+			padding-left: 18px;
+			line-height: 1.6;
+		}
+
+		.playback-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: start;
+			gap: 12px;
+			margin-bottom: 16px;
+		}
+
+		.playback-controls {
+			display: flex;
+			gap: 10px;
+			flex-wrap: wrap;
+			margin-bottom: 14px;
+		}
+
+		.playback-progress {
+			display: grid;
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+			gap: 8px;
+			margin-bottom: 14px;
+		}
+
+		.playback-dot {
+			padding: 10px 8px;
+			border-radius: 12px;
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			background: rgba(255, 255, 255, 0.03);
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 0.72rem;
+			text-align: center;
+			color: var(--muted);
+		}
+
+		.playback-dot.done {
+			background: rgba(110, 231, 183, 0.12);
+			border-color: rgba(110, 231, 183, 0.3);
+			color: var(--text);
+		}
+
+		.playback-dot.current {
+			background: rgba(244, 183, 63, 0.16);
+			border-color: rgba(244, 183, 63, 0.42);
+			color: var(--text);
+		}
+
+		.phase-panel {
+			position: relative;
+			padding: 18px;
+			border-radius: 16px;
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			background: rgba(255, 255, 255, 0.035);
+			min-height: 154px;
+		}
+
+		.timeline-list li.done-step {
+			color: #eef8ff;
+		}
+
+		.timeline-list li.current-step {
+			color: #fff2ce;
+		}
+
+		@keyframes pulse {
+			0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.18), 0 10px 20px rgba(0, 0, 0, 0.35); }
+			70% { box-shadow: 0 0 0 14px rgba(255, 255, 255, 0), 0 10px 20px rgba(0, 0, 0, 0.35); }
+			100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0), 0 10px 20px rgba(0, 0, 0, 0.35); }
+		}
+
+		@keyframes dash {
+			to {
+				stroke-dashoffset: -110;
+			}
+		}
+
+		@media (max-width: 1160px) {
+			.hero,
+			.surface {
+				grid-template-columns: 1fr;
+			}
+
+			.map-stage {
+				padding: 14px;
+			}
+
+			.map-blueprint {
+				min-height: 560px;
+			}
+		}
+
+		@media (max-width: 860px) {
+			.hero-grid,
+			.lesson-grid,
+			.split-grid,
+			.scenario-grid,
+			.map-detail-grid,
+			.room-callout-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.shell {
+				width: min(100% - 20px, 1500px);
+			}
+
+			.hero-card,
+			.status-card,
+			.map-panel,
+			.info-panel {
+				padding: 20px;
+			}
+
+			.map-stage {
+				padding: 12px;
+			}
+
+			.map-blueprint {
+				min-height: 440px;
+			}
+
+			.playback-progress {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+		}
+
+		@media (max-width: 560px) {
+			h1 {
+				font-size: 2.35rem;
+			}
+
+			.hero-card::after {
+				font-size: 78px;
+			}
+
+			.marker::after {
+				max-width: 120px;
+				white-space: normal;
+			}
+
+			.floor-tab {
+				width: 100%;
+			}
+
+			.map-tools {
+				width: 100%;
+			}
+
+			.playback-progress {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main class="shell">
+		<section class="hero">
+			<article class="panel hero-card">
+				<span class="eyebrow">Interactive Tactical Classroom</span>
+				<h1>Rainbow Six Siege: Mastering Bank</h1>
+				<p class="lead">
+					This lesson teaches how to attack and defend Bank with a full-round structure instead of isolated tips. Use the controls to swap sides, trigger round-changing situations, and watch the map update with utility, routes, drone locations, holds, and fallback plans.
+				</p>
+				<div class="hero-grid">
+					<div class="hero-stat">
+						<strong>3 Floors</strong>
+						<span>Bank rewards vertical control, especially over Open Area, Archives, CEO, and the basement site.</span>
+					</div>
+					<div class="hero-stat">
+						<strong>2 Game Plans</strong>
+						<span>Attackers build info then squeeze. Defenders delay space, protect denial, and force awkward clears.</span>
+					</div>
+					<div class="hero-stat">
+						<strong>7 Scenarios</strong>
+						<span>Simulate picks, lost drones, broken setups, and man-disadvantage rounds to practice adaptation.</span>
+					</div>
+				</div>
+			</article>
+
+			<aside class="panel status-card">
+				<div>
+					<span class="micro-label">Lesson Focus</span>
+					<h2 class="section-title" id="status-title">Attacker Lesson</h2>
+					<p class="section-subtitle" id="status-description">
+						Learn how attackers clear top-down control, establish drone networks, and convert map control into a safe execute.
+					</p>
+				</div>
+				<div class="status-chip-row">
+					<div class="status-chip">
+						<span class="label">Primary site</span>
+						<strong id="status-site">Basement lock down</strong>
+					</div>
+					<div class="status-chip">
+						<span class="label">Main pressure</span>
+						<strong id="status-route">Square + Open Area</strong>
+					</div>
+					<div class="status-chip">
+						<span class="label">Mindset</span>
+						<strong id="status-mindset">Info before action</strong>
+					</div>
+				</div>
+				<div class="callout-card">
+					<strong id="coach-title">Coach note</strong>
+					<ul class="coach-list" id="coach-list"></ul>
+				</div>
+			</aside>
+		</section>
+
+		<section class="surface">
+			<section class="panel map-panel">
+				<div class="map-header">
+					<div>
+						<span class="eyebrow">Map Visualizer</span>
+						<h2 class="section-title">Bank Round Flow Map</h2>
+						<p class="section-subtitle">
+							Yellow markers show utility. Blue markers show attacker activity. Orange-red markers show defender holds. Red warning markers highlight danger after a scenario changes the round.
+						</p>
+					</div>
+				</div>
+
+				<div class="legend">
+					<div class="legend-item"><span class="legend-dot" style="background: var(--attack);"></span><div><strong>Attack</strong><small>Drones, entry, collapse paths</small></div></div>
+					<div class="legend-item"><span class="legend-dot" style="background: var(--defense);"></span><div><strong>Defense</strong><small>Anchors, roamers, crossfires</small></div></div>
+					<div class="legend-item"><span class="legend-dot" style="background: var(--accent);"></span><div><strong>Utility</strong><small>Gadgets, denial, breach value</small></div></div>
+					<div class="legend-item"><span class="legend-dot" style="background: var(--danger);"></span><div><strong>Reaction</strong><small>Fallbacks, holes, pressure points</small></div></div>
+				</div>
+
+				<div class="map-summary">
+					<strong id="scenario-summary-title">Default execute: top-down basement attack</strong>
+					<span class="section-subtitle" id="scenario-summary-body">Attackers secure Square, drone Open Area, remove denial above the site, and open a plant lane that forces defenders off default positions.</span>
+				</div>
+
+				<div class="map-control-bar">
+					<div class="floor-tabs" role="tablist" aria-label="Choose floor">
+						<button class="floor-tab" data-floor="3" role="tab" aria-selected="false">
+							<strong>3F Executive</strong>
+							<span>CEO, Janitor, Square, Skylight</span>
+						</button>
+						<button class="floor-tab" data-floor="2" role="tab" aria-selected="false">
+							<strong>2F Main Floor</strong>
+							<span>Lobby, Tellers, Open Area, Archives</span>
+						</button>
+						<button class="floor-tab active" data-floor="1" role="tab" aria-selected="true">
+							<strong>B1 Basement</strong>
+							<span>Garage, Server, Lockers, CCTV</span>
+						</button>
+					</div>
+					<div class="map-tools">
+						<div class="floor-hint" id="floor-hint">Viewing B1 Basement</div>
+						<button class="mini-btn" id="zoom-out" type="button">Zoom Out</button>
+						<button class="mini-btn" id="zoom-in" type="button">Zoom In</button>
+						<button class="mini-btn" id="zoom-reset" type="button">Reset View</button>
+					</div>
+				</div>
+
+				<div class="map-stage">
+					<div class="map-blueprint">
+						<div class="map-viewport" id="map-viewport">
+							<div class="map-canvas" id="map-canvas">
+								<svg class="floor-plan" data-floor="3" viewBox="0 0 1000 640" aria-label="3F Executive Bank map">
+							<polygon class="building-shell" points="78,108 240,72 852,72 918,140 918,515 850,568 140,568 78,514"></polygon>
+							<polygon class="spawn-zone" points="78,108 240,72 232,176 82,216"></polygon>
+							<polygon class="room" points="252,102 480,102 480,246 244,246 232,176"></polygon>
+							<text class="room-label" x="360" y="168">CEO</text>
+							<polygon class="room" points="244,258 470,258 470,396 240,396"></polygon>
+							<text class="room-label" x="356" y="328">Executive Lounge</text>
+							<polygon class="stairs" points="484,102 584,102 584,210 484,210"></polygon>
+							<text class="room-label" x="534" y="156">Janitor</text>
+							<polygon class="special-zone" points="484,222 584,222 584,396 484,396"></polygon>
+							<text class="room-label" x="534" y="306">Square</text>
+							<polygon class="hallway" points="598,102 724,102 724,396 598,396"></polygon>
+							<text class="room-label" x="661" y="250">Skylight Hall</text>
+							<polygon class="room" points="734,102 848,102 848,228 734,228"></polygon>
+							<text class="room-label" x="791" y="166">Stocks</text>
+							<polygon class="room" points="734,242 848,242 848,396 734,396"></polygon>
+							<text class="room-label" x="791" y="314">Conference</text>
+							<polygon class="stairs" points="862,124 918,158 918,478 862,512 804,512 804,124"></polygon>
+							<text class="room-label" x="858" y="320">Main Stairs</text>
+							<polygon class="hallway" points="230,410 584,410 584,536 214,536 150,506 150,438"></polygon>
+							<text class="room-label" x="378" y="474">Balcony / Hall</text>
+								</svg>
+								<svg class="floor-plan" data-floor="2" viewBox="0 0 1000 640" aria-label="2F Main Bank map">
+							<polygon class="building-shell" points="64,120 208,80 860,80 932,150 932,510 862,560 136,560 64,500"></polygon>
+							<polygon class="spawn-zone" points="64,120 208,80 192,230 64,260"></polygon>
+							<polygon class="room" points="214,120 392,120 392,250 212,250"></polygon>
+							<text class="room-label" x="302" y="184">Lobby</text>
+							<polygon class="room" points="214,266 392,266 392,408 214,408"></polygon>
+							<text class="room-label" x="302" y="338">Tellers</text>
+							<polygon class="room" points="214,424 392,424 392,540 160,540 160,470"></polygon>
+							<text class="room-label" x="286" y="486">Loan Office</text>
+							<polygon class="special-zone" points="408,120 600,120 600,540 408,540"></polygon>
+							<text class="room-label" x="504" y="328">Open Area</text>
+							<polygon class="stairs" points="614,120 714,120 714,236 614,236"></polygon>
+							<text class="room-label" x="664" y="178">Square</text>
+							<polygon class="room" points="614,252 714,252 714,368 614,368"></polygon>
+							<text class="room-label" x="664" y="310">Reception</text>
+							<polygon class="room" points="728,120 860,120 860,246 728,246"></polygon>
+							<text class="room-label" x="794" y="183">Archives</text>
+							<polygon class="room" points="728,262 860,262 860,386 728,386"></polygon>
+							<text class="room-label" x="794" y="324">Admin</text>
+							<polygon class="stairs" points="874,142 932,180 932,494 874,532 812,532 812,142"></polygon>
+							<text class="room-label" x="872" y="336">Printer / Red</text>
+							<polygon class="hallway" points="614,392 860,392 860,540 614,540"></polygon>
+							<text class="room-label" x="737" y="466">ATMs / Hall</text>
+								</svg>
+								<svg class="floor-plan active" data-floor="1" viewBox="0 0 1000 640" aria-label="B1 Basement Bank map">
+							<polygon class="building-shell" points="70,124 200,88 864,88 934,156 934,512 864,560 136,560 70,500"></polygon>
+							<polygon class="spawn-zone" points="70,124 200,88 188,244 70,274"></polygon>
+							<polygon class="special-zone" points="84,290 218,266 218,530 98,530 70,500 70,318"></polygon>
+							<text class="room-label" x="146" y="402">Garage</text>
+							<polygon class="room" points="232,132 380,132 380,256 232,256"></polygon>
+							<text class="room-label" x="306" y="194">Server</text>
+							<polygon class="stairs" points="232,272 380,272 380,394 232,394"></polygon>
+							<text class="room-label" x="306" y="332">Blue Stairs</text>
+							<polygon class="special-zone" points="396,132 582,132 582,540 396,540"></polygon>
+							<text class="room-label" x="489" y="336">Lockers</text>
+							<polygon class="stairs" points="598,132 694,132 694,252 598,252"></polygon>
+							<text class="room-label" x="646" y="192">Vault</text>
+							<polygon class="hallway" points="598,268 694,268 694,394 598,394"></polygon>
+							<text class="room-label" x="646" y="332">Elevator</text>
+							<polygon class="room" points="708,132 858,132 858,256 708,256"></polygon>
+							<text class="room-label" x="783" y="194">CCTV</text>
+							<polygon class="room" points="708,272 858,272 858,394 708,394"></polygon>
+							<text class="room-label" x="783" y="332">Tunnel</text>
+							<polygon class="stairs" points="870,150 934,190 934,496 870,534 804,534 804,150"></polygon>
+							<text class="room-label" x="870" y="338">Main / Server</text>
+							<polygon class="hallway" points="232,410 858,410 858,540 232,540"></polygon>
+							<text class="room-label" x="548" y="474">Basement Hall</text>
+								</svg>
+								<svg class="route-layer" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+								<div class="room-hotspot-layer" id="room-hotspots"></div>
+								<div class="map-marker-layer" aria-hidden="true"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="map-detail-grid">
+					<article class="room-inspector">
+						<div class="room-visual" id="room-visual">
+							<div class="room-visual-badge">Room Visual Reference</div>
+							<div class="room-visual-copy">
+								<strong id="room-title">Lockers</strong>
+								<span id="room-subtitle">Default plant destination and the center of most basement rounds.</span>
+								<span class="camera-note" id="room-footage-note">Visual angle guide for utility lines, cover, and swing timing.</span>
+							</div>
+						</div>
+						<div class="room-callout-grid">
+							<div class="callout-subcard">
+								<strong>Utility in this room</strong>
+								<ul id="room-utility-list"></ul>
+							</div>
+							<div class="callout-subcard">
+								<strong>Positioning and play</strong>
+								<ul id="room-position-list"></ul>
+							</div>
+						</div>
+					</article>
+
+					<article class="playback-card">
+						<div class="playback-header">
+							<div>
+								<span class="eyebrow">Scenario Playback</span>
+								<h3 style="margin-top: 10px; font-size: 1.35rem;">Phase-by-phase map replay</h3>
+								<span class="playback-meta">Markers and paths appear as the round develops on the selected floor.</span>
+							</div>
+							<div class="phase-timer" id="playback-status">Phase 1 of 4</div>
+						</div>
+						<div class="playback-controls">
+							<button class="mini-btn" id="playback-prev" type="button">Previous</button>
+							<button class="mini-btn active" id="playback-play" type="button">Play</button>
+							<button class="mini-btn" id="playback-next" type="button">Next</button>
+							<button class="mini-btn" id="playback-reset" type="button">Restart</button>
+						</div>
+						<div class="playback-progress" id="playback-progress"></div>
+						<div class="phase-panel">
+							<div class="playback-badge" id="phase-badge">Phase 1</div>
+							<strong class="phase-title" id="phase-title">Prep phase</strong>
+							<span class="phase-body" id="phase-body">The selected scenario will explain how the round begins and which rooms matter first.</span>
+						</div>
+					</article>
+				</div>
+			</section>
+
+			<aside class="panel info-panel">
+				<div class="section-header">
+					<div>
+						<span class="eyebrow">Interactive Controls</span>
+						<h2 class="section-title">Switch Side and Situation</h2>
+						<p class="section-subtitle">Every scenario rewrites the lesson priorities so you can practice decision-making instead of memorizing a script.</p>
+					</div>
+				</div>
+
+				<div class="tab-row" role="tablist" aria-label="Choose side">
+					<button class="side-tab active" data-side="attacker" role="tab" aria-selected="true">Attacker Side</button>
+					<button class="side-tab" data-side="defender" role="tab" aria-selected="false">Defender Side</button>
+				</div>
+
+				<div class="scenario-grid" id="scenario-grid"></div>
+
+				<div class="info-stack">
+					<div class="timeline-card">
+						<strong id="timeline-title">Round structure</strong>
+						<div class="reaction-meta" id="timeline-meta">Prep, mid-round, execute</div>
+						<ol class="timeline-list" id="timeline-list"></ol>
+					</div>
+
+					<div class="reaction-box">
+						<strong id="reaction-title">Immediate reaction</strong>
+						<div class="reaction-meta" id="reaction-meta">How the round changes</div>
+						<ul class="reaction-list" id="reaction-list"></ul>
+					</div>
+
+					<div class="focus-card" data-tag="Priority">
+						<strong id="focus-title">Current priorities</strong>
+						<ul class="focus-list" id="focus-list"></ul>
+					</div>
+
+					<div class="callout-card">
+						<strong id="win-title">Win condition</strong>
+						<p class="section-subtitle" id="win-body">Keep your round goal visible: Bank punishes teams that drift without a clear route, flank plan, and utility count.</p>
+					</div>
+				</div>
+			</aside>
+		</section>
+
+		<section class="panel" style="margin-top: 22px; padding: 24px;">
+			<div class="section-header">
+				<div>
+					<span class="eyebrow">Detailed Lesson Notes</span>
+					<h2 class="section-title" id="lesson-heading">Attacker Side Breakdown</h2>
+					<p class="section-subtitle" id="lesson-intro">
+						Attackers on Bank are strongest when they take space in layers: first the roof or safe spawn, then Square and Open Area, then the floor above the site, and only then the execute lane.
+					</p>
+				</div>
+			</div>
+
+			<div class="lesson-grid">
+				<article class="lesson-card">
+					<strong>Utility Placements</strong>
+					<ul class="lesson-list" id="utility-list"></ul>
+				</article>
+				<article class="lesson-card">
+					<strong>Ability Usage</strong>
+					<ul class="lesson-list" id="ability-list"></ul>
+				</article>
+				<article class="lesson-card">
+					<strong>Drone and Info Positions</strong>
+					<ul class="lesson-list" id="drone-list"></ul>
+				</article>
+				<article class="lesson-card">
+					<strong>Operator Positioning and Playstyle</strong>
+					<ul class="lesson-list" id="positioning-list"></ul>
+				</article>
+			</div>
+
+			<div class="split-grid">
+				<article class="focus-card" data-tag="Default Ops">
+					<strong id="roster-title">Recommended roles</strong>
+					<ul class="focus-list" id="roster-list"></ul>
+				</article>
+				<article class="focus-card" data-tag="Adaptation">
+					<strong id="adapt-title">How to react when the round changes</strong>
+					<ul class="focus-list" id="adapt-list"></ul>
+				</article>
+			</div>
+			<p class="footer-note">Use the scenario buttons above while reading these notes. The map and the adaptation list update together so you can see how Bank shifts when structure breaks.</p>
+		</section>
+	</main>
+
+	<script>
+		const floorNames = {
+			3: '3F Executive',
+			2: '2F Main Floor',
+			1: 'B1 Basement'
+		};
+
+		const roomData = [
+			{
+				id: 'ceo',
+				floor: 3,
+				name: 'CEO',
+				subtitle: 'Long office lines that attackers want early and defenders rarely hold to the death.',
+				footageNote: 'Executive office reference angle: rappel entry, desk cover, and Janitor pinch.',
+				bounds: { x: 24.5, y: 15.5, w: 24, h: 23 },
+				visual: 'linear-gradient(135deg, rgba(70, 122, 177, 0.92), rgba(16, 31, 48, 0.95)), radial-gradient(circle at 68% 36%, rgba(255,255,255,0.18), transparent 28%)',
+				attacker: {
+					utility: [
+						'Use this room as the safe launch point for the Square clear instead of sprinting straight to Skylight.',
+						'Keep one drone tucked on desk or by the printer side so late flanks back into CEO get called instantly.'
+					],
+					positioning: [
+						'An entry and support pair should trade through Janitor instead of splitting window and door alone.',
+						'Once CEO is secure, the vertical player can move forward while flank watch holds the rotation behind.'
+					]
+				},
+				defender: {
+					utility: [
+						'Only invest delay utility here if it burns serious drone time; otherwise save gadgets for Square or site support.',
+						'Impact rotates into Janitor or Lounge matter more than stubbornly holding window contact.'
+					],
+					positioning: [
+						'Fight for info, then leave before attackers can trade the room for free.',
+						'If you stay, stay with an exit plan toward Square or Main.'
+					]
+				}
+			},
+			{
+				id: 'square-3f',
+				floor: 3,
+				name: 'Square',
+				subtitle: 'The most important vertical transit room on Bank.',
+				footageNote: 'Square reference angle: top rail, hatch pressure, and stair control.',
+				bounds: { x: 48.4, y: 34.7, w: 10.5, h: 27.5 },
+				visual: 'linear-gradient(135deg, rgba(127, 97, 59, 0.92), rgba(28, 22, 14, 0.96)), radial-gradient(circle at 40% 40%, rgba(255,214,153,0.16), transparent 26%)',
+				attacker: {
+					utility: [
+						'Airjabs or flank gadgets here make basement clears safer because defenders love timing this staircase late.',
+						'Leave a live drone on the landing when the team pushes down to Open Area.'
+					],
+					positioning: [
+						'One gun owns the staircase while the rest of the stack works the next room.',
+						'Never let Square go completely unwatched once you have taken it.'
+					]
+				},
+				defender: {
+					utility: [
+						'A shield or trap package here is valuable because it changes the whole attacker route.',
+						'If the utility is gone, rotate out quickly rather than donating another gun.'
+					],
+					positioning: [
+						'Play for a stall and fallback, not a heroic final stand.',
+						'Use the sound of hatch and stair movement to set up a later flank.'
+					]
+				}
+			},
+			{
+				id: 'open-area',
+				floor: 2,
+				name: 'Open Area',
+				subtitle: 'The vertical control room that shapes basement attacks and many mid-round decisions.',
+				footageNote: 'Open Area reference angle: desk lanes, printer side, and lines down into basement anchors.',
+				bounds: { x: 40.8, y: 18.5, w: 19.2, h: 66.5 },
+				visual: 'linear-gradient(135deg, rgba(55, 95, 111, 0.92), rgba(11, 27, 34, 0.96)), radial-gradient(circle at 64% 52%, rgba(155,224,255,0.18), transparent 24%)',
+				attacker: {
+					utility: [
+						'Open small destruction first to identify anchor reactions before committing full vertical holes.',
+						'Keep one drone under desk cover or near Printer side to catch defender re-peeks.'
+					],
+					positioning: [
+						'The vertical player works slightly behind the entry pair, not alone in the room.',
+						'Hold both Square side and Archives side so defenders cannot suddenly reclaim the floor.'
+					]
+				},
+				defender: {
+					utility: [
+						'This is where hidden info denial and traps pay off because attackers spend time droning it every round.',
+						'C4 value increases the longer attackers stay here opening floors.'
+					],
+					positioning: [
+						'Contest from multiple pockets, then disappear before the trade arrives.',
+						'If attackers own Open Area completely, stop contesting it and play anti-vertical below.'
+					]
+				}
+			},
+			{
+				id: 'archives',
+				floor: 2,
+				name: 'Archives',
+				subtitle: 'A quieter room that becomes strong when the main stack leans too hard into Square.',
+				footageNote: 'Archives reference angle: side pinch into Open Area and late lurk entry toward site paths.',
+				bounds: { x: 72.8, y: 18.5, w: 13.2, h: 19.5 },
+				visual: 'linear-gradient(135deg, rgba(119, 82, 53, 0.92), rgba(25, 18, 12, 0.96)), radial-gradient(circle at 25% 30%, rgba(255,210,157,0.15), transparent 24%)',
+				attacker: {
+					utility: [
+						'Use this room to split Open Area holds instead of every attacker entering from the same doorway.',
+						'A tucked drone here catches defenders trying to rotate around the main pressure.'
+					],
+					positioning: [
+						'The flex player often gets the most value here because they can support or cut off the escape route.',
+						'Do not overstack it; one player and one drone are usually enough.'
+					]
+				},
+				defender: {
+					utility: [
+						'Traps and sound cues here are excellent because attackers forget this side during fast clears.',
+						'If you lose this room, use that information to tighten the site-side crossfire immediately.'
+					],
+					positioning: [
+						'A lurker here should gather info or punish inattentive attackers, then disappear.',
+						'Do not hold it once attackers bring two guns and a drone.'
+					]
+				}
+			},
+			{
+				id: 'lobby',
+				floor: 2,
+				name: 'Lobby',
+				subtitle: 'A broad rotation area that changes flank timing and attacker safety.',
+				footageNote: 'Lobby reference angle: elevator side, front desk cover, and transition into Tellers.',
+				bounds: { x: 21.4, y: 18.5, w: 17.8, h: 20 },
+				visual: 'linear-gradient(135deg, rgba(72, 96, 126, 0.9), rgba(14, 24, 36, 0.95)), radial-gradient(circle at 70% 25%, rgba(255,255,255,0.14), transparent 22%)',
+				attacker: {
+					utility: [
+						'Use Lobby to stabilize entry if Alley pressure gets contested early.',
+						'A drone hidden here becomes valuable once defenders attempt late floor retakes.'
+					],
+					positioning: [
+						'This is a transition room, not the final objective. Use it to protect your route, then move the weight forward.',
+						'The flank-watch player often lives here for a few seconds during a basement setup.'
+					]
+				},
+				defender: {
+					utility: [
+						'Delay tools here are good if the attack is front-loaded, but they should not starve the site of utility.',
+						'Use cameras or alarms to know when you can abandon Lobby safely.'
+					],
+					positioning: [
+						'Hold the transition, not the entire room. One well-timed peek matters more than a static posture.',
+						'Rotate out before you become trapped between two attacker lanes.'
+					]
+				}
+			},
+			{
+				id: 'server',
+				floor: 1,
+				name: 'Server',
+				subtitle: 'One of the safest attacker launch points and a defender retake route.',
+				footageNote: 'Server reference angle: rack cover, breach line, and swing into Lockers or Blue.',
+				bounds: { x: 23.2, y: 20.5, w: 14.8, h: 19.8 },
+				visual: 'linear-gradient(135deg, rgba(41, 89, 100, 0.94), rgba(9, 22, 29, 0.96)), radial-gradient(circle at 62% 44%, rgba(157,255,247,0.13), transparent 24%)',
+				attacker: {
+					utility: [
+						'Hard breach support often stages here because it is safer than overexposing in the open plant lane.',
+						'Claymore or flank utility near the approach prevents desperate defender pivots back into this room.'
+					],
+					positioning: [
+						'One player can hold Server while another works breach or Blue, creating a stable attacker triangle.',
+						'Do not all stack inside. Use the room as cover, not as a pile-up.'
+					]
+				},
+				defender: {
+					utility: [
+						'If attackers are using Server as a launch point, punish with C4 timing or coordinated swing only when crossfires exist.',
+						'Barbed or sound cues nearby tell you whether a late retake through this room is possible.'
+					],
+					positioning: [
+						'Do not repeek the same rack angle repeatedly against a structured attack.',
+						'Use Server as a retake lane once the attack overfocuses on breach and Lockers.'
+					]
+				}
+			},
+			{
+				id: 'lockers',
+				floor: 1,
+				name: 'Lockers',
+				subtitle: 'The core basement objective and the room every execute is trying to break open.',
+				footageNote: 'Lockers reference angle: default plant cover, breach lane, and anti-plant denial spots.',
+				bounds: { x: 39.6, y: 20.5, w: 18.6, h: 63.8 },
+				visual: 'linear-gradient(135deg, rgba(122, 106, 63, 0.94), rgba(23, 18, 8, 0.96)), radial-gradient(circle at 54% 40%, rgba(255,231,170,0.15), transparent 24%)',
+				attacker: {
+					utility: [
+						'Breach support, smoke timing, and vertical holes all converge here. Count every remaining denial tool before committing the plant.',
+						'If a defender survives behind cover, clear them with utility or angle pressure before anyone sticks the diffuser.'
+					],
+					positioning: [
+						'The planter should be covered by one breach-side gun and one vertical or flank denial player.',
+						'After plant, spread into layered crossfires instead of staring from the same breach.'
+					]
+				},
+				defender: {
+					utility: [
+						'This room deserves the last smoke canister, C4, or denial gadget. Spending it early elsewhere often loses the round.',
+						'Hidden denial beats visible denial because attackers commit more bodies before they realize the plant is still unsafe.'
+					],
+					positioning: [
+						'Use cover that can shift between breach and default plant instead of locking onto one doorway.',
+						'If the room is opened above and beside you, move deeper and wait for the exact plant cue.'
+					]
+				}
+			},
+			{
+				id: 'cctv',
+				floor: 1,
+				name: 'CCTV',
+				subtitle: 'A defender anchor room and one of the strongest late-round pivots in basement.',
+				footageNote: 'CCTV reference angle: breach denial support, doorway punish, and late retake swing.',
+				bounds: { x: 70.8, y: 20.5, w: 15, h: 19.8 },
+				visual: 'linear-gradient(135deg, rgba(80, 51, 89, 0.94), rgba(18, 11, 24, 0.96)), radial-gradient(circle at 32% 28%, rgba(224,160,255,0.14), transparent 22%)',
+				attacker: {
+					utility: [
+						'If this room remains occupied, expect denial or a swing protecting Lockers. Drone it before exposing the planter.',
+						'Flashes or secondary pressure here can pull a defender off the main breach just long enough to plant.'
+					],
+					positioning: [
+						'A split attacker should pressure CCTV from the side while the main stack works the breach.',
+						'Do not face-check it during a man advantage. Make the defender move first.'
+					]
+				},
+				defender: {
+					utility: [
+						'Denial operators love this room because it can support Lockers without exposing directly to the first breach line.',
+						'Use it as the hidden pivot for the final anti-plant swing.'
+					],
+					positioning: [
+						'Anchor here only while the room still supports the main deny plan.',
+						'If the angle is lost, rotate rather than dying in a corner with utility unused.'
+					]
+				}
+			},
+			{
+				id: 'garage',
+				floor: 1,
+				name: 'Garage',
+				subtitle: 'The long external pressure lane that can divide site attention or become a retake route.',
+				footageNote: 'Garage reference angle: default entry line, van cover, and split toward Server or Lockers.',
+				bounds: { x: 7.4, y: 41.5, w: 14.6, h: 37.5 },
+				visual: 'linear-gradient(135deg, rgba(63, 80, 99, 0.94), rgba(13, 19, 27, 0.96)), radial-gradient(circle at 40% 56%, rgba(177,208,255,0.13), transparent 24%)',
+				attacker: {
+					utility: [
+						'Garage pressure is strongest when it is part of a split, not the only plan. Use it to stretch defenders.',
+						'Claymores and flank gadgets protect the long retreat if the team does not fully commit through here.'
+					],
+					positioning: [
+						'One attacker can hold this lane and force defenders to respect it while the core executes elsewhere.',
+						'If the attack converts into a Garage push, move fast before defenders reposition to the sound.'
+					]
+				},
+				defender: {
+					utility: [
+						'Use Garage presence to sell the idea of a full hold, then fall back and make attackers clear empty space.',
+						'Traps or barbed here protect against sudden split pressure late in the round.'
+					],
+					positioning: [
+						'Fight from cover and leave once attackers bring utility to remove the angle.',
+						'Retake through Garage only if the main plant lane is already being pinched from another side.'
+					]
+				}
+			},
+			{
+				id: 'blue-stairs',
+				floor: 1,
+				name: 'Blue Stairs',
+				subtitle: 'A classic late flank and an attacker concern whenever upstairs pressure shifts downstairs.',
+				footageNote: 'Blue reference angle: stair landing, server swing, and late defender timing route.',
+				bounds: { x: 23.2, y: 42.5, w: 14.8, h: 19.5 },
+				visual: 'linear-gradient(135deg, rgba(48, 88, 142, 0.94), rgba(11, 22, 41, 0.96)), radial-gradient(circle at 52% 42%, rgba(153,205,255,0.15), transparent 24%)',
+				attacker: {
+					utility: [
+						'This route needs a dedicated watch or gadget before the execute starts. Bank throws rounds away through unchecked stairs.',
+						'A parked drone or airjab here is often more valuable than one more flash into site.'
+					],
+					positioning: [
+						'The support player who is not planting usually owns this route in the late round.',
+						'If Blue gets noisy, pause the plant and clear the threat before recommitting.'
+					]
+				},
+				defender: {
+					utility: [
+						'Keep this route alive for as long as possible because it gives defenders retake leverage even when site looks lost.',
+						'Sound cues or small utility here tell you when the attack has forgotten its flank discipline.'
+					],
+					positioning: [
+						'Use Blue as a timing route, not a permanent hold, unless the whole defense is built around it.',
+						'Arrive late, when attackers are already fixing their eyes on plant denial.'
+					]
+				}
+			}
+		];
+
+		const sideData = {
+			attacker: {
+				status: {
+					title: 'Attacker Lesson',
+					description: 'Learn how attackers clear top-down control, establish drone networks, and convert map control into a safe execute.',
+					site: 'Basement lock down',
+					route: 'Square + Open Area',
+					mindset: 'Info before action',
+					coachTitle: 'Coach note',
+					coachList: [
+						'Bank punishes rushed entries because defenders can stack utility across several floors. Clear the layer above the site first.',
+						'Never let your breacher, flank watch, and planter drift apart. If one role dies, reassign it immediately before you execute.',
+						'Use drones to confirm where denial actually is. Guessing at Kaid claws or C4 positions wastes too much utility on this map.'
+					],
+					lessonHeading: 'Attacker Side Breakdown',
+					lessonIntro: 'Attackers on Bank are strongest when they take space in layers: first the roof or safe spawn, then Square and Open Area, then the floor above the site, and only then the execute lane.',
+					rosterTitle: 'Recommended attacking roles',
+					roster: [
+						'Hard breach plus secondary hard breach so hatches, Server wall, or default plant lanes stay open even after one death.',
+						'Vertical pressure operator such as Buck, Sledge, or Ram to remove denial from Open Area or CEO floors above anchors.',
+						'Flank security such as Nomad or Gridlock to lock red stairs, main stairs, and late-round basement flanks.',
+						'Entry and trade pair that can take Square, Janitor, and Open Area without isolating themselves from drone support.'
+					],
+					utility: [
+						'Place claymores or flank gadgets on Red Stairs rappel exit, Main Stairs swing, and the basement rotate route once top control is secured.',
+						'Use hard breach on Server wall or hatches only after drones confirm where denial sits. Force defenders to choose between Lockers cover and CCTV safety.',
+						'Open small vertical holes in Open Area and CEO instead of overswinging entire floors immediately; this preserves cover while removing anchors from default spots.',
+						'Smoke grenades or flash pressure should land just before the plant, not at the start of the execute, so defenders cannot simply wait them out.'
+					],
+					abilities: [
+						'Droning should move one room ahead of the entry pair: one live drone feeding info, one parked drone holding the retreat path behind them.',
+						'Use breaching charges, skeleton key, or gadget-based soft destruction to clear the floor above the objective and to open anti-C4 plant holes.',
+						'EMP, impact EMP, or explosive clear should be layered: first reveal denial, then remove the shield or wall denial, then breach.',
+						'Post-plant utility should be saved for the last 20 seconds: airjabs, Trax, smoke, and vertical holes all become stronger after the diffuser goes down.'
+					],
+					drones: [
+						'Park a prep-phase drone in Open Area or tucked near Printer so you know whether defenders are extending vertically over basement.',
+						'Hide a second drone on Square Skylight railing, Janitor shelf, or Lobby edge to watch rotates from CEO to Square without risking a player body.',
+						'Once basement control matters, keep one drone on Blue Stairs or Server push line and one inside CCTV/Tunnel to check whether anchors are stacking a swing.',
+						'If defenders start shooting every parked drone, shift to living drones in pairs and let one player escort the drone so info converts into space immediately.'
+					],
+					positioning: [
+						'Entry pair should stay close enough to trade inside Square and Janitor. Single-man lurks on Bank usually get pinched by long hallways and vertical pressure.',
+						'The flex or flank-watch player belongs behind the first wave, holding Red, Main, or Blue depending on the route your team has already opened.',
+						'Planter should avoid first contact until the execute lane is built. On Bank, the round often fails because the diffuser carrier dies while helping clear roamers.',
+						'When man advantage is secured, collapse in a triangle: one vertical player, one site lane player, and one flank catcher. That forces defenders to move into crossfires.'
+					]
+				},
+				scenarios: [
+					{
+						id: 'default',
+						label: 'Default Basement Take',
+						summaryTitle: 'Default execute: top-down basement attack',
+						summaryBody: 'Attackers secure Square, drone Open Area, remove denial above the site, and open a plant lane that forces defenders off default positions.',
+						timelineTitle: 'Round structure',
+						timelineMeta: 'Prep, mid-round, execute',
+						timeline: [
+							'Prep phase: save at least one drone in Open Area or Square and identify whether defenders are playing a heavy top extension.',
+							'Entry phase: take roof or Alley control, clear CEO to Janitor if needed, then own Square so the team can move down safely.',
+							'Mid-round: drone Open Area, cut flanks, open vertical pressure over Lockers/CCTV anchors, and only then commit the hard breach.',
+							'Execute: smoke default angles, plant behind breach or server cover, and keep one player on vertical denial for C4 and retake paths.'
+						],
+						reactionTitle: 'Immediate reaction',
+						reactionMeta: 'How to keep the round clean',
+						reactions: [
+							'If defenders turtle basement, do not skip top control. Use the free space upstairs to strip denial and force them into weaker angles.',
+							'If roamers back away early, convert that into map control instead of chasing kills. Bank rewards structure more than hero plays.',
+							'Count utility before the breach. The execute starts only when denial, shield pressure, and flank watch are all assigned.'
+						],
+						focusTitle: 'Current priorities',
+						focus: [
+							'Own Square so defenders cannot rotate freely between floors.',
+							'Maintain two drone layers: live clear drone and parked execute drone.',
+							'Keep the diffuser near the player least likely to take first contact.'
+						],
+						winTitle: 'Win condition',
+						winBody: 'Open a safe plant lane while defenders are still reacting to vertical pressure above them.',
+						adapt: [
+							'If the top floor is empty, shorten the clear and accelerate to Open Area before defenders rebuild utility below.',
+							'If denial remains hidden after your first scan, stop and re-drone instead of committing a blind breach.',
+							'If a defender swings Open Area aggressively, trade first and only then resume vertical destruction.'
+						],
+						markers: [
+							{ floor: 3, x: 26, y: 31, type: 'attack', label: 'Roof entry' },
+							{ floor: 3, x: 47, y: 47, type: 'attack', label: 'Square clear' },
+							{ floor: 2, x: 46, y: 51, type: 'utility', label: 'Vertical holes' },
+							{ floor: 2, x: 66, y: 33, type: 'attack', label: 'Drone hold' },
+							{ floor: 1, x: 39, y: 54, type: 'attack', label: 'Plant route' },
+							{ floor: 1, x: 69, y: 33, type: 'defense', label: 'Anchor stack' }
+						],
+						routes: [
+							{ floor: 3, type: 'attack', points: [[18, 23], [28, 23], [39, 24], [46, 32]] },
+							{ floor: 2, type: 'attack', points: [[46, 18], [46, 34], [45, 48], [40, 57]] },
+							{ floor: 1, type: 'attack', points: [[22, 31], [28, 34], [34, 44], [40, 53]] },
+							{ floor: 1, type: 'attack', points: [[67, 35], [71, 45], [74, 58]] }
+						]
+					},
+					{
+						id: 'entry-pick',
+						label: 'You Get First Pick',
+						summaryTitle: 'Scenario: attackers open with a pick on the roamer',
+						summaryBody: 'A defender dies upstairs. The attack should speed up only enough to exploit the gap, not enough to lose structure.',
+						timelineTitle: 'Capitalize without rushing',
+						timelineMeta: 'The best Bank teams compress the round after a pick',
+						timeline: [
+							'Confirm who died and what utility disappeared with them. Killing a Vigil is different from killing a Smoke or Kaid.',
+							'Keep the same route but shorten the safety checks. The pick means less resistance, not zero resistance.',
+							'Push an extra player into vertical pressure so defenders below feel the man-disadvantage immediately.',
+							'Start execute prep 10 to 15 seconds earlier because defenders now have fewer guns to hold both breach and flank.'
+						],
+						reactionTitle: 'Immediate reaction',
+						reactionMeta: 'Use the man advantage correctly',
+						reactions: [
+							'Turn the dead defender into map control by flooding the floor they were meant to protect.',
+							'Do not throw away the advantage on isolated window jumps or solo basement peeks.',
+							'Force anchors to spend utility early by adding vertical pressure before the breach opens.'
+						],
+						focusTitle: 'Current priorities',
+						focus: [
+							'Trade every doorway and keep drones alive for the execute.',
+							'Make defenders reveal their fallback positions earlier than planned.',
+							'Reassign the freest player to cover flanks so the main stack can accelerate.'
+						],
+						winTitle: 'Win condition',
+						winBody: 'Use the extra player count to pin defenders from two layers and deny them a coordinated retake.',
+						adapt: [
+							'When the first pick is upstairs, squeeze that floor hard and deny every rotate back to site.',
+							'When the first pick is site-side, let the hard breacher step up because anchors will be stretched thinner.',
+							'If the team starts overchasing, pause with a drone check and restate the exact plant plan.'
+						],
+						markers: [
+							{ floor: 3, x: 51, y: 29, type: 'warning', label: 'Roamer lost' },
+							{ floor: 2, x: 46, y: 51, type: 'attack', label: 'Flood Open Area' },
+							{ floor: 1, x: 39, y: 54, type: 'utility', label: 'Breach now' },
+							{ floor: 1, x: 71, y: 35, type: 'defense', label: 'Fallback anchors' }
+						],
+						routes: [
+							{ floor: 3, type: 'attack', points: [[23, 22], [32, 23], [46, 24], [52, 30]] },
+							{ floor: 2, type: 'attack', points: [[46, 18], [46, 33], [46, 48]] },
+							{ floor: 1, type: 'attack', points: [[52, 29], [62, 33], [70, 40], [75, 56]] }
+						]
+					},
+					{
+						id: 'drones-shot',
+						label: 'Drones Get Shot',
+						summaryTitle: 'Scenario: defenders destroy the parked drones',
+						summaryBody: 'Your information network collapses. The round becomes slower and more trade-dependent unless you rebuild info with living drones.',
+						timelineTitle: 'Rebuild info discipline',
+						timelineMeta: 'You can still win, but blind entries are no longer acceptable',
+						timeline: [
+							'Stop before every contested room and pair a live drone with the next entry player.',
+							'Move a support player closer to the front so drone information can be acted on immediately rather than relayed too late.',
+							'Replace parked drone roles with bodies: one player explicitly watches the previous flank and one player explicitly drones the next layer.',
+							'Delay the final execute until at least one drone sees the site or a vertical player can confirm denial positions.'
+						],
+						reactionTitle: 'Immediate reaction',
+						reactionMeta: 'The danger is not lost utility; it is lost certainty',
+						reactions: [
+							'Expect a close-range swing behind common drone-kill spots such as Open Area cubbies, Janitor, or top square.',
+							'Treat every staircase as live until a teammate or utility replaces the drone coverage there.',
+							'Use explosives, flashes, or sound pressure to force defenders off hidden corners before the next body enters.'
+						],
+						focusTitle: 'Current priorities',
+						focus: [
+							'Convert support players into temporary IGL and drone operators.',
+							'Slow the round enough to regain certainty without letting the clock become desperate.',
+							'Preserve one drone for the final 20 seconds if possible.'
+						],
+						winTitle: 'Win condition',
+						winBody: 'Rebuild enough live information to avoid a blind collapse into stacked defender angles.',
+						adapt: [
+							'If both prep drones die early, commit one player to pure info and keep them alive; Bank is too large for five independent fights.',
+							'If defenders are chasing drones aggressively, punish that by swinging the room right after the drone bait.',
+							'Swap to more direct breach pressure when vertical clears become too risky without information.'
+						],
+						markers: [
+							{ floor: 3, x: 47, y: 47, type: 'warning', label: 'Lost drone' },
+							{ floor: 2, x: 66, y: 33, type: 'warning', label: 'Info gap' },
+							{ floor: 2, x: 46, y: 51, type: 'attack', label: 'Live drone only' },
+							{ floor: 1, x: 74, y: 56, type: 'defense', label: 'Late swing risk' }
+						],
+						routes: [
+							{ floor: 3, type: 'warning', points: [[46, 18], [47, 27], [53, 34]] },
+							{ floor: 2, type: 'attack', points: [[22, 46], [31, 46], [46, 48]] },
+							{ floor: 1, type: 'warning', points: [[56, 56], [66, 58], [74, 56]] }
+						]
+					},
+					{
+						id: 'breach-denied',
+						label: 'Breach Denied',
+						summaryTitle: 'Scenario: Kaid or Bandit denial survives the first attempt',
+						summaryBody: 'The first breach fails. The attackers must reset utility and threaten defenders from vertical holes or alternate openings before trying again.',
+						timelineTitle: 'Second-layer breach plan',
+						timelineMeta: 'Bank defenders want impatience here',
+						timeline: [
+							'Confirm whether denial is on the wall, hatch, or hidden off-site through a soft floor anchor point.',
+							'Use vertical destruction or explosives above the denial location so the second EMP or explosive clear has real value.',
+							'Send the flex to hold the defender swing that usually follows a failed breach, especially CCTV and Server doorway aggression.',
+							'Only re-breach once the denial operator is displaced, dead, or out of reach from their current position.'
+						],
+						reactionTitle: 'Immediate reaction',
+						reactionMeta: 'Reset the layer, not the whole round',
+						reactions: [
+							'Defenders often peek after a failed breach because they know attackers are distracted by utility. Hold that swing first.',
+							'If the second breach option is weak, build a hatch-and-server split instead of tunneling into the same wall again.',
+							'Preserve at least one smoke or flash set for the final plant even if utility must be spent reopening the wall.'
+						],
+						focusTitle: 'Current priorities',
+						focus: [
+							'Expose the denial source from above or from a second angle.',
+							'Stop defenders from reoccupying Open Area while the breach team resets.',
+							'Keep flank gadgets active because the delay invites roamer timing plays.'
+						],
+						winTitle: 'Win condition',
+						winBody: 'Force denial to move or die, then reopen the plant lane before the clock removes your leverage.',
+						adapt: [
+							'If Kaid is hidden too deep, shift to hatch pressure and make defenders split their eyes.',
+							'If Bandit tricking is active, stack sound pressure and utility timing instead of trickling gadgets one by one.',
+							'If the clock gets low, call a decisive fallback plan instead of repeating a failed breach pattern.'
+						],
+						markers: [
+							{ floor: 2, x: 46, y: 51, type: 'utility', label: 'Above denial' },
+							{ floor: 1, x: 39, y: 54, type: 'warning', label: 'Failed breach' },
+							{ floor: 1, x: 70, y: 35, type: 'defense', label: 'Kaid hold' },
+							{ floor: 1, x: 25, y: 32, type: 'attack', label: 'Server split' }
+						],
+						routes: [
+							{ floor: 2, type: 'attack', points: [[46, 48], [43, 42], [41, 30]] },
+							{ floor: 1, type: 'warning', points: [[40, 64], [40, 58], [40, 52]] },
+							{ floor: 1, type: 'attack', points: [[46, 48], [38, 45], [28, 34], [23, 31]] }
+						]
+					}
+				]
+			},
+			defender: {
+				status: {
+					title: 'Defender Lesson',
+					description: 'Learn how defenders stretch the map, hide denial, protect anchors, and decide when to give space versus when to fight for it.',
+					site: 'Basement or CEO hold',
+					route: 'Delay upstairs, collapse late',
+					mindset: 'Trade time for safety',
+					coachTitle: 'Coach note',
+					coachList: [
+						'The best Bank defenses waste attacker time on the wrong floor without losing too many guns doing it.',
+						'A roamer is valuable only if their position changes attacker pathing, drone economy, or utility count.',
+						'Denial should be hidden behind vertical layers and crossfires, not parked in the first place attackers expect.'
+					],
+					lessonHeading: 'Defender Side Breakdown',
+					lessonIntro: 'Defenders on Bank win by staging the fight. You do not need to hold every room forever; you need to slow the attack, preserve denial, and fall into prepared crossfires when pressure becomes overwhelming.',
+					rosterTitle: 'Recommended defensive roles',
+					roster: [
+						'One denial anchor such as Kaid, Bandit, or mute-style wall control to protect basement or top-floor breach paths.',
+						'One smoke or area denial anchor who can stop the final plant after vertical pressure forces the site open.',
+						'Two flexible roamers or lurkers who can play Square, Open Area, Janitor, or Archives depending on the site and attacker route.',
+						'One information or trap operator who punishes rushes and tells the team when it is time to fall back.'
+					],
+					utility: [
+						'Place shields where they force attackers to clear a second angle before challenging the defender, such as top square, Open Area, or CCTV swing spots.',
+						'Hide denial where vertical attackers must expose themselves to remove it, for example tucked Kaid claws, mute support, or off-angle batteries.',
+						'Use barbed wire, traps, or alarm utility on staircases and long hallways because Bank retakes fail when flank timing is untracked.',
+						'Preserve at least one piece of plant denial for the last 20 seconds. Early gadget spam often helps the attack more than the defense.'
+					],
+					abilities: [
+						'Roamers should use impact holes, rotates, and hatch drop routes to reposition after the first drone finds them.',
+						'Anchors should communicate exactly when utility is consumed so roamers know whether they must swing for relief or continue wasting time.',
+						'Camera and info gadgets must be placed with fallback in mind: one for the initial fight, one for the retreat route, and one for the execute warning.',
+						'C4 or late denial abilities are strongest when paired with vertical sound cues from Open Area, Square, or CEO floor holes.'
+					],
+					drones: [
+						'Shoot obvious prep drones in site, but let at least one live in a misleading place if it makes attackers believe a room is clear or occupied incorrectly.',
+						'Expect attacker parking spots around Square skylight, Printer, Janitor shelf, and Lobby edges; clear them on your first safe rotation.',
+						'Use defender cameras or sound traps to mirror attacker drone coverage on key stairs so you know when the collapse actually starts.',
+						'If attackers invest heavily in drone work, back away once they see you and force them to spend more time checking the next layer.'
+					],
+					positioning: [
+						'The first defender contact should rarely be the diffuser-denial player. Let flexible roamers take early fights and anchors stay hidden.',
+						'Roamers need escape routes before they contest Open Area or CEO. On Bank, a trapped roamer usually gives attackers both a kill and instant map control.',
+						'Anchors should sit in positions that can pivot between site and breach lanes instead of hard-tunneling one doorway.',
+						'Once attackers gain full top control, defenders should stop taking ego fights and instead stack layered site crossfires and denial timing.'
+					]
+				},
+				scenarios: [
+					{
+						id: 'default',
+						label: 'Default Defense',
+						summaryTitle: 'Default defense: stretch the map, then compress into site',
+						summaryBody: 'Defenders contest early drones and key power rooms, then fall back into denial-backed crossfires once attackers commit to the execute.',
+						timelineTitle: 'Round structure',
+						timelineMeta: 'Prep, delay, final stand',
+						timeline: [
+							'Prep phase: set denial, place one info trap on the first attacker route, and build at least one retreat rotate for the roamer package.',
+							'Early round: fight for Square, Open Area, or CEO only long enough to tax drones and entry time, then retreat before trades become free.',
+							'Mid-round: keep attackers unsure whether denial is still active while anchors preserve health and utility.',
+							'Late round: collapse into plant denial, stair crossfires, and retake denial from vertical or hidden anchor positions.'
+						],
+						reactionTitle: 'Immediate reaction',
+						reactionMeta: 'How the hold should feel',
+						reactions: [
+							'Every early contact should either destroy information, burn attacker utility, or delay a route by several seconds.',
+							'If attackers secure a floor, defenders should relocate before the next drone confirms the new position.',
+							'Do not reveal the final denial operator until attackers are committed to the plant lane.'
+						],
+						focusTitle: 'Current priorities',
+						focus: [
+							'Waste attacker drone economy on two different floors.',
+							'Keep one escape path open for roamers.',
+							'Preserve at least one late-round denial tool.'
+						],
+						winTitle: 'Win condition',
+						winBody: 'Force the plant into the final seconds, then deny it from cover while roamers pinch late rotates.',
+						adapt: [
+							'If attackers clear slowly, keep moving and make them re-drone every room.',
+							'If they rush site, abandon the far roam and stack the exact plant lane they chose.',
+							'If a shield is lost early, trade back space faster and prepare a tighter site hold rather than forcing the same power position.'
+						],
+						markers: [
+							{ floor: 3, x: 47, y: 47, type: 'defense', label: 'Square hold' },
+							{ floor: 2, x: 46, y: 51, type: 'defense', label: 'Open area roamer' },
+							{ floor: 1, x: 69, y: 33, type: 'utility', label: 'Denial stack' },
+							{ floor: 1, x: 39, y: 54, type: 'defense', label: 'Anchor crossfire' }
+						],
+						routes: [
+							{ floor: 3, type: 'defense', points: [[47, 32], [47, 24], [53, 18]] },
+							{ floor: 2, type: 'defense', points: [[46, 48], [53, 40], [66, 34]] },
+							{ floor: 1, type: 'defense', points: [[39, 53], [49, 48], [69, 35]] }
+						]
+					},
+					{
+						id: 'teammate-down',
+						label: 'A Teammate Dies',
+						summaryTitle: 'Scenario: defense loses an early roamer',
+						summaryBody: 'One defender dies before time is burned. The remaining team must compress sooner and protect denial instead of trying to recreate the full extension.',
+						timelineTitle: 'Shrink the defense intelligently',
+						timelineMeta: 'A 4v5 Bank defense still wins by forcing a slow plant',
+						timeline: [
+							'Instantly identify which room is now undefended and whether its utility needs to be destroyed or abandoned.',
+							'Call an earlier fallback for the second roamer so attackers do not chain the first kill into more map control.',
+							'Shift spare utility toward the strongest remaining choke point, usually the plant lane or the staircase that now lacks coverage.',
+							'Save health and gadgets for the final denial rather than fighting to reclaim the dead player’s room.'
+						],
+						reactionTitle: 'Immediate reaction',
+						reactionMeta: 'You cannot defend everything anymore',
+						reactions: [
+							'Collapse into a shorter defense with clear trade lines instead of leaving isolated lurkers behind.',
+							'Turn the dead player’s utility into a trap by holding the room attackers expect to be free with a tucked crossfire.',
+							'Keep comms specific: name the lost role, not just the death, so everyone understands what coverage disappeared.'
+						],
+						focusTitle: 'Current priorities',
+						focus: [
+							'Protect the denial player and the plant-stopping utility.',
+							'Remove one risky roam route from the plan and play tighter.',
+							'Use cameras to replace the dead player’s vision as much as possible.'
+						],
+						winTitle: 'Win condition',
+						winBody: 'Trade space early, then force attackers to plant into stacked denial with fewer seconds left than expected.',
+						adapt: [
+							'If the dead player carried crucial denial, reposition a second operator to body-block or support that lane immediately.',
+							'If attackers flood the dead side, make the opposite side lethal with a crossfire instead of contesting both.',
+							'If the team gets tilted into repeeks, restate the fallback timer and force discipline.'
+						],
+						markers: [
+							{ floor: 3, x: 47, y: 47, type: 'warning', label: 'Roamer dead' },
+							{ floor: 2, x: 46, y: 51, type: 'warning', label: 'Space lost' },
+							{ floor: 1, x: 69, y: 33, type: 'utility', label: 'Protect denial' },
+							{ floor: 1, x: 39, y: 54, type: 'defense', label: 'Tighter stack' }
+						],
+						routes: [
+							{ floor: 3, type: 'warning', points: [[47, 32], [46, 28], [46, 18]] },
+							{ floor: 1, type: 'defense', points: [[46, 48], [42, 52], [39, 53]] }
+						]
+					},
+					{
+						id: 'top-lost',
+						label: 'Attackers Take Top Floor',
+						summaryTitle: 'Scenario: attackers secure top floor early',
+						summaryBody: 'The upper layer is gone. Defenders should stop contesting it, move to anti-vertical positions, and prepare punish swings only when attackers expose themselves.',
+						timelineTitle: 'From extension to survival',
+						timelineMeta: 'This is where disciplined teams still win',
+						timeline: [
+							'Evacuate Square, Janitor, and CEO survivors before attackers cut the retreat stairs.',
+							'Shift anti-vertical players into positions under cover where they can punish floor holes or breach setups.',
+							'Hide denial and C4 until attackers reveal the exact plant lane or vertical commit spot.',
+							'Only contest again when the attackers have to split attention between breach, vertical holes, and flank timing.'
+						],
+						reactionTitle: 'Immediate reaction',
+						reactionMeta: 'Give space, keep the round',
+						reactions: [
+							'Top floor is not worth dying for once attackers have the numbers and drones to hold it.',
+							'Use impact rotates and lower-floor movement to make vertical attackers guess where the swing will come from.',
+							'If attackers spend too long opening floors, punish their clock with complete silence and hidden denial.'
+						],
+						focusTitle: 'Current priorities',
+						focus: [
+							'Stop the plant, not the map clear that already succeeded.',
+							'Keep vertical exposure short and unpredictable.',
+							'Protect every remaining route into site from a fast collapse.'
+						],
+						winTitle: 'Win condition',
+						winBody: 'Survive the vertical clear, then deny the execute when attackers finally have to expose bodies to plant.',
+						adapt: [
+							'If attackers also gain Open Area, move denial deeper and prepare a last-second swing from CCTV or Server instead of holding shallow.',
+							'If they overcommit to vertical holes, flank later through the staircase they stopped watching.',
+							'If your C4 operator is trapped, use gun crossfires to delay until they can reposition rather than sacrificing them early.'
+						],
+						markers: [
+							{ floor: 3, x: 29, y: 30, type: 'attack', label: 'Top control lost' },
+							{ floor: 2, x: 46, y: 51, type: 'warning', label: 'Vertical threat' },
+							{ floor: 1, x: 39, y: 54, type: 'defense', label: 'Deeper anchor' },
+							{ floor: 1, x: 69, y: 33, type: 'utility', label: 'Hidden denial' }
+						],
+						routes: [
+							{ floor: 3, type: 'attack', points: [[24, 23], [35, 24], [47, 25]] },
+							{ floor: 2, type: 'warning', points: [[46, 18], [46, 33], [46, 48]] },
+							{ floor: 1, type: 'defense', points: [[39, 53], [52, 45], [69, 35]] }
+						]
+					},
+					{
+						id: 'plant-down',
+						label: 'Diffuser Is Planted',
+						summaryTitle: 'Scenario: attackers get the plant down',
+						summaryBody: 'The defense failed to stop the plant, but the round is not over. Retake structure and crossfire timing become the new win condition.',
+						timelineTitle: 'Post-plant retake protocol',
+						timelineMeta: 'Retakes on Bank need layered timing, not panic swings',
+						timeline: [
+							'Identify planter position, post-plant vertical angles, and which staircase or hallway is still free to use.',
+							'Group surviving defenders into at least two pressure points so attackers cannot hold a single choke comfortably.',
+							'Use utility or sound cues to force one attacker to look away, then swing the diffuser from the opposite side.',
+							'One player sticks only when the crossfire has been broken or when the remaining attackers cannot contest in time.'
+						],
+						reactionTitle: 'Immediate reaction',
+						reactionMeta: 'Retake with order',
+						reactions: [
+							'Do not send single players onto the diffuser while vertical attackers still have uncontested line of sight.',
+							'Clear the most dangerous post-plant angle first, even if that means touching diffuser later than you want.',
+							'Use smoke gaps, rotates, or flank routes to pinch the planter’s teammates before attempting the disable.'
+						],
+						focusTitle: 'Current priorities',
+						focus: [
+							'Break the post-plant crossfire before the disable starts.',
+							'Force attackers to reposition off their safest angle.',
+							'Keep one defender alive specifically to cover the disable stick.'
+						],
+						winTitle: 'Win condition',
+						winBody: 'Collapse from two directions, kill or displace the strongest post-plant player, then cover the disable with the last surviving gun.',
+						adapt: [
+							'If the planter is protected by vertical holes, retake the floor above only if time allows; otherwise swing the planter’s support from below.',
+							'If you have a smoke or explosive left, use it to clear the diffuser space before the disable attempt.',
+							'If the numbers are low, fake the stick once to force a peek, then trade it and return to disable.'
+						],
+						markers: [
+							{ floor: 1, x: 39, y: 54, type: 'warning', label: 'Planted diffuser' },
+							{ floor: 1, x: 25, y: 32, type: 'defense', label: 'Retake group' },
+							{ floor: 1, x: 74, y: 56, type: 'defense', label: 'Second pinch' },
+							{ floor: 2, x: 46, y: 51, type: 'attack', label: 'Vertical post-plant' }
+						],
+						routes: [
+							{ floor: 1, type: 'defense', points: [[23, 31], [29, 38], [39, 53]] },
+							{ floor: 1, type: 'defense', points: [[74, 56], [63, 56], [39, 53]] },
+							{ floor: 2, type: 'attack', points: [[46, 48], [42, 52], [40, 61]] }
+						]
+					}
+				]
+			}
+		};
+
+		const state = {
+			side: 'attacker',
+			scenarioId: 'default',
+			floor: 1,
+			activeRoomId: 'lockers',
+			playStep: 0,
+			isPlaying: false,
+			zoom: 1,
+			panX: 0,
+			panY: 0
+		};
+
+		let playbackTimer = null;
+		let dragState = null;
+
+		const scenarioGrid = document.getElementById('scenario-grid');
+		const markerLayer = document.querySelector('.map-marker-layer');
+		const routeLayer = document.querySelector('.route-layer');
+		const floorHint = document.getElementById('floor-hint');
+		const roomHotspots = document.getElementById('room-hotspots');
+		const roomVisual = document.getElementById('room-visual');
+		const roomTitle = document.getElementById('room-title');
+		const roomSubtitle = document.getElementById('room-subtitle');
+		const roomFootageNote = document.getElementById('room-footage-note');
+		const roomUtilityList = document.getElementById('room-utility-list');
+		const roomPositionList = document.getElementById('room-position-list');
+		const playbackStatus = document.getElementById('playback-status');
+		const playbackProgress = document.getElementById('playback-progress');
+		const phaseBadge = document.getElementById('phase-badge');
+		const phaseTitle = document.getElementById('phase-title');
+		const phaseBody = document.getElementById('phase-body');
+		const mapViewport = document.getElementById('map-viewport');
+		const mapCanvas = document.getElementById('map-canvas');
+		const zoomOutButton = document.getElementById('zoom-out');
+		const zoomInButton = document.getElementById('zoom-in');
+		const zoomResetButton = document.getElementById('zoom-reset');
+		const playbackPrevButton = document.getElementById('playback-prev');
+		const playbackPlayButton = document.getElementById('playback-play');
+		const playbackNextButton = document.getElementById('playback-next');
+		const playbackResetButton = document.getElementById('playback-reset');
+
+		const statusTitle = document.getElementById('status-title');
+		const statusDescription = document.getElementById('status-description');
+		const statusSite = document.getElementById('status-site');
+		const statusRoute = document.getElementById('status-route');
+		const statusMindset = document.getElementById('status-mindset');
+		const coachTitle = document.getElementById('coach-title');
+		const coachList = document.getElementById('coach-list');
+
+		const scenarioSummaryTitle = document.getElementById('scenario-summary-title');
+		const scenarioSummaryBody = document.getElementById('scenario-summary-body');
+		const timelineTitle = document.getElementById('timeline-title');
+		const timelineMeta = document.getElementById('timeline-meta');
+		const timelineList = document.getElementById('timeline-list');
+		const reactionTitle = document.getElementById('reaction-title');
+		const reactionMeta = document.getElementById('reaction-meta');
+		const reactionList = document.getElementById('reaction-list');
+		const focusTitle = document.getElementById('focus-title');
+		const focusList = document.getElementById('focus-list');
+		const winTitle = document.getElementById('win-title');
+		const winBody = document.getElementById('win-body');
+
+		const lessonHeading = document.getElementById('lesson-heading');
+		const lessonIntro = document.getElementById('lesson-intro');
+		const utilityList = document.getElementById('utility-list');
+		const abilityList = document.getElementById('ability-list');
+		const droneList = document.getElementById('drone-list');
+		const positioningList = document.getElementById('positioning-list');
+		const rosterTitle = document.getElementById('roster-title');
+		const rosterList = document.getElementById('roster-list');
+		const adaptList = document.getElementById('adapt-list');
+
+		function setList(target, items) {
+			target.innerHTML = items.map((item) => `<li>${item}</li>`).join('');
+		}
+
+		function getScenario() {
+			const side = sideData[state.side];
+			return side.scenarios.find((item) => item.id === state.scenarioId) || side.scenarios[0];
+		}
+
+		function createProgressiveItems(items, totalSteps) {
+			return items.map((item, index) => ({
+				...item,
+				step: typeof item.step === 'number'
+					? item.step
+					: Math.min(totalSteps - 1, Math.floor(index * totalSteps / Math.max(items.length, 1)))
+			}));
+		}
+
+		function getScenarioProgression(scenario) {
+			const totalSteps = Math.max(1, scenario.timeline.length);
+			return {
+				steps: scenario.timeline.map((text, index) => ({
+					index,
+					title: `Phase ${index + 1}`,
+					body: text
+				})),
+				markers: createProgressiveItems(scenario.markers, totalSteps),
+				routes: createProgressiveItems(scenario.routes, totalSteps)
+			};
+		}
+
+		function getRoomForFloor(floor) {
+			return roomData.filter((room) => room.floor === floor);
+		}
+
+		function getActiveRoom() {
+			const floorRooms = getRoomForFloor(state.floor);
+			return floorRooms.find((room) => room.id === state.activeRoomId) || floorRooms[0] || null;
+		}
+
+		function ensureActiveRoom() {
+			const activeRoom = getActiveRoom();
+			if (activeRoom) {
+				state.activeRoomId = activeRoom.id;
+			}
+		}
+
+		function stopPlayback() {
+			if (playbackTimer) {
+				clearInterval(playbackTimer);
+				playbackTimer = null;
+			}
+			state.isPlaying = false;
+		}
+
+		function setPlaybackStep(stepIndex) {
+			const progression = getScenarioProgression(getScenario());
+			state.playStep = Math.max(0, Math.min(stepIndex, progression.steps.length - 1));
+			render();
+		}
+
+		function startPlayback() {
+			const progression = getScenarioProgression(getScenario());
+			stopPlayback();
+			state.isPlaying = true;
+			playbackTimer = window.setInterval(() => {
+				if (state.playStep >= progression.steps.length - 1) {
+					stopPlayback();
+					render();
+					return;
+				}
+				state.playStep += 1;
+				render();
+			}, 1900);
+		}
+
+		function updateCamera() {
+			mapCanvas.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+		}
+
+		function clampPan() {
+			const viewportWidth = mapViewport.clientWidth;
+			const viewportHeight = mapViewport.clientHeight;
+			const maxX = ((state.zoom - 1) * viewportWidth) / 2 + 40;
+			const maxY = ((state.zoom - 1) * viewportHeight) / 2 + 40;
+			state.panX = Math.max(-maxX, Math.min(maxX, state.panX));
+			state.panY = Math.max(-maxY, Math.min(maxY, state.panY));
+		}
+
+		function setZoom(nextZoom) {
+			state.zoom = Math.max(1, Math.min(2.8, Number(nextZoom.toFixed(2))));
+			if (state.zoom === 1) {
+				state.panX = 0;
+				state.panY = 0;
+			}
+			clampPan();
+			updateCamera();
+		}
+
+		function renderRoomHotspots() {
+			const floorRooms = getRoomForFloor(state.floor);
+			roomHotspots.innerHTML = floorRooms.map((room) => `
+				<button
+					class="room-hotspot${room.id === state.activeRoomId ? ' active' : ''}"
+					data-room-id="${room.id}"
+					type="button"
+					aria-label="Open ${room.name} callout"
+					style="left:${room.bounds.x}%; top:${room.bounds.y}%; width:${room.bounds.w}%; height:${room.bounds.h}%;"
+				></button>
+			`).join('');
+
+			roomHotspots.querySelectorAll('.room-hotspot').forEach((button) => {
+				button.addEventListener('click', () => {
+					state.activeRoomId = button.dataset.roomId;
+					renderRoomInspector();
+					renderRoomHotspots();
+				});
+			});
+		}
+
+		function renderRoomInspector() {
+			ensureActiveRoom();
+			const activeRoom = getActiveRoom();
+			if (!activeRoom) {
+				return;
+			}
+
+			const roomCopy = activeRoom[state.side];
+			roomVisual.style.setProperty('--room-visual', activeRoom.visual);
+			roomTitle.textContent = `${activeRoom.name} · ${floorNames[activeRoom.floor]}`;
+			roomSubtitle.textContent = activeRoom.subtitle;
+			roomFootageNote.textContent = activeRoom.footageNote;
+			setList(roomUtilityList, roomCopy.utility);
+			setList(roomPositionList, roomCopy.positioning);
+		}
+
+		function renderPlayback(scenario, progression) {
+			const currentStep = progression.steps[state.playStep];
+			playbackStatus.textContent = `Phase ${state.playStep + 1} of ${progression.steps.length}`;
+			phaseBadge.textContent = currentStep.title;
+			phaseTitle.textContent = currentStep.title;
+			phaseBody.textContent = currentStep.body;
+			playbackPlayButton.textContent = state.isPlaying ? 'Pause' : 'Play';
+			playbackPlayButton.classList.toggle('active', state.isPlaying);
+
+			playbackProgress.innerHTML = progression.steps.map((step) => {
+				const statusClass = step.index < state.playStep ? ' done' : step.index === state.playStep ? ' current' : '';
+				return `<div class="playback-dot${statusClass}">P${step.index + 1}</div>`;
+			}).join('');
+
+			Array.from(timelineList.children).forEach((item, index) => {
+				item.classList.toggle('done-step', index < state.playStep);
+				item.classList.toggle('current-step', index === state.playStep);
+			});
+		}
+
+		function buildScenarioButtons() {
+			const scenarios = sideData[state.side].scenarios;
+			scenarioGrid.innerHTML = scenarios.map((scenario) => `
+				<button class="scenario-btn${scenario.id === state.scenarioId ? ' active' : ''}" data-scenario="${scenario.id}">
+					<strong>${scenario.label}</strong>
+					<span class="section-subtitle">${scenario.summaryTitle}</span>
+				</button>
+			`).join('');
+
+			scenarioGrid.querySelectorAll('.scenario-btn').forEach((button) => {
+				button.addEventListener('click', () => {
+					stopPlayback();
+					state.scenarioId = button.dataset.scenario;
+					state.floor = getBestFloor(sideData[state.side].scenarios.find((item) => item.id === state.scenarioId));
+					state.playStep = 0;
+					ensureActiveRoom();
+					render();
+				});
+			});
+		}
+
+		function markerPosition(marker) {
+			return {
+				left: `${marker.x}%`,
+				top: `${marker.y}%`
+			};
+		}
+
+		function convertRoutePoint(point) {
+			const [x, y] = point;
+			return `${x},${y}`;
+		}
+
+		function getBestFloor(scenario) {
+			const score = { 1: 0, 2: 0, 3: 0 };
+			scenario.markers.forEach((marker) => {
+				score[marker.floor] += 2;
+			});
+			scenario.routes.forEach((route) => {
+				score[route.floor] += 1;
+			});
+			return Number(Object.entries(score).sort((a, b) => b[1] - a[1])[0][0]);
+		}
+
+		function renderMap(scenario) {
+			const progression = getScenarioProgression(scenario);
+			document.querySelectorAll('.floor-plan').forEach((plan) => {
+				plan.classList.toggle('active', Number(plan.dataset.floor) === state.floor);
+			});
+
+			floorHint.textContent = `Viewing ${floorNames[state.floor]}`;
+
+			markerLayer.innerHTML = progression.markers.filter((marker) => marker.floor === state.floor && marker.step <= state.playStep).map((marker) => {
+				const pos = markerPosition(marker);
+				return `<div class="marker ${marker.type}" data-label="${marker.label}" style="left:${pos.left}; top:${pos.top};"></div>`;
+			}).join('');
+
+			routeLayer.innerHTML = progression.routes.filter((route) => route.floor === state.floor && route.step <= state.playStep).map((route) => `
+				<polyline class="route-line ${route.type}" points="${route.points.map(convertRoutePoint).join(' ')}"></polyline>
+			`).join('');
+
+			renderRoomHotspots();
+			renderRoomInspector();
+			renderPlayback(scenario, progression);
+		}
+
+		function renderText() {
+			const side = sideData[state.side];
+			const scenario = getScenario();
+
+			statusTitle.textContent = side.status.title;
+			statusDescription.textContent = side.status.description;
+			statusSite.textContent = side.status.site;
+			statusRoute.textContent = side.status.route;
+			statusMindset.textContent = side.status.mindset;
+			coachTitle.textContent = side.status.coachTitle;
+			setList(coachList, side.status.coachList);
+
+			scenarioSummaryTitle.textContent = scenario.summaryTitle;
+			scenarioSummaryBody.textContent = scenario.summaryBody;
+			timelineTitle.textContent = scenario.timelineTitle;
+			timelineMeta.textContent = scenario.timelineMeta;
+			setList(timelineList, scenario.timeline);
+			reactionTitle.textContent = scenario.reactionTitle;
+			reactionMeta.textContent = scenario.reactionMeta;
+			setList(reactionList, scenario.reactions);
+			focusTitle.textContent = scenario.focusTitle;
+			setList(focusList, scenario.focus);
+			winTitle.textContent = scenario.winTitle;
+			winBody.textContent = scenario.winBody;
+
+			lessonHeading.textContent = side.status.lessonHeading;
+			lessonIntro.textContent = side.status.lessonIntro;
+			rosterTitle.textContent = side.status.rosterTitle;
+			setList(utilityList, side.status.utility);
+			setList(abilityList, side.status.abilities);
+			setList(droneList, side.status.drones);
+			setList(positioningList, side.status.positioning);
+			setList(rosterList, side.status.roster);
+			setList(adaptList, scenario.adapt);
+
+			renderMap(scenario);
+		}
+
+		function updateTabs() {
+			document.querySelectorAll('.side-tab').forEach((tab) => {
+				const active = tab.dataset.side === state.side;
+				tab.classList.toggle('active', active);
+				tab.setAttribute('aria-selected', String(active));
+			});
+
+			document.querySelectorAll('.floor-tab').forEach((tab) => {
+				const active = Number(tab.dataset.floor) === state.floor;
+				tab.classList.toggle('active', active);
+				tab.setAttribute('aria-selected', String(active));
+			});
+		}
+
+		function render() {
+			ensureActiveRoom();
+			buildScenarioButtons();
+			updateTabs();
+			renderText();
+			updateCamera();
+		}
+
+		document.querySelectorAll('.side-tab').forEach((tab) => {
+			tab.addEventListener('click', () => {
+				stopPlayback();
+				state.side = tab.dataset.side;
+				state.scenarioId = 'default';
+				state.floor = getBestFloor(sideData[state.side].scenarios[0]);
+				state.playStep = 0;
+				ensureActiveRoom();
+				render();
+			});
+		});
+
+		document.querySelectorAll('.floor-tab').forEach((tab) => {
+			tab.addEventListener('click', () => {
+				state.floor = Number(tab.dataset.floor);
+				ensureActiveRoom();
+				render();
+			});
+		});
+
+		zoomOutButton.addEventListener('click', () => {
+			setZoom(state.zoom - 0.2);
+		});
+
+		zoomInButton.addEventListener('click', () => {
+			setZoom(state.zoom + 0.2);
+		});
+
+		zoomResetButton.addEventListener('click', () => {
+			state.panX = 0;
+			state.panY = 0;
+			setZoom(1);
+		});
+
+		playbackPrevButton.addEventListener('click', () => {
+			stopPlayback();
+			setPlaybackStep(state.playStep - 1);
+		});
+
+		playbackNextButton.addEventListener('click', () => {
+			stopPlayback();
+			setPlaybackStep(state.playStep + 1);
+		});
+
+		playbackResetButton.addEventListener('click', () => {
+			stopPlayback();
+			setPlaybackStep(0);
+		});
+
+		playbackPlayButton.addEventListener('click', () => {
+			if (state.isPlaying) {
+				stopPlayback();
+				render();
+				return;
+			}
+			startPlayback();
+			render();
+		});
+
+		mapViewport.addEventListener('wheel', (event) => {
+			event.preventDefault();
+			setZoom(state.zoom + (event.deltaY < 0 ? 0.12 : -0.12));
+		}, { passive: false });
+
+		mapViewport.addEventListener('pointerdown', (event) => {
+			dragState = {
+				pointerId: event.pointerId,
+				startX: event.clientX,
+				startY: event.clientY,
+				originX: state.panX,
+				originY: state.panY
+			};
+			mapViewport.classList.add('dragging');
+			mapViewport.setPointerCapture(event.pointerId);
+		});
+
+		mapViewport.addEventListener('pointermove', (event) => {
+			if (!dragState || dragState.pointerId !== event.pointerId || state.zoom === 1) {
+				return;
+			}
+			state.panX = dragState.originX + (event.clientX - dragState.startX);
+			state.panY = dragState.originY + (event.clientY - dragState.startY);
+			clampPan();
+			updateCamera();
+		});
+
+		function endDrag(event) {
+			if (dragState && dragState.pointerId === event.pointerId) {
+				dragState = null;
+				mapViewport.classList.remove('dragging');
+			}
+		}
+
+		mapViewport.addEventListener('pointerup', endDrag);
+		mapViewport.addEventListener('pointercancel', endDrag);
+		window.addEventListener('resize', () => {
+			clampPan();
+			updateCamera();
+		});
+
+		render();
+	</script>
+</body>
+</html>

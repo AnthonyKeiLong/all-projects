@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SongForge Studio</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg: #f4efe4;
+      --panel: rgba(255, 251, 244, 0.86);
+      --panel-strong: #fff8ef;
+      --line: rgba(48, 32, 12, 0.12);
+      --ink: #24180b;
+      --muted: #675648;
+      --accent: #e36f2d;
+      --accent-strong: #b94915;
+      --accent-soft: rgba(227, 111, 45, 0.14);
+      --green: #245f4b;
+      --shadow: 0 24px 60px rgba(63, 30, 8, 0.14);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(227, 111, 45, 0.18), transparent 32%),
+        radial-gradient(circle at right 20%, rgba(36, 95, 75, 0.15), transparent 28%),
+        linear-gradient(160deg, #f7f1e7 0%, #f2e8d7 52%, #efe3ce 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(36, 24, 11, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(36, 24, 11, 0.025) 1px, transparent 1px);
+      background-size: 26px 26px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.75), transparent 92%);
+    }
+
+    .app-shell {
+      width: min(1760px, calc(100% - 32px));
+      margin: 24px auto 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero-copy {
+      padding: 28px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-copy::after {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(227, 111, 45, 0.22) 0%, rgba(227, 111, 45, 0) 72%);
+      right: -40px;
+      top: -60px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(36, 95, 75, 0.1);
+      color: var(--green);
+    }
+
+    h1 {
+      margin: 18px 0 10px;
+      font-size: clamp(2.4rem, 4vw, 4.7rem);
+      line-height: 0.96;
+      max-width: 10ch;
+    }
+
+    .hero-copy p {
+      max-width: 62ch;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+
+    .hero-stats {
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat-card {
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: 1.65rem;
+      margin-bottom: 4px;
+    }
+
+    .stat-card span {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .layout > *,
+    .hero > * {
+      min-width: 0;
+    }
+
+    .stack {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .section {
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .section-head h2,
+    .section-head h3 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 62ch;
+    }
+
+    .transport {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button,
+    select,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .primary {
+      background: var(--ink);
+      color: #fff9f2;
+      box-shadow: 0 12px 26px rgba(36, 24, 11, 0.2);
+    }
+
+    .secondary {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    .ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(36, 95, 75, 0.12);
+      color: var(--green);
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .meta-grid,
+    .inspector-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(48, 32, 12, 0.14);
+      background: rgba(255, 250, 242, 0.92);
+      color: var(--ink);
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(227, 111, 45, 0.65);
+      box-shadow: 0 0 0 4px rgba(227, 111, 45, 0.13);
+      background: #fffdf8;
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .mono {
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .sequencer-shell {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 4px;
+    }
+
+    .sequencer-grid {
+      display: grid;
+      gap: 12px;
+      min-width: 1120px;
+    }
+
+    .step-header,
+    .track-row {
+      display: grid;
+      grid-template-columns: 210px repeat(16, minmax(56px, 1fr));
+      gap: 8px;
+      align-items: center;
+    }
+
+    .step-header div {
+      text-align: center;
+      padding: 8px 0;
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      background: rgba(255, 248, 238, 0.7);
+      border: 1px solid rgba(48, 32, 12, 0.08);
+    }
+
+    .step-header div:first-child {
+      text-align: left;
+      padding-left: 16px;
+      background: transparent;
+      border-color: transparent;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .track-label {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255, 248, 239, 0.98), rgba(247, 235, 216, 0.92));
+      border: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .track-label strong {
+      font-size: 0.98rem;
+    }
+
+    .track-label span {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .step-select {
+      appearance: none;
+      padding: 10px 8px;
+      text-align: center;
+      text-align-last: center;
+      border-radius: 14px;
+      font-size: 0.83rem;
+      background: rgba(255, 250, 244, 0.86);
+      border: 1px solid rgba(48, 32, 12, 0.12);
+    }
+
+    .step-select.active-step {
+      background: rgba(36, 95, 75, 0.14);
+      border-color: rgba(36, 95, 75, 0.55);
+      box-shadow: inset 0 0 0 1px rgba(36, 95, 75, 0.2);
+    }
+
+    .track-row.is-playing .track-label {
+      border-color: rgba(36, 95, 75, 0.35);
+      box-shadow: inset 0 0 0 1px rgba(36, 95, 75, 0.14);
+    }
+
+    .tabs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .tab-card,
+    .tip-card,
+    .save-card {
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 243, 0.82);
+    }
+
+    .tab-card h3,
+    .tip-card h3,
+    .save-card h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .tab-card p,
+    .tip-card p,
+    .save-card p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.92rem;
+    }
+
+    .tab-card {
+      display: grid;
+      gap: 14px;
+    }
+
+    .sheet-preview {
+      border-radius: 18px;
+      border: 1px solid rgba(48, 32, 12, 0.12);
+      background:
+        radial-gradient(circle at top right, rgba(227, 111, 45, 0.08), transparent 28%),
+        linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(251, 245, 235, 0.98));
+      padding: 12px;
+      overflow: hidden;
+    }
+
+    .sheet-preview svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .practice-sheet {
+      display: grid;
+      gap: 14px;
+      color: var(--ink);
+    }
+
+    .practice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(48, 32, 12, 0.08);
+    }
+
+    .practice-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .practice-role {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .practice-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .practice-meta span {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(227, 111, 45, 0.1);
+      color: var(--accent-strong);
+      font-size: 0.82rem;
+    }
+
+    .practice-sections {
+      display: grid;
+      gap: 14px;
+    }
+
+    .practice-section {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 252, 247, 0.92);
+      border: 1px solid rgba(48, 32, 12, 0.08);
+    }
+
+    .practice-section-name {
+      margin-bottom: 8px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-strong);
+    }
+
+    .practice-chords {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .practice-chord {
+      color: #2d64c7;
+      font-size: 0.96rem;
+      min-width: 2.8ch;
+    }
+
+    .practice-lyrics {
+      display: grid;
+      gap: 4px;
+      line-height: 1.55;
+    }
+
+    .practice-lyrics div {
+      min-height: 1.4em;
+    }
+
+    .practice-cue {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .sheet-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .sheet-chip {
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(48, 32, 12, 0.12);
+      background: rgba(255, 251, 245, 0.9);
+      color: var(--ink);
+    }
+
+    .annotation-label {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .tab-card textarea {
+      min-height: 120px;
+    }
+
+    .storage-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .playhead {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .playhead span {
+      font-size: 1.05rem;
+      color: var(--ink);
+      min-width: 3ch;
+    }
+
+    .timeline-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .timeline-pills div {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(227, 111, 45, 0.1);
+      color: var(--accent-strong);
+      font-size: 0.86rem;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (min-width: 1600px) {
+      .hero {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+
+      .layout {
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .tabs-grid,
+      .meta-grid,
+      .inspector-grid,
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 780px) {
+      .app-shell {
+        width: min(100% - 20px, 1760px);
+        margin: 10px auto 24px;
+      }
+
+      .hero-copy,
+      .hero-stats,
+      .section {
+        padding: 20px;
+      }
+
+      h1 {
+        max-width: none;
+      }
+
+      .transport,
+      .storage-actions,
+      .section-head {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <div class="panel hero-copy">
+        <div class="eyebrow">Song writing platform</div>
+        <h1>SongForge Studio</h1>
+        <p>
+          Build songs across electric guitar, acoustic guitar, bass, drums, keyboard, and vocals in one workspace.
+          Sketch the groove, write the lyrics, map the structure, and store full tab sheets beside the arrangement.
+        </p>
+        <div class="timeline-pills" id="sectionPreview"></div>
+      </div>
+      <aside class="panel hero-stats">
+        <div class="section-head">
+          <div>
+            <h2>Session pulse</h2>
+            <p>Live indicators for your current project setup.</p>
+          </div>
+          <div class="status-badge"><span class="status-dot"></span><span id="autosaveLabel">Autosave ready</span></div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <strong id="tempoValue">96</strong>
+            <span>BPM</span>
+          </div>
+          <div class="stat-card">
+            <strong id="trackCount">6</strong>
+            <span>Tracks armed</span>
+          </div>
+          <div class="stat-card">
+            <strong id="filledSteps">0</strong>
+            <span>Programmed steps</span>
+          </div>
+          <div class="stat-card">
+            <strong id="wordCount">0</strong>
+            <span>Lyric words</span>
+          </div>
+        </div>
+        <div class="playhead">Playhead <span id="playheadStep">01</span></div>
+      </aside>
+    </section>
+
+    <div class="layout">
+      <section class="stack">
+        <section class="panel section">
+          <div class="section-head">
+            <div>
+              <h2>Song setup</h2>
+              <p>Define the song identity, arrangement, and harmonic roadmap before you track details.</p>
+            </div>
+          </div>
+          <div class="meta-grid">
+            <div class="field">
+              <label for="songTitle">Song title</label>
+              <input id="songTitle" type="text" placeholder="Midnight Static">
+            </div>
+            <div class="field">
+              <label for="artistName">Artist or project</label>
+              <input id="artistName" type="text" placeholder="Studio Session">
+            </div>
+            <div class="field">
+              <label for="songKey">Key</label>
+              <select id="songKey"></select>
+            </div>
+            <div class="field">
+              <label for="timeSignature">Time signature</label>
+              <select id="timeSignature">
+                <option value="4/4">4/4</option>
+                <option value="3/4">3/4</option>
+                <option value="6/8">6/8</option>
+                <option value="5/4">5/4</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="tempoInput">Tempo</label>
+              <input id="tempoInput" type="number" min="50" max="220" step="1" value="96">
+            </div>
+            <div class="field">
+              <label for="moodInput">Mood</label>
+              <input id="moodInput" type="text" placeholder="Warm, driving, reflective">
+            </div>
+            <div class="field field-wide">
+              <label for="structureInput">Song structure</label>
+              <input id="structureInput" type="text" placeholder="Intro | Verse 1 | Chorus | Verse 2 | Bridge | Chorus | Outro">
+            </div>
+            <div class="field field-wide">
+              <label for="chordsInput">Chord progression or notes</label>
+              <textarea id="chordsInput" placeholder="Verse: Em - C - G - D&#10;Chorus: G - D - Em - C"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel section">
+          <div class="section-head">
+            <div>
+              <h2>Arrangement sequencer</h2>
+              <p>Program a 16-step phrase for each instrument. Use playback to audition the skeleton of the track before filling in full tabs.</p>
+            </div>
+            <div class="transport">
+              <button class="primary" id="playButton" type="button">Play</button>
+              <button class="secondary" id="stopButton" type="button">Stop</button>
+              <button class="ghost" id="clearPatternButton" type="button">Clear pattern</button>
+            </div>
+          </div>
+          <div class="sequencer-shell">
+            <div class="sequencer-grid" id="sequencerGrid"></div>
+          </div>
+          <p class="footer-note">Each step stores a playable cue. Use the tabs below for complete notation, voicings, and lyric phrasing.</p>
+        </section>
+
+        <section class="panel section">
+          <div class="section-head">
+            <div>
+              <h2>Lyrics and tabs</h2>
+              <p>Write the full song text and keep tab sheets for every instrument in the same project.</p>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="field">
+              <label for="lyricsInput">Lyrics</label>
+              <textarea id="lyricsInput" placeholder="Verse 1&#10;We kept the lights low...&#10;&#10;Chorus&#10;Turn the static into gold..."></textarea>
+            </div>
+            <div class="tabs-grid" id="tabCards"></div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="stack">
+        <section class="panel section">
+          <div class="section-head">
+            <div>
+              <h3>Track inspector</h3>
+              <p>Adjust the selected track lane names and production notes.</p>
+            </div>
+          </div>
+          <div class="inspector-grid">
+            <div class="field">
+              <label for="selectedTrack">Focused track</label>
+              <select id="selectedTrack"></select>
+            </div>
+            <div class="field">
+              <label for="trackTone">Tone note</label>
+              <input id="trackTone" type="text" placeholder="Edge of breakup amp, palm muted pulse">
+            </div>
+            <div class="field field-wide">
+              <label for="trackNotes">Performance notes</label>
+              <textarea id="trackNotes" placeholder="Articulation, fills, mic setup, layer ideas"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel section">
+          <div class="section-head">
+            <div>
+              <h3>Project storage</h3>
+              <p>Keep a working draft in this browser and export a shareable song file.</p>
+            </div>
+          </div>
+          <div class="save-card">
+            <h3>Save options</h3>
+            <p>Autosave writes to local storage whenever you change the project. Export creates a JSON snapshot you can import later.</p>
+            <div class="storage-actions">
+              <button class="primary" id="saveButton" type="button">Save draft</button>
+              <button class="secondary" id="exportButton" type="button">Export JSON</button>
+              <button class="ghost" id="importButton" type="button">Import JSON</button>
+            </div>
+            <input class="hidden" id="importFileInput" type="file" accept="application/json">
+            <p class="footer-note" id="saveStatus">No manual save yet.</p>
+          </div>
+        </section>
+
+        <section class="panel section">
+          <div class="tip-card">
+            <h3>Workflow suggestions</h3>
+            <p>1. Set the tempo and structure.</p>
+            <p>2. Block out drums, bass, and chord rhythm in the sequencer.</p>
+            <p>3. Fill the full instrument tabs and lyric phrasing below.</p>
+            <p>4. Export a JSON file when a draft is worth sharing.</p>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'songforge-studio-project';
+    const STEP_COUNT = 16;
+    const keyOptions = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Bb', 'F', 'Eb', 'Ab', 'Db'];
+
+    const trackDefinitions = [
+      {
+        id: 'electricGuitar',
+        label: 'Electric Guitar',
+        short: 'Lead / riffs',
+        options: ['-', 'E3', 'G3', 'A3', 'B3', 'D4', 'E4', 'G4', 'A4', 'B4', 'D5'],
+        voice: 'electric',
+        clef: 'treble',
+        annotationPlaceholder: 'Lead guitar annotations, articulations, bends, and phrasing notes.'
+      },
+      {
+        id: 'acousticGuitar',
+        label: 'Acoustic Guitar',
+        short: 'Strums / open voicings',
+        options: ['-', 'G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'G4', 'A4', 'B4'],
+        voice: 'acoustic',
+        clef: 'treble',
+        annotationPlaceholder: 'Strumming direction, capo notes, and chord voicing reminders.'
+      },
+      {
+        id: 'bass',
+        label: 'Bass',
+        short: 'Root motion',
+        options: ['-', 'E1', 'G1', 'A1', 'B1', 'C2', 'D2', 'E2', 'G2', 'A2'],
+        voice: 'bass',
+        clef: 'bass',
+        annotationPlaceholder: 'Bass fingering, accents, slides, and pocket notes.'
+      },
+      {
+        id: 'drums',
+        label: 'Drums',
+        short: 'Kit accents',
+        options: ['-', 'Kick', 'Snare', 'Hat', 'Clap', 'Crash', 'Tom'],
+        voice: 'drums',
+        clef: 'percussion',
+        annotationPlaceholder: 'Stickings, ghost notes, fills, and cymbal instructions.'
+      },
+      {
+        id: 'keyboard',
+        label: 'Keyboard',
+        short: 'Pads / hooks',
+        options: ['-', 'C3', 'D3', 'E3', 'G3', 'A3', 'C4', 'D4', 'E4', 'G4', 'A4', 'C5'],
+        voice: 'keyboard',
+        clef: 'treble',
+        annotationPlaceholder: 'Chord spellings, inversions, left-hand patterns, and sustain notes.'
+      },
+      {
+        id: 'vocal',
+        label: 'Vocal',
+        short: 'Melody cues',
+        options: ['-', 'A3', 'B3', 'C4', 'D4', 'E4', 'G4', 'A4', 'B4', 'C5', 'D5'],
+        voice: 'vocal',
+        clef: 'treble',
+        annotationPlaceholder: 'Breaths, harmony splits, vowel shaping, and lyric stress notes.'
+      }
+    ];
+
+    const starterPattern = {
+      electricGuitar: ['E4', '-', 'G4', '-', 'A4', '-', 'G4', '-', 'E4', '-', 'D4', '-', 'B3', '-', 'D4', '-'],
+      acousticGuitar: ['G3', '-', 'D4', '-', 'E4', '-', 'D4', '-', 'G3', '-', 'D4', '-', 'E4', '-', 'D4', '-'],
+      bass: ['E1', '-', '-', 'E1', 'G1', '-', '-', 'A1', 'E1', '-', '-', 'D2', 'C2', '-', '-', 'B1'],
+      drums: ['Kick', 'Hat', 'Snare', 'Hat', 'Kick', 'Hat', 'Snare', 'Hat', 'Kick', 'Hat', 'Snare', 'Hat', 'Kick', 'Hat', 'Crash', 'Hat'],
+      keyboard: ['C4', '-', 'E4', '-', 'G4', '-', 'A4', '-', 'C4', '-', 'E4', '-', 'G4', '-', 'A4', '-'],
+      vocal: ['-', '-', 'A3', '-', 'B3', '-', 'C4', '-', '-', '-', 'D4', '-', 'C4', '-', 'B3', '-']
+    };
+
+    function createDefaultState() {
+      const tracks = {};
+      const tabs = {};
+      const notes = {};
+
+      trackDefinitions.forEach((track) => {
+        tracks[track.id] = starterPattern[track.id] ? [...starterPattern[track.id]] : Array(STEP_COUNT).fill('-');
+        tabs[track.id] = track.annotationPlaceholder;
+        notes[track.id] = {
+          tone: '',
+          performance: ''
+        };
+      });
+
+      return {
+        meta: {
+          songTitle: 'Midnight Static',
+          artistName: 'Studio Session',
+          songKey: 'E',
+          timeSignature: '4/4',
+          tempo: 96,
+          mood: 'Driving, warm, after-hours groove',
+          structure: 'Intro | Verse 1 | Chorus | Verse 2 | Bridge | Chorus | Outro',
+          chords: 'Intro: Em - C - G - D\nVerse: Em - C - G - D\nChorus: G - D - Em - C'
+        },
+        lyrics: 'Verse 1\nThe room is humming like a wire in rain\nI hear the city bend around your name\n\nChorus\nTurn the static into gold tonight\nHold the note until it catches light',
+        tracks,
+        tabs,
+        notes,
+        inspectorTrack: 'electricGuitar'
+      };
+    }
+
+    let state = loadState();
+    let audioContext;
+    let playbackTimer = null;
+    let currentStep = 0;
+    let currentHighlightTrackIds = [];
+    let noiseBuffer = null;
+
+    const elements = {
+      songTitle: document.getElementById('songTitle'),
+      artistName: document.getElementById('artistName'),
+      songKey: document.getElementById('songKey'),
+      timeSignature: document.getElementById('timeSignature'),
+      tempoInput: document.getElementById('tempoInput'),
+      moodInput: document.getElementById('moodInput'),
+      structureInput: document.getElementById('structureInput'),
+      chordsInput: document.getElementById('chordsInput'),
+      sequencerGrid: document.getElementById('sequencerGrid'),
+      lyricsInput: document.getElementById('lyricsInput'),
+      tabCards: document.getElementById('tabCards'),
+      selectedTrack: document.getElementById('selectedTrack'),
+      trackTone: document.getElementById('trackTone'),
+      trackNotes: document.getElementById('trackNotes'),
+      playButton: document.getElementById('playButton'),
+      stopButton: document.getElementById('stopButton'),
+      clearPatternButton: document.getElementById('clearPatternButton'),
+      saveButton: document.getElementById('saveButton'),
+      exportButton: document.getElementById('exportButton'),
+      importButton: document.getElementById('importButton'),
+      importFileInput: document.getElementById('importFileInput'),
+      saveStatus: document.getElementById('saveStatus'),
+      tempoValue: document.getElementById('tempoValue'),
+      trackCount: document.getElementById('trackCount'),
+      filledSteps: document.getElementById('filledSteps'),
+      wordCount: document.getElementById('wordCount'),
+      playheadStep: document.getElementById('playheadStep'),
+      autosaveLabel: document.getElementById('autosaveLabel'),
+      sectionPreview: document.getElementById('sectionPreview')
+    };
+
+    populateStaticSelects();
+    renderAll();
+    bindEvents();
+
+    function populateStaticSelects() {
+      keyOptions.forEach((key) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = key;
+        elements.songKey.append(option);
+      });
+
+      trackDefinitions.forEach((track) => {
+        const option = document.createElement('option');
+        option.value = track.id;
+        option.textContent = track.label;
+        elements.selectedTrack.append(option);
+      });
+    }
+
+    function bindEvents() {
+      elements.songTitle.addEventListener('input', updateMeta);
+      elements.artistName.addEventListener('input', updateMeta);
+      elements.songKey.addEventListener('change', updateMeta);
+      elements.timeSignature.addEventListener('change', updateMeta);
+      elements.tempoInput.addEventListener('input', updateMeta);
+      elements.moodInput.addEventListener('input', updateMeta);
+      elements.structureInput.addEventListener('input', updateMeta);
+      elements.chordsInput.addEventListener('input', updateMeta);
+      elements.lyricsInput.addEventListener('input', () => {
+        state.lyrics = elements.lyricsInput.value;
+        persistState('Lyrics updated');
+        updateHeroStats();
+      });
+
+      elements.selectedTrack.addEventListener('change', () => {
+        state.inspectorTrack = elements.selectedTrack.value;
+        syncInspector();
+        persistState('Track focus changed');
+      });
+
+      elements.trackTone.addEventListener('input', () => {
+        state.notes[state.inspectorTrack].tone = elements.trackTone.value;
+        persistState('Track tone saved');
+      });
+
+      elements.trackNotes.addEventListener('input', () => {
+        state.notes[state.inspectorTrack].performance = elements.trackNotes.value;
+        persistState('Track notes saved');
+      });
+
+      elements.playButton.addEventListener('click', startPlayback);
+      elements.stopButton.addEventListener('click', stopPlayback);
+      elements.clearPatternButton.addEventListener('click', clearPattern);
+      elements.saveButton.addEventListener('click', () => persistState('Draft saved manually'));
+      elements.exportButton.addEventListener('click', exportProject);
+      elements.importButton.addEventListener('click', () => elements.importFileInput.click());
+      elements.importFileInput.addEventListener('change', importProject);
+    }
+
+    function updateMeta() {
+      const safeTempo = clampTempo(Number(elements.tempoInput.value));
+
+      state.meta.songTitle = elements.songTitle.value;
+      state.meta.artistName = elements.artistName.value;
+      state.meta.songKey = elements.songKey.value;
+      state.meta.timeSignature = elements.timeSignature.value;
+      state.meta.tempo = safeTempo;
+      state.meta.mood = elements.moodInput.value;
+      state.meta.structure = elements.structureInput.value;
+      state.meta.chords = elements.chordsInput.value;
+      elements.tempoInput.value = safeTempo;
+
+      persistState('Song setup saved');
+      updateHeroStats();
+      renderSectionPreview();
+    }
+
+    function renderAll() {
+      elements.songTitle.value = state.meta.songTitle;
+      elements.artistName.value = state.meta.artistName;
+      elements.songKey.value = state.meta.songKey;
+      elements.timeSignature.value = state.meta.timeSignature;
+      elements.tempoInput.value = state.meta.tempo;
+      elements.moodInput.value = state.meta.mood;
+      elements.structureInput.value = state.meta.structure;
+      elements.chordsInput.value = state.meta.chords;
+      elements.lyricsInput.value = state.lyrics;
+      elements.selectedTrack.value = state.inspectorTrack;
+
+      renderSequencer();
+      renderTabs();
+      syncInspector();
+      renderSectionPreview();
+      updateHeroStats();
+      updatePlayhead();
+    }
+
+    function renderSequencer() {
+      elements.sequencerGrid.innerHTML = '';
+
+      const headerRow = document.createElement('div');
+      headerRow.className = 'step-header';
+      const trackCell = document.createElement('div');
+      trackCell.textContent = 'Track / step';
+      headerRow.append(trackCell);
+
+      for (let step = 0; step < STEP_COUNT; step += 1) {
+        const cell = document.createElement('div');
+        cell.textContent = String(step + 1).padStart(2, '0');
+        headerRow.append(cell);
+      }
+
+      elements.sequencerGrid.append(headerRow);
+
+      trackDefinitions.forEach((track) => {
+        const row = document.createElement('div');
+        row.className = 'track-row';
+        row.dataset.trackId = track.id;
+
+        const label = document.createElement('div');
+        label.className = 'track-label';
+        label.innerHTML = `<strong>${track.label}</strong><span>${track.short}</span>`;
+        row.append(label);
+
+        state.tracks[track.id].forEach((value, stepIndex) => {
+          const select = document.createElement('select');
+          select.className = 'step-select mono';
+          select.dataset.trackId = track.id;
+          select.dataset.stepIndex = String(stepIndex);
+
+          track.options.forEach((optionValue) => {
+            const option = document.createElement('option');
+            option.value = optionValue;
+            option.textContent = optionValue;
+            if (optionValue === value) {
+              option.selected = true;
+            }
+            select.append(option);
+          });
+
+          select.addEventListener('change', () => {
+            state.tracks[track.id][stepIndex] = select.value;
+            renderTabs();
+            persistState('Pattern updated');
+            updateHeroStats();
+          });
+
+          row.append(select);
+        });
+
+        elements.sequencerGrid.append(row);
+      });
+    }
+
+    function renderTabs() {
+      elements.tabCards.innerHTML = '';
+
+      trackDefinitions.forEach((track) => {
+        const card = document.createElement('article');
+        card.className = 'tab-card';
+
+        const title = document.createElement('h3');
+        title.textContent = `${track.label} sheet`;
+
+        const blurb = document.createElement('p');
+        blurb.textContent = `Live sheet music preview for ${track.label.toLowerCase()}, generated from the sequencer above.`;
+
+        const toolbar = document.createElement('div');
+        toolbar.className = 'sheet-toolbar';
+        toolbar.innerHTML = `<span class="sheet-chip">${getNotationBadge(track)}</span><span>${getPreviewCaption(track)}</span>`;
+
+        const preview = document.createElement('div');
+        preview.className = 'sheet-preview';
+        preview.innerHTML = renderSheetMusicPreview(track, state.tracks[track.id]);
+
+        const annotationLabel = document.createElement('p');
+        annotationLabel.className = 'annotation-label';
+        annotationLabel.textContent = 'Annotations';
+
+        const area = document.createElement('textarea');
+        area.className = 'mono';
+        area.value = state.tabs[track.id] || '';
+        area.placeholder = track.annotationPlaceholder;
+        area.addEventListener('input', () => {
+          state.tabs[track.id] = area.value;
+          persistState(`${track.label} sheet saved`);
+        });
+
+        card.append(title, blurb, toolbar, preview, annotationLabel, area);
+        elements.tabCards.append(card);
+      });
+    }
+
+    function renderSheetMusicPreview(track, sequence) {
+      if (track.id === 'drums') {
+        return renderDrumSheet(track, sequence);
+      }
+
+      return renderBandPracticeSheet(track);
+    }
+
+    function renderBandPracticeSheet(track) {
+      const sections = buildPracticeSections();
+      const roleCue = getPracticeRoleCue(track);
+      const metaBits = [
+        `Key ${escapeHtml(state.meta.songKey || 'C')}`,
+        `${escapeHtml(String(state.meta.tempo || 96))} BPM`,
+        escapeHtml(state.meta.timeSignature || '4/4'),
+        escapeHtml(roleCue.short)
+      ];
+
+      return `
+        <div class="practice-sheet" aria-label="${escapeHtml(track.label)} pop band practice sheet">
+          <div class="practice-header">
+            <div class="practice-title">${escapeHtml(state.meta.songTitle || 'Untitled Song')}</div>
+            <div class="practice-role">${escapeHtml(track.label)} practice chart</div>
+          </div>
+          <div class="practice-meta">${metaBits.map((bit) => `<span>${bit}</span>`).join('')}</div>
+          <div class="practice-sections">
+            ${sections.map((section) => renderPracticeSection(section, roleCue)).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPracticeSection(section, roleCue) {
+      const lyricLines = section.lyrics.length
+        ? section.lyrics
+        : ['Instrumental or follow the vocal phrasing.'];
+
+      return `
+        <section class="practice-section">
+          <div class="practice-section-name">${escapeHtml(section.title)}</div>
+          <div class="practice-chords">
+            ${section.chords.map((chord) => `<span class="practice-chord">|${escapeHtml(chord)}</span>`).join('')}
+          </div>
+          <div class="practice-lyrics">
+            ${lyricLines.map((line) => `<div>${escapeHtml(line)}</div>`).join('')}
+          </div>
+          <div class="practice-cue">${escapeHtml(roleCue.long)}</div>
+        </section>
+      `;
+    }
+
+    function renderStringTabSheet(track, sequence, config) {
+      const width = 760;
+      const height = config.strings.length === 6 ? 310 : 288;
+      const marginLeft = 100;
+      const marginRight = 28;
+      const notationTop = 76;
+      const notationSpacing = 12;
+      const notationBottom = notationTop + (notationSpacing * 4);
+      const tabTop = config.strings.length === 6 ? 186 : 190;
+      const tabSpacing = config.strings.length === 6 ? 13 : 16;
+      const tabBottom = tabTop + (tabSpacing * (config.strings.length - 1));
+      const stepWidth = (width - marginLeft - marginRight) / STEP_COUNT;
+      const timeSignature = state.meta.timeSignature.split('/');
+      let svg = `<svg viewBox="0 0 ${width} ${height}" aria-label="${track.label} notation and tablature" role="img">`;
+
+      svg += renderSheetFrame(width, height, track.label, config.clef === 'bass' ? 'Standard notation over bass tab' : 'Standard notation over guitar tab');
+      svg += renderStaffLines(marginLeft, width - marginRight, notationTop, notationSpacing, 5);
+      svg += renderStaffLines(marginLeft, width - marginRight, tabTop, tabSpacing, config.strings.length);
+      svg += `<line x1="${marginLeft}" y1="${notationTop}" x2="${marginLeft}" y2="${tabBottom}" stroke="rgba(36,24,11,0.88)" stroke-width="2" />`;
+
+      for (let measure = 1; measure < 4; measure += 1) {
+        const barX = marginLeft + ((width - marginLeft - marginRight) / 4) * measure;
+        svg += `<line x1="${barX}" y1="${notationTop}" x2="${barX}" y2="${notationBottom}" stroke="rgba(36,24,11,0.45)" stroke-width="1.2" />`;
+        svg += `<line x1="${barX}" y1="${tabTop}" x2="${barX}" y2="${tabBottom}" stroke="rgba(36,24,11,0.35)" stroke-width="1.1" />`;
+      }
+
+      svg += `<text x="36" y="108" font-size="44" font-family="serif" fill="#24180b">${getClefSymbol(config.clef)}</text>`;
+      svg += `<text x="74" y="94" font-size="17" font-family="IBM Plex Mono, monospace" fill="#24180b">${escapeSvg(timeSignature[0] || '4')}</text>`;
+      svg += `<text x="74" y="118" font-size="17" font-family="IBM Plex Mono, monospace" fill="#24180b">${escapeSvg(timeSignature[1] || '4')}</text>`;
+      svg += `<text x="44" y="${tabTop + (tabSpacing * ((config.strings.length - 1) / 2)) + 5}" font-size="22" font-family="IBM Plex Mono, monospace" fill="#24180b">TAB</text>`;
+
+      config.strings.forEach((string, index) => {
+        const y = tabTop + (tabSpacing * index) + 4;
+        svg += `<text x="78" y="${y}" font-size="13" font-family="IBM Plex Mono, monospace" text-anchor="end" fill="#675648">${escapeSvg(string.label)}</text>`;
+      });
+
+      sequence.forEach((value, index) => {
+        const x = marginLeft + (stepWidth * index) + (stepWidth * 0.56);
+        if (value === '-') {
+          return;
+        }
+
+        const y = mapNoteToStaffY(value, config.clef, notationTop, notationSpacing);
+        const ledgerLines = getLedgerLinesForY(y, notationTop, notationSpacing);
+        svg += ledgerLines.map((ledgerY) => `<line x1="${x - 10}" y1="${ledgerY}" x2="${x + 10}" y2="${ledgerY}" stroke="rgba(36,24,11,0.82)" stroke-width="1.2" />`).join('');
+        svg += `<ellipse cx="${x}" cy="${y}" rx="8.2" ry="6" transform="rotate(-22 ${x} ${y})" fill="#24180b" />`;
+        svg += `<line x1="${x + 7}" y1="${y}" x2="${x + 7}" y2="${y - 34}" stroke="#24180b" stroke-width="1.5" />`;
+
+        const tabPosition = findTabPosition(value, config.strings);
+        if (tabPosition) {
+          const tabY = tabTop + (tabSpacing * tabPosition.stringIndex) + 4;
+          svg += `<rect x="${x - 8}" y="${tabY - 12}" width="16" height="14" rx="3" fill="rgba(255,251,245,0.96)" />`;
+          svg += `<text x="${x}" y="${tabY}" font-size="13" font-family="IBM Plex Mono, monospace" text-anchor="middle" fill="#24180b">${tabPosition.fret}</text>`;
+        }
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function renderKeyboardSheet(track, sequence) {
+      const width = 760;
+      const height = 320;
+      const marginLeft = 108;
+      const marginRight = 28;
+      const trebleTop = 76;
+      const bassTop = 186;
+      const spacing = 12;
+      const trebleBottom = trebleTop + (spacing * 4);
+      const bassBottom = bassTop + (spacing * 4);
+      const stepWidth = (width - marginLeft - marginRight) / STEP_COUNT;
+      const timeSignature = state.meta.timeSignature.split('/');
+      const separated = splitKeyboardVoices(sequence);
+      let svg = `<svg viewBox="0 0 ${width} ${height}" aria-label="${track.label} grand staff" role="img">`;
+
+      svg += renderSheetFrame(width, height, track.label, 'Grand staff layout with treble and bass staves');
+      svg += renderStaffLines(marginLeft, width - marginRight, trebleTop, spacing, 5);
+      svg += renderStaffLines(marginLeft, width - marginRight, bassTop, spacing, 5);
+      svg += `<line x1="${marginLeft}" y1="${trebleTop}" x2="${marginLeft}" y2="${bassBottom}" stroke="rgba(36,24,11,0.88)" stroke-width="2" />`;
+      svg += `<path d="M 36 ${trebleTop - 8} C 16 ${trebleTop + 6}, 16 ${bassBottom - 6}, 36 ${bassBottom + 8} C 50 ${bassBottom - 6}, 50 ${trebleTop + 6}, 36 ${trebleTop - 8}" fill="none" stroke="rgba(36,24,11,0.78)" stroke-width="2" />`;
+
+      for (let measure = 1; measure < 4; measure += 1) {
+        const barX = marginLeft + ((width - marginLeft - marginRight) / 4) * measure;
+        svg += `<line x1="${barX}" y1="${trebleTop}" x2="${barX}" y2="${trebleBottom}" stroke="rgba(36,24,11,0.45)" stroke-width="1.2" />`;
+        svg += `<line x1="${barX}" y1="${bassTop}" x2="${barX}" y2="${bassBottom}" stroke="rgba(36,24,11,0.45)" stroke-width="1.2" />`;
+      }
+
+      svg += `<text x="58" y="108" font-size="44" font-family="serif" fill="#24180b">𝄞</text>`;
+      svg += `<text x="58" y="220" font-size="44" font-family="serif" fill="#24180b">𝄢</text>`;
+      svg += `<text x="92" y="94" font-size="17" font-family="IBM Plex Mono, monospace" fill="#24180b">${escapeSvg(timeSignature[0] || '4')}</text>`;
+      svg += `<text x="92" y="118" font-size="17" font-family="IBM Plex Mono, monospace" fill="#24180b">${escapeSvg(timeSignature[1] || '4')}</text>`;
+      svg += `<text x="92" y="204" font-size="17" font-family="IBM Plex Mono, monospace" fill="#24180b">${escapeSvg(timeSignature[0] || '4')}</text>`;
+      svg += `<text x="92" y="228" font-size="17" font-family="IBM Plex Mono, monospace" fill="#24180b">${escapeSvg(timeSignature[1] || '4')}</text>`;
+
+      separated.treble.forEach((value, index) => {
+        if (value === '-') {
+          return;
+        }
+        const x = marginLeft + (stepWidth * index) + (stepWidth * 0.56);
+        const y = mapNoteToStaffY(value, 'treble', trebleTop, spacing);
+        const ledgerLines = getLedgerLinesForY(y, trebleTop, spacing);
+        svg += ledgerLines.map((ledgerY) => `<line x1="${x - 10}" y1="${ledgerY}" x2="${x + 10}" y2="${ledgerY}" stroke="rgba(36,24,11,0.82)" stroke-width="1.2" />`).join('');
+        svg += `<ellipse cx="${x}" cy="${y}" rx="8.2" ry="6" transform="rotate(-22 ${x} ${y})" fill="#24180b" />`;
+        svg += `<line x1="${x + 7}" y1="${y}" x2="${x + 7}" y2="${y - 34}" stroke="#24180b" stroke-width="1.5" />`;
+      });
+
+      separated.bass.forEach((value, index) => {
+        if (value === '-') {
+          return;
+        }
+        const x = marginLeft + (stepWidth * index) + (stepWidth * 0.56);
+        const y = mapNoteToStaffY(value, 'bass', bassTop, spacing);
+        const ledgerLines = getLedgerLinesForY(y, bassTop, spacing);
+        svg += ledgerLines.map((ledgerY) => `<line x1="${x - 10}" y1="${ledgerY}" x2="${x + 10}" y2="${ledgerY}" stroke="rgba(36,24,11,0.82)" stroke-width="1.2" />`).join('');
+        svg += `<ellipse cx="${x}" cy="${y}" rx="8.2" ry="6" transform="rotate(-22 ${x} ${y})" fill="#24180b" />`;
+        svg += `<line x1="${x - 7}" y1="${y}" x2="${x - 7}" y2="${y + 34}" stroke="#24180b" stroke-width="1.5" />`;
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function renderVocalSheet(track, sequence) {
+      const width = 760;
+      const height = 250;
+      const marginLeft = 94;
+      const marginRight = 28;
+      const staffTop = 82;
+      const spacing = 12;
+      const staffBottom = staffTop + (spacing * 4);
+      const stepWidth = (width - marginLeft - marginRight) / STEP_COUNT;
+      const timeSignature = state.meta.timeSignature.split('/');
+      const lyricWords = getLyricWords();
+      let lyricIndex = 0;
+      let svg = `<svg viewBox="0 0 ${width} ${height}" aria-label="${track.label} lead sheet" role="img">`;
+
+      svg += renderSheetFrame(width, height, track.label, 'Lead melody with lyric placement under the staff');
+      svg += renderStaffLines(marginLeft, width - marginRight, staffTop, spacing, 5);
+      svg += `<line x1="${marginLeft}" y1="${staffTop}" x2="${marginLeft}" y2="${staffBottom}" stroke="rgba(36,24,11,0.88)" stroke-width="2" />`;
+
+      for (let measure = 1; measure < 4; measure += 1) {
+        const barX = marginLeft + ((width - marginLeft - marginRight) / 4) * measure;
+        svg += `<line x1="${barX}" y1="${staffTop}" x2="${barX}" y2="${staffBottom}" stroke="rgba(36,24,11,0.45)" stroke-width="1.2" />`;
+      }
+
+      svg += `<text x="42" y="114" font-size="44" font-family="serif" fill="#24180b">𝄞</text>`;
+      svg += `<text x="78" y="100" font-size="17" font-family="IBM Plex Mono, monospace" fill="#24180b">${escapeSvg(timeSignature[0] || '4')}</text>`;
+      svg += `<text x="78" y="124" font-size="17" font-family="IBM Plex Mono, monospace" fill="#24180b">${escapeSvg(timeSignature[1] || '4')}</text>`;
+
+      sequence.forEach((value, index) => {
+        if (value === '-') {
+          return;
+        }
+
+        const x = marginLeft + (stepWidth * index) + (stepWidth * 0.56);
+        const y = mapNoteToStaffY(value, 'treble', staffTop, spacing);
+        const ledgerLines = getLedgerLinesForY(y, staffTop, spacing);
+        const lyric = lyricWords[lyricIndex] || 'la';
+        lyricIndex += 1;
+
+        svg += ledgerLines.map((ledgerY) => `<line x1="${x - 10}" y1="${ledgerY}" x2="${x + 10}" y2="${ledgerY}" stroke="rgba(36,24,11,0.82)" stroke-width="1.2" />`).join('');
+        svg += `<ellipse cx="${x}" cy="${y}" rx="8.2" ry="6" transform="rotate(-22 ${x} ${y})" fill="#24180b" />`;
+        svg += `<line x1="${x + 7}" y1="${y}" x2="${x + 7}" y2="${y - 34}" stroke="#24180b" stroke-width="1.5" />`;
+        svg += `<text x="${x}" y="${staffBottom + 36}" font-size="12" font-family="Space Grotesk, sans-serif" text-anchor="middle" fill="#675648">${escapeSvg(lyric)}</text>`;
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function renderDrumSheet(track, sequence) {
+      const width = 760;
+      const height = 252;
+      const marginLeft = 102;
+      const marginRight = 28;
+      const staffTop = 88;
+      const spacing = 12;
+      const staffBottom = staffTop + (spacing * 4);
+      const stepWidth = (width - marginLeft - marginRight) / STEP_COUNT;
+      const timeSignature = state.meta.timeSignature.split('/');
+      const drumMap = {
+        Crash: { y: staffTop - spacing, head: 'x', ledger: [staffTop - spacing] },
+        Hat: { y: staffTop, head: 'x', ledger: [] },
+        Clap: { y: staffTop + (spacing * 1.5), head: 'x', ledger: [] },
+        Snare: { y: staffTop + (spacing * 2), head: 'normal', ledger: [] },
+        Tom: { y: staffTop + (spacing * 3), head: 'normal', ledger: [] },
+        Kick: { y: staffTop + (spacing * 5), head: 'normal', ledger: [staffTop + (spacing * 4)] }
+      };
+      let svg = `<svg viewBox="0 0 ${width} ${height}" aria-label="${track.label} percussion sheet" role="img">`;
+
+      svg += renderSheetFrame(width, height, state.meta.songTitle || track.label, 'Pop groove chart with cymbal x-noteheads, snare backbeats, and kick voice below');
+      svg += renderStaffLines(marginLeft, width - marginRight, staffTop, spacing, 5);
+      svg += `<line x1="${marginLeft}" y1="${staffTop}" x2="${marginLeft}" y2="${staffBottom}" stroke="rgba(36,24,11,0.88)" stroke-width="2" />`;
+
+      for (let measure = 1; measure < 4; measure += 1) {
+        const barX = marginLeft + ((width - marginLeft - marginRight) / 4) * measure;
+        svg += `<line x1="${barX}" y1="${staffTop}" x2="${barX}" y2="${staffBottom}" stroke="rgba(36,24,11,0.45)" stroke-width="1.2" />`;
+      }
+
+      svg += `<line x1="46" y1="96" x2="46" y2="132" stroke="#24180b" stroke-width="2.3" />`;
+      svg += `<line x1="54" y1="96" x2="54" y2="132" stroke="#24180b" stroke-width="2.3" />`;
+      svg += `<text x="28" y="40" font-size="12" font-family="IBM Plex Mono, monospace" fill="#675648">Bar 1-4 groove</text>`;
+      svg += `<text x="82" y="106" font-size="17" font-family="IBM Plex Mono, monospace" fill="#24180b">${escapeSvg(timeSignature[0] || '4')}</text>`;
+      svg += `<text x="82" y="130" font-size="17" font-family="IBM Plex Mono, monospace" fill="#24180b">${escapeSvg(timeSignature[1] || '4')}</text>`;
+      svg += `<text x="40" y="78" font-size="11" font-family="IBM Plex Mono, monospace" fill="#675648">HH</text>`;
+      svg += `<text x="40" y="${staffTop + (spacing * 2) + 4}" font-size="11" font-family="IBM Plex Mono, monospace" fill="#675648">SD</text>`;
+      svg += `<text x="40" y="${staffTop + (spacing * 4) + 24}" font-size="11" font-family="IBM Plex Mono, monospace" fill="#675648">BD</text>`;
+
+      const hatPositions = [];
+
+      sequence.forEach((value, index) => {
+        if (value === '-') {
+          return;
+        }
+
+        const cue = drumMap[value] || drumMap.Snare;
+        const x = marginLeft + (stepWidth * index) + (stepWidth * 0.56);
+        svg += cue.ledger.map((ledgerY) => `<line x1="${x - 10}" y1="${ledgerY}" x2="${x + 10}" y2="${ledgerY}" stroke="rgba(36,24,11,0.82)" stroke-width="1.2" />`).join('');
+
+        if (cue.head === 'x') {
+          svg += `<line x1="${x - 6}" y1="${cue.y - 6}" x2="${x + 6}" y2="${cue.y + 6}" stroke="#24180b" stroke-width="1.8" />`;
+          svg += `<line x1="${x + 6}" y1="${cue.y - 6}" x2="${x - 6}" y2="${cue.y + 6}" stroke="#24180b" stroke-width="1.8" />`;
+          hatPositions.push({ x, y: cue.y });
+        } else {
+          svg += `<ellipse cx="${x}" cy="${cue.y}" rx="8.2" ry="6" transform="rotate(-22 ${x} ${cue.y})" fill="#24180b" />`;
+        }
+
+        const stemTop = cue.head === 'x' ? cue.y - 24 : cue.y - 34;
+        svg += `<line x1="${x + 7}" y1="${cue.y}" x2="${x + 7}" y2="${stemTop}" stroke="#24180b" stroke-width="1.5" />`;
+      });
+
+      for (let index = 0; index < hatPositions.length - 1; index += 1) {
+        const current = hatPositions[index];
+        const next = hatPositions[index + 1];
+        if (next.x - current.x < stepWidth * 2.2) {
+          svg += `<line x1="${current.x + 7}" y1="${current.y - 24}" x2="${next.x + 7}" y2="${next.y - 24}" stroke="#24180b" stroke-width="2.2" />`;
+        }
+      }
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function buildPracticeSections() {
+      const structureParts = state.meta.structure
+        .split('|')
+        .map((part) => part.trim())
+        .filter(Boolean);
+      const chordMap = parseChordMap(state.meta.chords);
+      const lyricSections = parseLyricSections(state.lyrics);
+
+      if (!structureParts.length) {
+        return [{
+          title: 'Song',
+          chords: chordMap.default || ['N.C.'],
+          lyrics: lyricSections.default || getLyricFallbackLines()
+        }];
+      }
+
+      return structureParts.map((title) => {
+        const normalized = normalizeSectionName(title);
+        const base = normalized.replace(/\d+/g, '').trim();
+        return {
+          title,
+          chords: chordMap[normalized] || chordMap[base] || chordMap.default || ['N.C.'],
+          lyrics: lyricSections[normalized] || lyricSections[base] || []
+        };
+      });
+    }
+
+    function parseChordMap(text) {
+      const map = {};
+      const lines = String(text || '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+
+      lines.forEach((line) => {
+        const match = /^([^:]+):(.*)$/.exec(line);
+        if (match) {
+          map[normalizeSectionName(match[1])] = splitChords(match[2]);
+        } else if (!map.default) {
+          map.default = splitChords(line);
+        }
+      });
+
+      if (!map.default) {
+        map.default = ['N.C.'];
+      }
+
+      return map;
+    }
+
+    function parseLyricSections(text) {
+      const sections = {};
+      const lines = String(text || '').split(/\r?\n/);
+      let currentKey = 'default';
+      sections[currentKey] = [];
+
+      lines.forEach((line) => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          if (sections[currentKey].length && sections[currentKey][sections[currentKey].length - 1] !== '') {
+            sections[currentKey].push('');
+          }
+          return;
+        }
+
+        if (/^(verse|chorus|bridge|intro|outro|pre-chorus|hook)/i.test(trimmed)) {
+          currentKey = normalizeSectionName(trimmed);
+          if (!sections[currentKey]) {
+            sections[currentKey] = [];
+          }
+          return;
+        }
+
+        sections[currentKey].push(trimmed);
+      });
+
+      Object.keys(sections).forEach((key) => {
+        sections[key] = sections[key].filter((line, index, array) => !(line === '' && array[index - 1] === ''));
+      });
+
+      return sections;
+    }
+
+    function splitChords(text) {
+      return String(text || '')
+        .split(/\||-|\s{2,}/)
+        .map((part) => part.trim())
+        .filter(Boolean);
+    }
+
+    function normalizeSectionName(value) {
+      return String(value || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+    }
+
+    function getPracticeRoleCue(track) {
+      const cueMap = {
+        electricGuitar: {
+          short: 'Hook and texture',
+          long: 'Use this chart as a rhythm and hook guide. Lock chord hits to the vocal phrasing and mark fills in the annotation box.'
+        },
+        acousticGuitar: {
+          short: 'Strum support',
+          long: 'Follow the chord line as a strumming chart. Keep section changes clear and support dynamics across verse and chorus lifts.'
+        },
+        bass: {
+          short: 'Root movement',
+          long: 'Treat the chord line as your harmonic roadmap. Outline roots and passing tones while following the lyric phrasing for section shape.'
+        },
+        keyboard: {
+          short: 'Chord beds',
+          long: 'Voice these chords for pads, hooks, or piano support. Use the section labels to shape register and texture changes.'
+        },
+        vocal: {
+          short: 'Lead guide',
+          long: 'Use the chord line and lyrics as a lead-sheet reference for melody and entrances. Mark harmony or breathing notes below.'
+        }
+      };
+
+      return cueMap[track.id] || {
+        short: 'Band chart',
+        long: 'Follow the section labels, chord movement, and lyric phrasing as a rehearsal guide.'
+      };
+    }
+
+    function getLyricFallbackLines() {
+      return String(state.lyrics || '')
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .slice(0, 4);
+    }
+
+    function escapeHtml(text) {
+      return escapeSvg(text);
+    }
+
+    function renderSheetFrame(width, height, title, subtitle) {
+      let svg = `<rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="18" fill="rgba(255,251,245,0.92)" stroke="rgba(48,32,12,0.08)" />`;
+      svg += `<text x="28" y="38" font-family="Space Grotesk, sans-serif" font-size="16" font-weight="700" fill="#24180b">${escapeSvg(title)}</text>`;
+      svg += `<text x="28" y="58" font-family="IBM Plex Mono, monospace" font-size="11" fill="#675648">${escapeSvg(subtitle)}</text>`;
+      return svg;
+    }
+
+    function renderStaffLines(startX, endX, top, spacing, count) {
+      let lines = '';
+      for (let line = 0; line < count; line += 1) {
+        const y = top + (line * spacing);
+        lines += `<line x1="${startX}" y1="${y}" x2="${endX}" y2="${y}" stroke="rgba(36,24,11,0.76)" stroke-width="1.35" />`;
+      }
+      return lines;
+    }
+
+    function splitKeyboardVoices(sequence) {
+      const treble = sequence.map((value) => {
+        if (value === '-') {
+          return '-';
+        }
+        return noteToMidiNumber(value) >= 60 ? value : '-';
+      });
+
+      const bass = sequence.map((value) => {
+        if (value === '-') {
+          return '-';
+        }
+        return noteToMidiNumber(value) < 60 ? value : '-';
+      });
+
+      if (bass.every((value) => value === '-')) {
+        for (let measure = 0; measure < 4; measure += 1) {
+          const slice = sequence.slice(measure * 4, (measure * 4) + 4);
+          const firstNote = slice.find((value) => value !== '-');
+          if (firstNote) {
+            bass[measure * 4] = lowerNoteByOctave(firstNote);
+          }
+        }
+      }
+
+      return { treble, bass };
+    }
+
+    function findTabPosition(noteName, strings) {
+      const noteMidi = noteToMidiNumber(noteName);
+      if (noteMidi === null) {
+        return null;
+      }
+
+      let best = null;
+      strings.forEach((string, stringIndex) => {
+        const fret = noteMidi - string.midi;
+        if (fret < 0 || fret > 15) {
+          return;
+        }
+
+        const score = fret + Math.abs(stringIndex - ((strings.length - 1) / 2)) * 0.3;
+        if (!best || score < best.score) {
+          best = { stringIndex, fret, score };
+        }
+      });
+
+      return best;
+    }
+
+    function mapNoteToStaffY(noteName, clef, staffTop, spacing) {
+      const diatonicIndex = getDiatonicIndex(noteName);
+      const reference = clef === 'bass' ? getDiatonicIndex('D3') : getDiatonicIndex('B4');
+      const middleLineY = staffTop + (spacing * 2);
+      return middleLineY - ((diatonicIndex - reference) * (spacing / 2));
+    }
+
+    function getLedgerLinesForY(y, staffTop, spacing) {
+      const ledgerLines = [];
+      const highestLineY = staffTop;
+      const lowestLineY = staffTop + (spacing * 4);
+
+      if (y <= highestLineY - spacing) {
+        for (let ledgerY = highestLineY - spacing; ledgerY >= y - 0.1; ledgerY -= spacing) {
+          ledgerLines.push(ledgerY);
+        }
+      }
+
+      if (y >= lowestLineY + spacing) {
+        for (let ledgerY = lowestLineY + spacing; ledgerY <= y + 0.1; ledgerY += spacing) {
+          ledgerLines.push(ledgerY);
+        }
+      }
+
+      return ledgerLines;
+    }
+
+    function getNotationBadge(track) {
+      if (track.id === 'drums') {
+        return 'pop drum chart';
+      }
+      return 'pop band lead sheet';
+    }
+
+    function getPreviewCaption(track) {
+      if (track.id === 'drums') {
+        return 'Groove-style rehearsal notation for drum set practice';
+      }
+      return 'Chord-over-lyrics chart for pop band rehearsal';
+    }
+
+    function getLyricWords() {
+      const ignored = new Set(['verse', 'chorus', 'bridge', 'intro', 'outro', 'pre-chorus', 'hook']);
+      return state.lyrics
+        .replace(/\r/g, ' ')
+        .split(/\s+/)
+        .map((word) => word.replace(/[^a-zA-Z'-]/g, ''))
+        .filter((word) => word && !ignored.has(word.toLowerCase()));
+    }
+
+    function lowerNoteByOctave(noteName) {
+      const match = /^([A-G])(#|b)?(\d)$/.exec(noteName);
+      if (!match) {
+        return noteName;
+      }
+      return `${match[1]}${match[2] || ''}${Math.max(0, Number(match[3]) - 1)}`;
+    }
+
+    function noteToMidiNumber(noteName) {
+      const match = /^([A-G])(#|b)?(\d)$/.exec(noteName);
+      if (!match) {
+        return null;
+      }
+
+      const semitoneMap = {
+        C: 0,
+        D: 2,
+        E: 4,
+        F: 5,
+        G: 7,
+        A: 9,
+        B: 11
+      };
+
+      let semitone = semitoneMap[match[1]];
+      if (match[2] === '#') {
+        semitone += 1;
+      }
+      if (match[2] === 'b') {
+        semitone -= 1;
+      }
+
+      return semitone + ((Number(match[3]) + 1) * 12);
+    }
+
+    function getDiatonicIndex(noteName) {
+      const match = /^([A-G])(#|b)?(\d)$/.exec(noteName);
+      if (!match) {
+        return 0;
+      }
+
+      const steps = { C: 0, D: 1, E: 2, F: 3, G: 4, A: 5, B: 6 };
+      return (Number(match[3]) * 7) + steps[match[1]];
+    }
+
+    function getClefSymbol(clef) {
+      if (clef === 'bass') {
+        return '𝄢';
+      }
+      if (clef === 'percussion') {
+        return '𝄥';
+      }
+      return '𝄞';
+    }
+
+    function escapeSvg(text) {
+      return String(text)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function syncInspector() {
+      const noteState = state.notes[state.inspectorTrack];
+      elements.selectedTrack.value = state.inspectorTrack;
+      elements.trackTone.value = noteState.tone;
+      elements.trackNotes.value = noteState.performance;
+    }
+
+    function renderSectionPreview() {
+      elements.sectionPreview.innerHTML = '';
+      const parts = state.meta.structure
+        .split('|')
+        .map((part) => part.trim())
+        .filter(Boolean);
+
+      if (!parts.length) {
+        const pill = document.createElement('div');
+        pill.textContent = 'Add a structure to map the song arc';
+        elements.sectionPreview.append(pill);
+        return;
+      }
+
+      parts.forEach((part) => {
+        const pill = document.createElement('div');
+        pill.textContent = part;
+        elements.sectionPreview.append(pill);
+      });
+    }
+
+    function updateHeroStats() {
+      elements.tempoValue.textContent = String(state.meta.tempo);
+      elements.trackCount.textContent = String(trackDefinitions.length);
+      elements.filledSteps.textContent = String(countFilledSteps());
+      elements.wordCount.textContent = String(countWords(state.lyrics));
+    }
+
+    function countFilledSteps() {
+      return trackDefinitions.reduce((total, track) => {
+        return total + state.tracks[track.id].filter((step) => step !== '-').length;
+      }, 0);
+    }
+
+    function countWords(text) {
+      const trimmed = text.trim();
+      if (!trimmed) {
+        return 0;
+      }
+      return trimmed.split(/\s+/).length;
+    }
+
+    function persistState(message) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      elements.saveStatus.textContent = `${message} at ${new Date().toLocaleTimeString()}`;
+      elements.autosaveLabel.textContent = 'Autosaved locally';
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        return createDefaultState();
+      }
+
+      try {
+        const parsed = JSON.parse(raw);
+        return sanitizeLoadedState(parsed);
+      } catch {
+        return createDefaultState();
+      }
+    }
+
+    function sanitizeLoadedState(parsed) {
+      const fallback = createDefaultState();
+      const safeState = structuredClone(fallback);
+
+      if (parsed.meta) {
+        safeState.meta.songTitle = String(parsed.meta.songTitle || fallback.meta.songTitle);
+        safeState.meta.artistName = String(parsed.meta.artistName || fallback.meta.artistName);
+        safeState.meta.songKey = keyOptions.includes(parsed.meta.songKey) ? parsed.meta.songKey : fallback.meta.songKey;
+        safeState.meta.timeSignature = parsed.meta.timeSignature || fallback.meta.timeSignature;
+        safeState.meta.tempo = clampTempo(Number(parsed.meta.tempo || fallback.meta.tempo));
+        safeState.meta.mood = String(parsed.meta.mood || '');
+        safeState.meta.structure = String(parsed.meta.structure || fallback.meta.structure);
+        safeState.meta.chords = String(parsed.meta.chords || '');
+      }
+
+      safeState.lyrics = typeof parsed.lyrics === 'string' ? parsed.lyrics : fallback.lyrics;
+      safeState.inspectorTrack = trackDefinitions.some((track) => track.id === parsed.inspectorTrack)
+        ? parsed.inspectorTrack
+        : fallback.inspectorTrack;
+
+      trackDefinitions.forEach((track) => {
+        const incomingTrack = Array.isArray(parsed.tracks?.[track.id]) ? parsed.tracks[track.id] : fallback.tracks[track.id];
+        safeState.tracks[track.id] = Array.from({ length: STEP_COUNT }, (_, index) => {
+          const candidate = incomingTrack[index] || '-';
+          return track.options.includes(candidate) ? candidate : '-';
+        });
+
+        safeState.tabs[track.id] = typeof parsed.tabs?.[track.id] === 'string'
+          ? parsed.tabs[track.id]
+          : fallback.tabs[track.id];
+
+        safeState.notes[track.id] = {
+          tone: typeof parsed.notes?.[track.id]?.tone === 'string' ? parsed.notes[track.id].tone : '',
+          performance: typeof parsed.notes?.[track.id]?.performance === 'string' ? parsed.notes[track.id].performance : ''
+        };
+      });
+
+      return safeState;
+    }
+
+    function clearPattern() {
+      trackDefinitions.forEach((track) => {
+        state.tracks[track.id] = Array(STEP_COUNT).fill('-');
+      });
+
+      renderSequencer();
+      renderTabs();
+      persistState('Pattern cleared');
+      updateHeroStats();
+      stopPlayback();
+    }
+
+    function exportProject() {
+      const payload = JSON.stringify(state, null, 2);
+      const blob = new Blob([payload], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const slug = (state.meta.songTitle || 'songforge-project')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+
+      link.href = url;
+      link.download = `${slug || 'songforge-project'}.json`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      elements.saveStatus.textContent = `Exported JSON at ${new Date().toLocaleTimeString()}`;
+    }
+
+    function importProject(event) {
+      const [file] = event.target.files || [];
+      if (!file) {
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const imported = JSON.parse(String(reader.result));
+          state = sanitizeLoadedState(imported);
+          renderAll();
+          persistState('Project imported');
+        } catch {
+          elements.saveStatus.textContent = 'Import failed: invalid JSON file.';
+        } finally {
+          elements.importFileInput.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function clampTempo(value) {
+      if (Number.isNaN(value)) {
+        return 96;
+      }
+      return Math.max(50, Math.min(220, Math.round(value)));
+    }
+
+    function startPlayback() {
+      if (playbackTimer) {
+        return;
+      }
+
+      ensureAudioContext();
+      currentStep = 0;
+      triggerCurrentStep();
+      playbackTimer = window.setInterval(triggerCurrentStep, getStepDurationMs());
+      elements.playButton.textContent = 'Playing';
+      elements.playButton.disabled = true;
+    }
+
+    function stopPlayback() {
+      if (playbackTimer) {
+        window.clearInterval(playbackTimer);
+        playbackTimer = null;
+      }
+
+      currentStep = 0;
+      clearStepHighlight();
+      updatePlayhead();
+      elements.playButton.textContent = 'Play';
+      elements.playButton.disabled = false;
+    }
+
+    function getStepDurationMs() {
+      return (60000 / clampTempo(state.meta.tempo)) / 4;
+    }
+
+    function triggerCurrentStep() {
+      const stepToPlay = currentStep;
+      const playbackTime = audioContext.currentTime + 0.02;
+      currentHighlightTrackIds = [];
+
+      trackDefinitions.forEach((track) => {
+        const cue = state.tracks[track.id][stepToPlay];
+        if (cue === '-') {
+          return;
+        }
+
+        currentHighlightTrackIds.push(track.id);
+        if (track.voice === 'drums') {
+          playDrum(cue, playbackTime);
+        } else {
+          playMelodic(track.voice, cue, playbackTime);
+        }
+      });
+
+      highlightStep(stepToPlay);
+      currentStep = (currentStep + 1) % STEP_COUNT;
+
+      if (playbackTimer) {
+        window.clearInterval(playbackTimer);
+        playbackTimer = window.setInterval(triggerCurrentStep, getStepDurationMs());
+      }
+    }
+
+    function ensureAudioContext() {
+      if (!audioContext) {
+        audioContext = new AudioContext();
+      }
+
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+
+      if (!noiseBuffer) {
+        noiseBuffer = createNoiseBuffer(audioContext);
+      }
+    }
+
+    function playMelodic(voice, noteName, time) {
+      const frequency = noteToFrequency(noteName);
+      if (!frequency) {
+        return;
+      }
+
+      const output = audioContext.createGain();
+      output.connect(audioContext.destination);
+
+      const filter = audioContext.createBiquadFilter();
+      filter.connect(output);
+
+      const mainOsc = audioContext.createOscillator();
+      const supportOsc = audioContext.createOscillator();
+      const detuneMap = {
+        electric: 6,
+        acoustic: -2,
+        bass: -4,
+        keyboard: 4,
+        vocal: 9
+      };
+      const typeMap = {
+        electric: 'sawtooth',
+        acoustic: 'triangle',
+        bass: 'square',
+        keyboard: 'sine',
+        vocal: 'triangle'
+      };
+      const filterMap = {
+        electric: { type: 'lowpass', frequency: 2200, q: 2.4, gain: 0.18, decay: 0.34 },
+        acoustic: { type: 'lowpass', frequency: 1800, q: 1.4, gain: 0.16, decay: 0.4 },
+        bass: { type: 'lowpass', frequency: 650, q: 1.2, gain: 0.2, decay: 0.42 },
+        keyboard: { type: 'lowpass', frequency: 2400, q: 0.8, gain: 0.14, decay: 0.52 },
+        vocal: { type: 'bandpass', frequency: 1400, q: 3, gain: 0.13, decay: 0.48 }
+      };
+      const settings = filterMap[voice];
+
+      mainOsc.type = typeMap[voice];
+      supportOsc.type = voice === 'bass' ? 'sine' : 'triangle';
+      mainOsc.frequency.setValueAtTime(frequency, time);
+      supportOsc.frequency.setValueAtTime(frequency * (voice === 'bass' ? 0.5 : 1.002), time);
+      supportOsc.detune.setValueAtTime(detuneMap[voice], time);
+
+      filter.type = settings.type;
+      filter.frequency.setValueAtTime(settings.frequency, time);
+      filter.Q.setValueAtTime(settings.q, time);
+
+      mainOsc.connect(filter);
+      supportOsc.connect(filter);
+
+      output.gain.setValueAtTime(0.0001, time);
+      output.gain.exponentialRampToValueAtTime(settings.gain, time + 0.018);
+      output.gain.exponentialRampToValueAtTime(0.0001, time + settings.decay);
+
+      if (voice === 'vocal') {
+        mainOsc.detune.setValueAtTime(0, time);
+        mainOsc.detune.linearRampToValueAtTime(18, time + 0.12);
+        mainOsc.detune.linearRampToValueAtTime(0, time + 0.24);
+      }
+
+      mainOsc.start(time);
+      supportOsc.start(time);
+      mainOsc.stop(time + settings.decay + 0.04);
+      supportOsc.stop(time + settings.decay + 0.04);
+    }
+
+    function playDrum(type, time) {
+      if (type === 'Kick' || type === 'Tom') {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.type = type === 'Kick' ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(type === 'Kick' ? 125 : 180, time);
+        osc.frequency.exponentialRampToValueAtTime(type === 'Kick' ? 44 : 90, time + 0.16);
+        gain.gain.setValueAtTime(0.23, time);
+        gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.18);
+        osc.start(time);
+        osc.stop(time + 0.2);
+        return;
+      }
+
+      const noise = audioContext.createBufferSource();
+      noise.buffer = noiseBuffer;
+
+      const filter = audioContext.createBiquadFilter();
+      const gain = audioContext.createGain();
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioContext.destination);
+
+      const drumSettings = {
+        Snare: { type: 'bandpass', freq: 1800, q: 0.7, level: 0.22, decay: 0.16 },
+        Hat: { type: 'highpass', freq: 7200, q: 0.8, level: 0.1, decay: 0.07 },
+        Clap: { type: 'highpass', freq: 2200, q: 0.9, level: 0.16, decay: 0.14 },
+        Crash: { type: 'highpass', freq: 5200, q: 0.65, level: 0.18, decay: 0.42 }
+      };
+
+      const settings = drumSettings[type] || drumSettings.Snare;
+      filter.type = settings.type;
+      filter.frequency.setValueAtTime(settings.freq, time);
+      filter.Q.setValueAtTime(settings.q, time);
+
+      gain.gain.setValueAtTime(settings.level, time);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + settings.decay);
+      noise.start(time);
+      noise.stop(time + settings.decay);
+    }
+
+    function createNoiseBuffer(context) {
+      const bufferSize = context.sampleRate;
+      const buffer = context.createBuffer(1, bufferSize, context.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      for (let index = 0; index < bufferSize; index += 1) {
+        data[index] = Math.random() * 2 - 1;
+      }
+
+      return buffer;
+    }
+
+    function noteToFrequency(noteName) {
+      const match = /^([A-G])(#|b)?(\d)$/.exec(noteName);
+      if (!match) {
+        return null;
+      }
+
+      const [, root, accidental = '', octaveText] = match;
+      const semitoneMap = {
+        C: 0,
+        D: 2,
+        E: 4,
+        F: 5,
+        G: 7,
+        A: 9,
+        B: 11
+      };
+      let semitone = semitoneMap[root];
+      if (accidental === '#') {
+        semitone += 1;
+      }
+      if (accidental === 'b') {
+        semitone -= 1;
+      }
+
+      const octave = Number(octaveText);
+      const midiNumber = semitone + ((octave + 1) * 12);
+      return 440 * Math.pow(2, (midiNumber - 69) / 12);
+    }
+
+    function highlightStep(stepIndex) {
+      clearStepHighlight();
+
+      document.querySelectorAll(`.step-select[data-step-index="${stepIndex}"]`).forEach((select) => {
+        select.classList.add('active-step');
+      });
+
+      currentHighlightTrackIds.forEach((trackId) => {
+        const row = document.querySelector(`.track-row[data-track-id="${trackId}"]`);
+        row?.classList.add('is-playing');
+      });
+
+      elements.playheadStep.textContent = String(stepIndex + 1).padStart(2, '0');
+    }
+
+    function clearStepHighlight() {
+      document.querySelectorAll('.step-select.active-step').forEach((select) => select.classList.remove('active-step'));
+      document.querySelectorAll('.track-row.is-playing').forEach((row) => row.classList.remove('is-playing'));
+    }
+
+    function updatePlayhead() {
+      elements.playheadStep.textContent = String(currentStep + 1).padStart(2, '0');
+    }
+  </script>
+</body>
+</html>

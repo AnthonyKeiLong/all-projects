@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deductive Geometry Lesson</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <!-- MathJax Configuration and Script -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                pageReady: () => {
+                    return MathJax.startup.defaultPageReady().then(() => {
+                        console.log('MathJax initial typesetting complete');
+                    });
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .angle-path {
+            transition: all 0.3s ease;
+        }
+        .quiz-option {
+            transition: all 0.2s ease;
+        }
+        /* Custom hide class for dynamically hiding elements */
+        .hidden-el { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-900 font-sans selection:bg-blue-200 pb-20">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center gap-2 text-blue-600">
+            <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold font-serif text-lg">
+                &Delta;
+            </div>
+            <h1 class="text-xl font-bold tracking-tight">GeoMastery</h1>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-8">
+        <!-- Navigation Tabs -->
+        <div class="flex p-1 bg-slate-200/60 rounded-xl mb-8 w-fit shadow-inner overflow-x-auto max-w-full">
+            <button onclick="switchTab('lesson')" id="tab-btn-lesson" class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all bg-white text-blue-600 shadow-sm whitespace-nowrap">
+                <i data-feather="book-open" class="w-4 h-4"></i> Lesson
+            </button>
+            <button onclick="switchTab('exercises')" id="tab-btn-exercises" class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all text-slate-600 hover:text-slate-800 whitespace-nowrap">
+                <i data-feather="edit-3" class="w-4 h-4"></i> Exercises
+            </button>
+            <button onclick="switchTab('quiz')" id="tab-btn-quiz" class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all text-slate-600 hover:text-slate-800 whitespace-nowrap">
+                <i data-feather="check-circle" class="w-4 h-4"></i> Quiz
+            </button>
+        </div>
+
+        <!-- ================= LESSON SECTION ================= -->
+        <div id="section-lesson" class="tab-content active space-y-8">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">Introduction to Deductive Geometry</h2>
+                <p class="text-slate-600 mb-4 leading-relaxed">
+                    Deductive geometry is a formal system of mathematics where we prove geometric facts (called <strong>Theorems</strong>) using a step-by-step logical process. We start from a few basic assumptions (called <strong>Axioms</strong>) and previously proven theorems.
+                </p>
+                <p class="text-slate-600 leading-relaxed">
+                    Every statement in a geometric proof must be supported by a valid <strong>reason</strong>. This builds an unbreakable chain of logic.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">Parallel Lines & Transversals</h2>
+                <p class="text-slate-600 mb-6">
+                    When two parallel lines are intersected by a third line (the transversal), special angle relationships are formed. Click the buttons below to highlight them!
+                </p>
+
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <!-- Interactive SVG Diagram -->
+                    <div class="w-full md:w-1/2 max-w-sm bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <svg viewBox="0 0 300 200" class="w-full h-auto drop-shadow-sm">
+                            <!-- Lines -->
+                            <line x1="20" y1="60" x2="280" y2="60" stroke="#334155" stroke-width="3" />
+                            <line x1="20" y1="140" x2="280" y2="140" stroke="#334155" stroke-width="3" />
+                            <line x1="100" y1="20" x2="220" y2="180" stroke="#3b82f6" stroke-width="3" />
+
+                            <!-- Arrow heads for parallel indication -->
+                            <polygon points="270,55 280,60 270,65" fill="#334155" />
+                            <polygon points="270,135 280,140 270,145" fill="#334155" />
+
+                            <!-- Angles at top intersection (100, 60) -->
+                            <!-- a: top-right (corresponding, at (100,60)), between parallel and transversal -->
+                            <path id="angle-a" class="angle-path" d="M 100 60 A 16 16 0 0 1 112 54" fill="none" stroke="#cbd5e1" stroke-width="2" />
+                            <text x="116" y="54" font-size="14" fill="#334155">a</text>
+
+                            <!-- b: bottom-left (alternate, at (100,60)), between parallel and transversal -->
+                            <path id="angle-b" class="angle-path" d="M 100 60 A 16 16 0 0 1 94 72" fill="none" stroke="#cbd5e1" stroke-width="2" />
+                            <text x="90" y="76" font-size="14" fill="#334155">b</text>
+
+                            <!-- c: top-left (interior, at (100,60)), between parallel and transversal -->
+                            <path id="angle-c" class="angle-path" d="M 100 60 A 16 16 0 0 0 88 54" fill="none" stroke="#cbd5e1" stroke-width="2" />
+                            <text x="80" y="54" font-size="14" fill="#334155">c</text>
+
+                            <!-- d: bottom-right (alternate, at (100,60)), between parallel and transversal -->
+                            <path id="angle-d" class="angle-path" d="M 100 60 A 16 16 0 0 0 106 72" fill="none" stroke="#cbd5e1" stroke-width="2" />
+                            <text x="110" y="76" font-size="14" fill="#334155">d</text>
+
+                            <!-- e: top-right (corresponding, at (180,140)), between parallel and transversal -->
+                            <path id="angle-e" class="angle-path" d="M 180 140 A 16 16 0 0 1 192 134" fill="none" stroke="#cbd5e1" stroke-width="2" />
+                            <text x="196" y="134" font-size="14" fill="#334155">e</text>
+
+                            <!-- f: bottom-right (interior, at (180,140)), between parallel and transversal -->
+                            <path id="angle-f" class="angle-path" d="M 180 140 A 16 16 0 0 0 186 152" fill="none" stroke="#cbd5e1" stroke-width="2" />
+                            <text x="190" y="156" font-size="14" fill="#334155">f</text>
+
+                            <!-- g: bottom-left (alternate, at (180,140)), between parallel and transversal -->
+                            <path id="angle-g" class="angle-path" d="M 180 140 A 16 16 0 0 1 168 146" fill="none" stroke="#cbd5e1" stroke-width="2" />
+                            <text x="160" y="150" font-size="14" fill="#334155">g</text>
+
+                            <!-- h: top-left (alternate, at (180,140)), between parallel and transversal -->
+                            <path id="angle-h" class="angle-path" d="M 180 140 A 16 16 0 0 0 174 128" fill="none" stroke="#cbd5e1" stroke-width="2" />
+                            <text x="160" y="130" font-size="14" fill="#334155">h</text>
+                        </svg>
+                    </div>
+
+                    <!-- Controls & Explanations -->
+                    <div class="w-full md:w-1/2 space-y-3">
+                        <button onclick="highlightAngles('alt')" id="btn-alt" class="angle-btn w-full text-left p-3 rounded-lg border transition-all bg-white border-slate-200 hover:bg-slate-50">
+                            <div class="font-semibold text-slate-800">Alternate Angles</div>
+                            <div class="text-sm text-slate-600">$\angle b = \angle g$ and $\angle d = \angle f$</div>
+                            <div id="desc-alt" class="hidden-el text-xs text-emerald-600 mt-1">Form a 'Z' shape. They are equal!</div>
+                        </button>
+
+                        <button onclick="highlightAngles('corr')" id="btn-corr" class="angle-btn w-full text-left p-3 rounded-lg border transition-all bg-white border-slate-200 hover:bg-slate-50">
+                            <div class="font-semibold text-slate-800">Corresponding Angles</div>
+                            <div class="text-sm text-slate-600">$\angle a = \angle e$ (and others)</div>
+                            <div id="desc-corr" class="hidden-el text-xs text-red-600 mt-1">Form an 'F' shape. They are equal!</div>
+                        </button>
+
+                        <button onclick="highlightAngles('int')" id="btn-int" class="angle-btn w-full text-left p-3 rounded-lg border transition-all bg-white border-slate-200 hover:bg-slate-50">
+                            <div class="font-semibold text-slate-800">Interior Angles</div>
+                            <div class="text-sm text-slate-600">$\angle c + \angle f = 180^\circ$</div>
+                            <div id="desc-int" class="hidden-el text-xs text-red-600 mt-1">Form a 'C' shape. They are supplementary (add up to $180^\circ$)!</div>
+                        </button>
+                        
+                        <button onclick="highlightAngles('vert')" id="btn-vert" class="angle-btn w-full text-left p-3 rounded-lg border transition-all bg-white border-slate-200 hover:bg-slate-50">
+                            <div class="font-semibold text-slate-800">Vertically Opposite Angles</div>
+                            <div class="text-sm text-slate-600">$\angle a = \angle c$ (and others)</div>
+                            <div id="desc-vert" class="hidden-el text-xs text-red-600 mt-1">Form an 'X' shape. They are always equal, even without parallel lines!</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">Triangle Properties</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-semibold text-lg text-slate-800 mb-2">1. Angle Sum of Triangle</h3>
+                        <p class="text-slate-600 mb-2">The sum of the interior angles of any triangle is always $180^\circ$.</p>
+                        <div class="bg-slate-50 p-4 rounded-lg text-center border border-slate-200">
+                            <div>$$\angle A + \angle B + \angle C = 180^\circ$$</div>
+                            <p class="text-sm text-slate-500 mt-2">Reason: $\angle$ sum of $\triangle$</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg text-slate-800 mb-2">2. Exterior Angle of Triangle</h3>
+                        <p class="text-slate-600 mb-2">The exterior angle of a triangle equals the sum of the two opposite interior angles.</p>
+                        <div class="bg-slate-50 p-4 rounded-lg text-center border border-slate-200">
+                            <div>$$Ext. \angle = Int. \angle_1 + Int. \angle_2$$</div>
+                            <p class="text-sm text-slate-500 mt-2">Reason: ext. $\angle$ of $\triangle$</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= EXERCISES SECTION ================= -->
+        <div id="section-exercises" class="tab-content space-y-8">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Interactive Proof Practice</h2>
+                <p class="text-slate-600 mb-6">Fill in the correct deductive reasons to complete the geometric proofs.</p>
+
+                <!-- EXERCISE 1 -->
+                <div class="mb-10 p-6 bg-slate-50 rounded-xl border border-slate-200">
+                    <div class="flex flex-col sm:flex-row justify-between items-start mb-4 gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">Problem 1</h3>
+                            <p class="text-slate-600 mt-1">Given: $AB \parallel CD$. Find the value of $x$.</p>
+                        </div>
+                        <div class="w-32 h-24 bg-white border border-slate-200 rounded-lg flex items-center justify-center p-2 shrink-0">
+                            <svg viewBox="0 0 100 80" class="w-full h-full">
+                                <line x1="10" y1="20" x2="90" y2="20" stroke="black" stroke-width="2" />
+                                <text x="5" y="25" font-size="10">A</text>
+                                <text x="92" y="25" font-size="10">B</text>
+                                
+                                <line x1="10" y1="60" x2="90" y2="60" stroke="black" stroke-width="2" />
+                                <text x="5" y="65" font-size="10">C</text>
+                                <text x="92" y="65" font-size="10">D</text>
+
+                                <line x1="30" y1="10" x2="70" y2="70" stroke="blue" stroke-width="2" />
+                                
+                                <text x="42" y="32" font-size="10">50°</text>
+                                <text x="65" y="55" font-size="10">x</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white p-3 rounded-lg border border-slate-200">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold shrink-0">1</div>
+                            <div class="flex-1 w-full sm:w-auto">$\angle x = 50^\circ$</div>
+                            <div class="flex-1 flex items-center gap-2 w-full sm:w-auto">
+                                <span class="text-sm text-slate-500 whitespace-nowrap">Reason:</span>
+                                <select id="ex1-step1" onchange="checkExercise('ex1-step1', 'alt', 'ex1-icon')" class="p-2 border border-slate-300 rounded-md text-sm outline-none w-full sm:w-48 bg-white transition-colors">
+                                    <option value="">Select reason...</option>
+                                    <option value="corr">corr. angles, AB // CD</option>
+                                    <option value="alt">alt. angles, AB // CD</option>
+                                    <option value="int">int. angles, AB // CD</option>
+                                    <option value="vert">vert. opp. angles</option>
+                                </select>
+                                <i id="ex1-icon" data-feather="check-circle" class="w-5 h-5 text-green-500 hidden-el"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EXERCISE 2 -->
+                <div class="p-6 bg-slate-50 rounded-xl border border-slate-200">
+                    <div class="flex flex-col sm:flex-row justify-between items-start mb-4 gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">Problem 2: Triangle Exterior</h3>
+                            <p class="text-slate-600 mt-1">Given the triangle below, find the value of $y$.</p>
+                        </div>
+                        <div class="w-32 h-24 bg-white border border-slate-200 rounded-lg flex items-center justify-center p-2 shrink-0">
+                            <svg viewBox="0 0 100 80" class="w-full h-full">
+                                <polygon points="20,60 70,60 40,20" fill="none" stroke="black" stroke-width="2" />
+                                <line x1="70" y1="60" x2="95" y2="60" stroke="black" stroke-width="2" />
+                                
+                                <text x="35" y="35" font-size="10">70°</text>
+                                <text x="25" y="55" font-size="10">60°</text>
+                                <text x="75" y="55" font-size="10">y</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white p-3 rounded-lg border border-slate-200">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold shrink-0">1</div>
+                            <div class="flex-1 w-full sm:w-auto">$y = 70^\circ + 60^\circ$</div>
+                            <div class="flex-1 flex items-center gap-2 w-full sm:w-auto">
+                                <span class="text-sm text-slate-500 whitespace-nowrap">Reason:</span>
+                                <select id="ex2-step1" onchange="checkExercise('ex2-step1', 'ext', 'ex2-icon')" class="p-2 border border-slate-300 rounded-md text-sm outline-none w-full sm:w-48 bg-white transition-colors">
+                                    <option value="">Select reason...</option>
+                                    <option value="sum">$\angle$ sum of $\triangle$</option>
+                                    <option value="ext">ext. $\angle$ of $\triangle$</option>
+                                    <option value="adj">adj. $\angle$s on st. line</option>
+                                </select>
+                                <i id="ex2-icon" data-feather="check-circle" class="w-5 h-5 text-green-500 hidden-el"></i>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white p-3 rounded-lg border border-slate-200">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold shrink-0">2</div>
+                            <div class="flex-1 w-full sm:w-auto">$y = 130^\circ$</div>
+                            <div class="flex-1 flex items-center gap-2 w-full sm:w-auto">
+                                <span class="text-sm text-slate-500 italic">Calculation step</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= QUIZ SECTION ================= -->
+        <div id="section-quiz" class="tab-content space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800">Knowledge Check</h2>
+                    <div id="quiz-score-container" class="hidden-el px-4 py-2 rounded-full font-bold flex items-center gap-2">
+                        <i data-feather="award" class="w-5 h-5"></i>
+                        <span id="quiz-score-text">Score: 0 / 5</span>
+                    </div>
+                </div>
+
+                <div id="quiz-review-alert" class="hidden-el mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3 text-amber-800">
+                    <i data-feather="alert-circle" class="w-6 h-6 shrink-0 mt-0.5"></i>
+                    <div>
+                        <h4 class="font-bold">Review Mode Active</h4>
+                        <p class="text-sm">You have some incorrect answers. The wrong choices are highlighted in red. Change your answers below and click "Re-submit Corrections" to improve your score!</p>
+                    </div>
+                </div>
+
+                <div id="quiz-questions-container" class="space-y-8">
+                    <!-- Quiz questions will be dynamically injected here via JS -->
+                </div>
+
+                <div class="mt-8 flex justify-end gap-4">
+                    <button id="btn-submit-quiz" onclick="submitQuiz()" class="px-8 py-3 font-semibold rounded-xl transition-colors bg-slate-200 text-slate-400 cursor-not-allowed" disabled>
+                        Submit Quiz
+                    </button>
+                    <button id="btn-retake-quiz" onclick="resetQuiz()" class="hidden-el px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 flex items-center gap-2">
+                        <i data-feather="refresh-cw" class="w-5 h-5"></i> Retake Quiz
+                    </button>
+                    <button id="btn-resubmit-quiz" onclick="submitQuiz()" class="hidden-el px-6 py-3 bg-amber-500 text-white font-semibold rounded-xl hover:bg-amber-600 flex items-center gap-2">
+                        <i data-feather="refresh-cw" class="w-5 h-5"></i> Re-submit Corrections
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Interactive Logic -->
+    <script>
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace();
+            renderQuiz();
+        });
+
+        // --- TAB NAVIGATION ---
+        function switchTab(tabId) {
+            // Hide all sections
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            // Remove active styles from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+                btn.classList.add('text-slate-600');
+            });
+
+            // Show selected section
+            document.getElementById(`section-${tabId}`).classList.add('active');
+            
+            // Add active style to selected button
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            activeBtn.classList.remove('text-slate-600');
+            activeBtn.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+
+            // Optionally re-trigger MathJax to ensure nothing is missed when unhidden
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise([document.getElementById(`section-${tabId}`)]);
+            }
+        }
+
+        // --- LESSON: INTERACTIVE DIAGRAM ---
+        function highlightAngles(type) {
+            // Reset all paths
+            document.querySelectorAll('.angle-path').forEach(p => {
+                p.setAttribute('stroke', '#cbd5e1');
+                p.setAttribute('stroke-width', '2');
+            });
+            
+            // Reset all buttons
+            document.querySelectorAll('.angle-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-50', 'border-emerald-400', 'bg-red-50', 'border-red-400', 'shadow-sm');
+                btn.classList.add('bg-white', 'border-slate-200');
+            });
+
+            // Hide all descriptions
+            document.getElementById('desc-alt').classList.add('hidden-el');
+            document.getElementById('desc-corr').classList.add('hidden-el');
+            document.getElementById('desc-int').classList.add('hidden-el');
+            document.getElementById('desc-vert').classList.add('hidden-el');
+
+            // Highlight based on type
+            let activePaths = [];
+            let activeColor = '#ef4444'; // default red
+            let btnClass = ['bg-red-50', 'border-red-400', 'shadow-sm'];
+
+            if (type === 'alt') {
+                activePaths = ['angle-b', 'angle-g', 'angle-d', 'angle-f'];
+                activeColor = '#10b981'; // emerald
+                btnClass = ['bg-emerald-50', 'border-emerald-400', 'shadow-sm'];
+                document.getElementById('desc-alt').classList.remove('hidden-el');
+            } else if (type === 'corr') {
+                activePaths = ['angle-a', 'angle-e'];
+                document.getElementById('desc-corr').classList.remove('hidden-el');
+            } else if (type === 'int') {
+                activePaths = ['angle-c', 'angle-f'];
+                document.getElementById('desc-int').classList.remove('hidden-el');
+            } else if (type === 'vert') {
+                activePaths = ['angle-a', 'angle-c', 'angle-b', 'angle-d'];
+                document.getElementById('desc-vert').classList.remove('hidden-el');
+            }
+
+            // Apply SVG styles
+            activePaths.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.setAttribute('stroke', activeColor);
+                    el.setAttribute('stroke-width', '4');
+                }
+            });
+
+            // Apply Button styles
+            const btn = document.getElementById(`btn-${type}`);
+            btn.classList.remove('bg-white', 'border-slate-200');
+            btn.classList.add(...btnClass);
+        }
+
+        // --- EXERCISES: CHECKING ANSWERS ---
+        function checkExercise(selectId, correctValue, iconId) {
+            const selectEl = document.getElementById(selectId);
+            const iconEl = document.getElementById(iconId);
+            
+            if (selectEl.value === correctValue) {
+                selectEl.classList.remove('border-slate-300', 'bg-white');
+                selectEl.classList.add('border-green-400', 'bg-green-50');
+                iconEl.classList.remove('hidden-el');
+            } else {
+                selectEl.classList.add('border-slate-300', 'bg-white');
+                selectEl.classList.remove('border-green-400', 'bg-green-50');
+                iconEl.classList.add('hidden-el');
+            }
+        }
+
+        // --- QUIZ LOGIC ---
+        const quizData = [
+            {
+                id: 1,
+                text: 'What is the sum of the interior angles of any triangle?',
+                options: ['$$90^\\circ$$', '$$180^\\circ$$', '$$270^\\circ$$', '$$360^\\circ$$'],
+                correctIndex: 1,
+            },
+            {
+                id: 2,
+                text: 'If two parallel lines are cut by a transversal, the corresponding angles are...',
+                options: ['Complementary', 'Supplementary (add to $180^\\circ$)', 'Equal', 'Always $90^\\circ$'],
+                correctIndex: 2,
+            },
+            {
+                id: 3,
+                text: 'The exterior angle of a triangle is equal to:',
+                options: [
+                    'The sum of the two opposite interior angles',
+                    '$180^\\circ$ minus the adjacent interior angle',
+                    'Both A and B are true statements',
+                    'None of the above'
+                ],
+                correctIndex: 2,
+            },
+            {
+                id: 4,
+                text: 'Which of the following forms an "X" shape and denotes equal angles?',
+                options: [
+                    'Alternate angles',
+                    'Corresponding angles',
+                    'Interior angles',
+                    'Vertically opposite angles'
+                ],
+                correctIndex: 3,
+            },
+            {
+                id: 5,
+                text: 'If $\\angle A$ and $\\angle B$ are interior angles on the same side of a transversal cutting parallel lines, then:',
+                options: [
+                    '$\\angle A = \\angle B$',
+                    '$\\angle A + \\angle B = 180^\\circ$',
+                    '$\\angle A + \\angle B = 90^\\circ$',
+                    '$\\angle A - \\angle B = 0$'
+                ],
+                correctIndex: 1,
+            }
+        ];
+
+        let userAnswers = {};
+        let isQuizSubmitted = false;
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = ''; // Clear existing
+
+            quizData.forEach((q, i) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.id = `q-container-${q.id}`;
+                questionDiv.className = 'p-5 rounded-xl border-2 border-slate-100 bg-slate-50 transition-colors';
+
+                let optionsHtml = '';
+                q.options.forEach((opt, optIdx) => {
+                    optionsHtml += `
+                        <button 
+                            id="q${q.id}-opt${optIdx}" 
+                            onclick="selectQuizOption(${q.id}, ${optIdx})" 
+                            class="quiz-option p-3 text-left rounded-lg border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 bg-white text-slate-700 w-full"
+                        >
+                            ${opt}
+                        </button>
+                    `;
+                });
+
+                questionDiv.innerHTML = `
+                    <h3 class="font-semibold text-slate-800 mb-4 flex gap-2">
+                        <span>${i + 1}.</span> <span>${q.text}</span>
+                    </h3>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        ${optionsHtml}
+                    </div>
+                    <p id="q${q.id}-feedback" class="text-green-600 text-sm mt-3 flex items-center gap-1 hidden-el">
+                        <i data-feather="check-circle" class="w-4 h-4"></i> Correct!
+                    </p>
+                `;
+                container.appendChild(questionDiv);
+            });
+
+            // Re-run feather icons and MathJax for the new HTML
+            feather.replace();
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise([container]);
+            }
+        }
+
+        function selectQuizOption(qId, optIdx) {
+            userAnswers[qId] = optIdx;
+            
+            // Reset styles for all options in this question
+            const q = quizData.find(item => item.id === qId);
+            q.options.forEach((_, idx) => {
+                const btn = document.getElementById(`q${qId}-opt${idx}`);
+                btn.className = 'quiz-option p-3 text-left rounded-lg border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 bg-white text-slate-700 w-full';
+            });
+
+            // Style selected option
+            const selectedBtn = document.getElementById(`q${qId}-opt${optIdx}`);
+            selectedBtn.className = 'quiz-option p-3 text-left rounded-lg border-2 border-blue-500 bg-blue-50 text-blue-700 ring-2 ring-blue-200 w-full';
+
+            // Check if all answered to enable submit
+            if (Object.keys(userAnswers).length === quizData.length && !isQuizSubmitted) {
+                const submitBtn = document.getElementById('btn-submit-quiz');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('bg-slate-200', 'text-slate-400', 'cursor-not-allowed');
+                submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'text-white');
+            }
+
+            // If reviewing, visually clear feedback until resubmit
+            if (isQuizSubmitted) {
+                document.getElementById(`q-container-${qId}`).classList.remove('border-red-200', 'bg-red-50');
+                document.getElementById(`q-container-${qId}`).classList.add('border-blue-200', 'bg-blue-50');
+            }
+        }
+
+        function submitQuiz() {
+            isQuizSubmitted = true;
+            let score = 0;
+
+            quizData.forEach(q => {
+                const selected = userAnswers[q.id];
+                const isCorrect = selected === q.correctIndex;
+                const container = document.getElementById(`q-container-${q.id}`);
+                const feedback = document.getElementById(`q${q.id}-feedback`);
+
+                // Style Container
+                if (isCorrect) {
+                    score++;
+                    container.className = 'p-5 rounded-xl border-2 border-green-200 bg-green-50 transition-colors';
+                    feedback.classList.remove('hidden-el');
+                } else {
+                    container.className = 'p-5 rounded-xl border-2 border-red-200 bg-red-50 transition-colors';
+                    feedback.classList.add('hidden-el');
+                }
+
+                // Style Buttons based on correctness
+                q.options.forEach((_, idx) => {
+                    const btn = document.getElementById(`q${q.id}-opt${idx}`);
+                    // Reset to base
+                    btn.className = 'quiz-option p-3 text-left rounded-lg border-2 border-slate-200 bg-white text-slate-700 w-full opacity-60 pointer-events-none';
+                    
+                    if (idx === selected) {
+                        if (isCorrect) {
+                            btn.className = 'quiz-option p-3 text-left rounded-lg border-2 border-green-500 bg-green-100 text-green-800 font-medium w-full pointer-events-none';
+                        } else {
+                            // Let user re-select if wrong (remove pointer-events-none)
+                            btn.className = 'quiz-option p-3 text-left rounded-lg border-2 border-red-500 bg-red-100 text-red-800 w-full';
+                        }
+                    } else if (!isCorrect) {
+                        // Keep other options clickable if the answer was wrong
+                        btn.className = 'quiz-option p-3 text-left rounded-lg border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 bg-white text-slate-700 w-full cursor-pointer';
+                    }
+                });
+            });
+
+            // Update UI blocks
+            const scoreContainer = document.getElementById('quiz-score-container');
+            const scoreText = document.getElementById('quiz-score-text');
+            const reviewAlert = document.getElementById('quiz-review-alert');
+            
+            scoreText.innerText = `Score: ${score} / ${quizData.length}`;
+            scoreContainer.classList.remove('hidden-el');
+
+            document.getElementById('btn-submit-quiz').classList.add('hidden-el');
+
+            if (score === quizData.length) {
+                // Perfect score
+                scoreContainer.className = 'px-4 py-2 rounded-full font-bold flex items-center gap-2 bg-green-100 text-green-700';
+                reviewAlert.classList.add('hidden-el');
+                document.getElementById('btn-resubmit-quiz').classList.add('hidden-el');
+                document.getElementById('btn-retake-quiz').classList.remove('hidden-el');
+            } else {
+                // Review mode
+                scoreContainer.className = 'px-4 py-2 rounded-full font-bold flex items-center gap-2 bg-amber-100 text-amber-700';
+                reviewAlert.classList.remove('hidden-el');
+                document.getElementById('btn-resubmit-quiz').classList.remove('hidden-el');
+                document.getElementById('btn-retake-quiz').classList.add('hidden-el');
+            }
+        }
+
+        function resetQuiz() {
+            userAnswers = {};
+            isQuizSubmitted = false;
+            
+            document.getElementById('quiz-score-container').classList.add('hidden-el');
+            document.getElementById('quiz-review-alert').classList.add('hidden-el');
+            
+            const submitBtn = document.getElementById('btn-submit-quiz');
+            submitBtn.classList.remove('hidden-el');
+            submitBtn.disabled = true;
+            submitBtn.className = 'px-8 py-3 font-semibold rounded-xl transition-colors bg-slate-200 text-slate-400 cursor-not-allowed';
+            
+            document.getElementById('btn-retake-quiz').classList.add('hidden-el');
+            document.getElementById('btn-resubmit-quiz').classList.add('hidden-el');
+
+            renderQuiz(); // Re-render to reset visual states cleanly
+        }
+    </script>
+</body>
+</html>

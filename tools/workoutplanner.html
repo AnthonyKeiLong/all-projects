@@ -1,0 +1,1234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EliteFit Pro — Workout Planner</title>
+  <style>
+    /* ── Reset & Base ─────────────────────────────── */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;background:#0a1118;color:#e2eaf0;min-height:100vh}
+    /* ── Layout ──────────────────────────────────── */
+    .page-header{background:#0d1a24;border-bottom:1px solid #1e2e3a;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+    .container{max-width:900px;margin:0 auto;padding:20px 16px}
+    .section{margin-bottom:20px}
+    .section-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#3e6070;margin-bottom:10px}
+    /* ── Brand ───────────────────────────────────── */
+    .brand{display:flex;gap:12px;align-items:center}
+    .brand-icon{width:42px;height:42px;background:#10b981;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px}
+    .brand-name{font-weight:800;font-size:1.1rem;letter-spacing:-.3px}
+    .brand-name span{color:#10b981}
+    .brand-sub{font-size:12px;color:#5e7d91}
+    /* ── Buttons ─────────────────────────────────── */
+    button{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:8px 14px;background:#10b981;color:#052016;font-weight:600;transition:background .15s,opacity .15s}
+    button:hover{background:#0ed494}
+    button:active{opacity:.8}
+    button:disabled{opacity:.4;cursor:not-allowed}
+    .btn-ghost{background:#0d1e2a;color:#8ca5b5;border:1px solid #1e3040}
+    .btn-ghost:hover{background:#142533;color:#d0e4ef}
+    .btn-danger{background:transparent;color:#5e7d91;padding:4px 10px}
+    .btn-danger:hover{color:#ef4444;background:#1a1010}
+    /* ── Week Navigation ─────────────────────────── */
+    .week-nav{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+    .week-btn{min-width:66px;padding:10px 8px;border-radius:10px;border:1px solid #1c2d38;background:#0d1e2a;color:#5e7d91;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;transition:background .15s,border-color .15s}
+    .week-btn.active{background:#10b981;color:#052016;border-color:#0ea872}
+    .week-dot{width:6px;height:6px;border-radius:50%;background:#1e3040}
+    .week-dot.has-workout{background:#10b981}
+    .week-btn.active .week-dot{background:#052016}
+    /* ── Card ────────────────────────────────────── */
+    .card{background:#0d1e2a;border:1px solid #1c2d38;border-radius:14px;overflow:hidden;margin-bottom:20px}
+    .card-header{padding:16px 20px;border-bottom:1px solid #1c2d38;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
+    .card-body{padding:16px 20px}
+    .card-body+.card-body{border-top:1px solid #1c2d38}
+    .card-footer{padding:16px 20px;background:#0a1520;border-top:1px solid #1c2d38}
+    .day-label{font-size:12px;color:#10b981;text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:4px}
+    .day-title{font-size:1.4rem;font-weight:800}
+    /* ── Progress ────────────────────────────────── */
+    .progress-box{min-width:130px}
+    .progress-cap{font-size:11px;color:#5e7d91;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+    .progress-row{display:flex;align-items:center;gap:10px}
+    .progress-track{flex:1;height:6px;background:#152030;border-radius:99px;overflow:hidden}
+    .progress-fill{height:100%;background:#10b981;border-radius:99px;transition:width .4s ease}
+    .progress-pct{font-size:13px;font-weight:700;color:#10b981;min-width:34px;text-align:right}
+    /* ── Selector row ────────────────────────────── */
+    .selector-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+    .selector-row label{font-size:13px;color:#5e7d91}
+    select{font:inherit;padding:7px 10px;border-radius:8px;border:1px solid #1e3040;background:#061016;color:#d0e4ef;cursor:pointer}
+    select:focus{outline:2px solid #10b981;outline-offset:2px}
+    .equipment-tag{font-size:11px;color:#3e6070;border:1px solid #182530;border-radius:6px;padding:3px 8px;margin-left:auto}
+    /* ── Suggestions panel ───────────────────────── */
+    .suggestions-panel{background:#061420;border:1px solid #1a2e3c;border-radius:10px;padding:12px 14px;margin-bottom:14px}
+    .suggestions-panel h4{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:#10b981;margin-bottom:10px}
+    .suggest-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #102030}
+    .suggest-row:last-child{border-bottom:0}
+    .suggest-info strong{font-size:14px}
+    .suggest-meta{font-size:12px;color:#5e7d91;margin-top:2px}
+    .suggest-added{color:#10b981;font-size:11px;margin-left:6px}
+    /* ── Exercise list ───────────────────────────── */
+    .ex-grid{display:grid;grid-template-columns:22px 1fr 100px 90px 50px;gap:10px;align-items:center}
+    .ex-header{padding:0 6px 8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#3e6070;border-bottom:1px solid #152030;margin-bottom:8px}
+    .ex-row{padding:10px 6px;border-radius:8px;border:1px solid #152030;margin-bottom:6px;transition:border-color .15s,background .15s}
+    .ex-row.done{background:#061a12;border-color:#0c3020}
+    .ex-row.done .ex-name{text-decoration:line-through;color:#3e6070}
+    .ex-name{font-weight:700;font-size:14px}
+    .ex-tag{background:#0d1e2a;border:1px solid #1c2d38;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:600;color:#8ca5b5;text-align:center}
+    .empty-state{text-align:center;padding:32px 0;color:#3e6070;font-size:14px}
+    /* ── Checkbox ────────────────────────────────── */
+    input[type=checkbox]{width:18px;height:18px;cursor:pointer;accent-color:#10b981}
+    /* ── Add-exercise form ───────────────────────── */
+    .add-form{display:flex;gap:8px;flex-wrap:wrap}
+    input[type=text],input[type=number]{font:inherit;padding:8px 10px;border-radius:8px;border:1px solid #1e3040;background:#061016;color:#d0e4ef}
+    input[type=text]:focus,input[type=number]:focus{outline:2px solid #10b981;outline-offset:2px}
+    .input-name{flex:1;min-width:180px}
+    .input-short{width:82px}
+    /* ── Save indicator ──────────────────────────── */
+    .save-indicator{font-size:11px;color:#3e6070}
+    .save-indicator.saved{color:#10b981}
+    /* ── Demo viewer ─────────────────────────────── */
+    .demo-layout{display:grid;grid-template-columns:minmax(280px,1.1fr) minmax(240px,.9fr);gap:18px;align-items:stretch}
+    .demo-stage-wrap{position:relative;min-height:390px;border-radius:14px;overflow:hidden;border:1px solid #183041;background:
+      radial-gradient(circle at top,#234054 0%,#10202b 34%,#09121a 78%,#050b11 100%)}
+    .demo-stage{width:100%;height:100%;min-height:390px}
+    .demo-badge{position:absolute;top:12px;left:12px;padding:6px 10px;border-radius:999px;background:rgba(6,16,22,.82);border:1px solid #244554;color:#9fd4eb;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;backdrop-filter:blur(8px)}
+    .demo-panel{display:flex;flex-direction:column;gap:14px}
+    .demo-controls{margin-bottom:0}
+    .demo-title{font-size:1.2rem;font-weight:800;color:#f3fafc}
+    .demo-description{font-size:14px;line-height:1.55;color:#8ca5b5}
+    .demo-cues{padding:12px 14px;border-radius:12px;background:#061420;border:1px solid #17303d}
+    .demo-cues-label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#10b981;margin-bottom:8px}
+    .demo-cue-list{padding-left:18px;display:grid;gap:8px;color:#d0e4ef;font-size:14px;line-height:1.45}
+    .demo-hint{font-size:12px;color:#5e7d91}
+    .ex-demo-link{cursor:pointer;text-decoration:underline;text-decoration-color:#204658;text-underline-offset:3px}
+    .ex-demo-link:hover{color:#10b981;text-decoration-color:#10b981}
+    @media(max-width:600px){
+      .ex-header{display:none}
+      .ex-grid{grid-template-columns:22px 1fr auto auto}
+    }
+    @media(max-width:820px){
+      .demo-layout{grid-template-columns:1fr}
+      .demo-stage,.demo-stage-wrap{min-height:320px}
+    }
+  </style>
+</head>
+<body>
+
+  <header class="page-header">
+    <div class="brand">
+      <div class="brand-icon">🏋️</div>
+      <div>
+        <div class="brand-name">EliteFit <span>Pro</span></div>
+        <div class="brand-sub">Trainer-Crafted Programming</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="saveIndicator" class="save-indicator">—</span>
+      <button type="button" id="resetBtn" class="btn-ghost">↺ Reset Template</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Week navigation -->
+    <section class="section">
+      <p class="section-label">Your Week</p>
+      <div id="week" class="week-nav"></div>
+    </section>
+
+    <!-- 3D exercise demo: this gives the user a visual guide for movement form. -->
+    <section class="section">
+      <p class="section-label">Exercise Demo</p>
+      <div class="card">
+        <div class="card-body demo-layout">
+          <div class="demo-stage-wrap">
+            <div class="demo-badge">3D Pilates Coach</div>
+            <div id="demoStage" class="demo-stage" aria-label="Animated 3D exercise demonstration"></div>
+          </div>
+          <div class="demo-panel">
+            <div class="selector-row demo-controls">
+              <label for="demoExerciseSelect">Watch form:</label>
+              <select id="demoExerciseSelect">
+                <option value="squat">Squat</option>
+                <option value="splitSquat">Split Squat</option>
+                <option value="overheadPress">Overhead Press</option>
+                <option value="row">Bent-over Row</option>
+                <option value="pushup">Push-up</option>
+                <option value="plank">Plank</option>
+              </select>
+              <button type="button" id="demoToggleBtn" class="btn-ghost">Pause Demo</button>
+            </div>
+            <div>
+              <p id="demoTitle" class="demo-title"></p>
+              <p id="demoDescription" class="demo-description"></p>
+            </div>
+            <div class="demo-cues">
+              <p class="demo-cues-label">Form Cues</p>
+              <ul id="demoCueList" class="demo-cue-list"></ul>
+            </div>
+            <p class="demo-hint">Tip: click an exercise name in the planner to switch this coach to a matching movement pattern.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Workout card -->
+    <div class="card">
+
+      <!-- Header: day title + progress -->
+      <div class="card-header">
+        <div>
+          <p id="dayLabel" class="day-label"></p>
+          <h2 id="dayTitle" class="day-title"></h2>
+        </div>
+        <div id="progressBox" class="progress-box" style="display:none">
+          <p class="progress-cap">Completion</p>
+          <div class="progress-row">
+            <div class="progress-track"><div id="progressFill" class="progress-fill" style="width:0%"></div></div>
+            <span id="progressPct" class="progress-pct">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body-part selector -->
+      <div class="card-body">
+        <div class="selector-row">
+          <label for="bodyPartSelect">Train today:</label>
+          <select id="bodyPartSelect">
+            <option value="Chest">🏋️ Chest</option>
+            <option value="Back">🔙 Back</option>
+            <option value="Legs">🦵 Legs</option>
+            <option value="Shoulders">💪 Shoulders</option>
+            <option value="Arms">💪 Arms</option>
+            <option value="Core">🔥 Core</option>
+            <option value="Full Body">⚡ Full Body</option>
+            <option value="Cardio">🏃 Cardio</option>
+          </select>
+          <button type="button" id="suggestBtn">Show Suggestions</button>
+          <button type="button" id="autoAddBtn" class="btn-ghost">+ Add Top 5</button>
+          <span class="equipment-tag">24/7 Fitness HK</span>
+        </div>
+        <div id="suggestions"></div>
+      </div>
+
+      <!-- Exercise list -->
+      <div class="card-body">
+        <div class="ex-grid ex-header">
+          <div></div><div>Exercise</div><div>Sets × Reps</div><div>Weight</div><div></div>
+        </div>
+        <div id="exerciseList"></div>
+      </div>
+
+      <!-- Add-exercise form -->
+      <div class="card-footer">
+        <p class="section-label" style="margin-bottom:10px">＋ Add Custom Exercise</p>
+        <form id="addForm" class="add-form">
+          <input id="exerciseName" class="input-name" type="text" placeholder="Exercise name" required />
+          <input id="exerciseSets" class="input-short" type="number" min="1" value="3" title="Sets" required />
+          <input id="exerciseReps" class="input-short" type="text" value="10" title="Reps" required />
+          <input id="exerciseWeight" class="input-short" type="text" placeholder="lbs" title="Weight" />
+          <button type="submit">Add</button>
+        </form>
+      </div>
+
+    </div><!-- /.card -->
+  </div><!-- /.container -->
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+  <script>
+    'use strict';
+
+    // ─── Equipment available at 24/7 Fitness HK ───────────────────────────────
+    const EQUIPMENT = new Set([
+      'squat_rack','barbell','dumbbell','bench','cable','leg_press','lat_pulldown',
+      'rower','treadmill','kettlebell','pullup_bar','smith_machine','ez_bar',
+      'dip_bar','leg_extension','leg_curl','pec_deck','hack_squat_machine',
+      'calf_raise_machine','back_extension'
+    ]);
+
+    // ─── Exercise pool (66 exercises, 8 body parts) ───────────────────────────
+    const EXERCISE_POOL = [
+      // Chest
+      { id:'p1',  bodyPart:'Chest',     name:'Barbell Bench Press',         sets:4, reps:'6-8',   equipment:['barbell','bench'] },
+      { id:'p2',  bodyPart:'Chest',     name:'Incline Barbell Press',       sets:4, reps:'8-10',  equipment:['barbell','bench'] },
+      { id:'p3',  bodyPart:'Chest',     name:'Decline Barbell Press',       sets:3, reps:'8-10',  equipment:['barbell','bench'] },
+      { id:'p4',  bodyPart:'Chest',     name:'Dumbbell Bench Press',        sets:4, reps:'8-12',  equipment:['dumbbell','bench'] },
+      { id:'p5',  bodyPart:'Chest',     name:'Incline Dumbbell Press',      sets:3, reps:'8-12',  equipment:['dumbbell','bench'] },
+      { id:'p6',  bodyPart:'Chest',     name:'Dumbbell Flyes',              sets:3, reps:'10-15', equipment:['dumbbell','bench'] },
+      { id:'p7',  bodyPart:'Chest',     name:'Cable Flyes (High)',          sets:3, reps:'12-15', equipment:['cable'] },
+      { id:'p8',  bodyPart:'Chest',     name:'Cable Crossover (Low)',       sets:3, reps:'12-15', equipment:['cable'] },
+      { id:'p9',  bodyPart:'Chest',     name:'Pec Deck Flyes',              sets:3, reps:'12-15', equipment:['pec_deck'] },
+      { id:'p10', bodyPart:'Chest',     name:'Chest Dips',                  sets:3, reps:'8-12',  equipment:['dip_bar'] },
+      { id:'p11', bodyPart:'Chest',     name:'Smith Machine Bench Press',   sets:3, reps:'10-12', equipment:['smith_machine','bench'] },
+      // Back
+      { id:'p12', bodyPart:'Back',      name:'Barbell Row',                 sets:4, reps:'6-10',  equipment:['barbell'] },
+      { id:'p13', bodyPart:'Back',      name:'Lat Pulldown',                sets:4, reps:'8-12',  equipment:['lat_pulldown'] },
+      { id:'p14', bodyPart:'Back',      name:'Seated Cable Row',            sets:4, reps:'8-12',  equipment:['cable'] },
+      { id:'p15', bodyPart:'Back',      name:'Single-arm Dumbbell Row',     sets:3, reps:'8-12',  equipment:['dumbbell','bench'] },
+      { id:'p16', bodyPart:'Back',      name:'Pull-ups',                    sets:4, reps:'AMRAP', equipment:['pullup_bar'] },
+      { id:'p17', bodyPart:'Back',      name:'Chin-ups',                    sets:3, reps:'8-12',  equipment:['pullup_bar'] },
+      { id:'p18', bodyPart:'Back',      name:'Face Pulls',                  sets:3, reps:'15-20', equipment:['cable'] },
+      { id:'p19', bodyPart:'Back',      name:'Straight-arm Pulldown',       sets:3, reps:'12-15', equipment:['cable'] },
+      { id:'p20', bodyPart:'Back',      name:'Dumbbell Pullover',           sets:3, reps:'10-12', equipment:['dumbbell','bench'] },
+      { id:'p21', bodyPart:'Back',      name:'Back Extension',              sets:3, reps:'12-15', equipment:['back_extension'] },
+      // Legs
+      { id:'p22', bodyPart:'Legs',      name:'Back Squat',                  sets:5, reps:'5',     equipment:['squat_rack','barbell'] },
+      { id:'p23', bodyPart:'Legs',      name:'Front Squat',                 sets:4, reps:'5-8',   equipment:['squat_rack','barbell'] },
+      { id:'p24', bodyPart:'Legs',      name:'Romanian Deadlift',           sets:4, reps:'6-10',  equipment:['barbell'] },
+      { id:'p25', bodyPart:'Legs',      name:'Sumo Deadlift',               sets:4, reps:'5-8',   equipment:['barbell'] },
+      { id:'p26', bodyPart:'Legs',      name:'Leg Press',                   sets:4, reps:'8-15',  equipment:['leg_press'] },
+      { id:'p27', bodyPart:'Legs',      name:'Leg Extension',               sets:3, reps:'12-15', equipment:['leg_extension'] },
+      { id:'p28', bodyPart:'Legs',      name:'Lying Leg Curl',              sets:3, reps:'12-15', equipment:['leg_curl'] },
+      { id:'p29', bodyPart:'Legs',      name:'Seated Calf Raise',           sets:4, reps:'15-20', equipment:['calf_raise_machine'] },
+      { id:'p30', bodyPart:'Legs',      name:'Walking Lunges',              sets:3, reps:'12 ea', equipment:['dumbbell'] },
+      { id:'p31', bodyPart:'Legs',      name:'Bulgarian Split Squat',       sets:3, reps:'10-12', equipment:['dumbbell','bench'] },
+      { id:'p32', bodyPart:'Legs',      name:'Hack Squat Machine',          sets:3, reps:'10-12', equipment:['hack_squat_machine'] },
+      { id:'p33', bodyPart:'Legs',      name:'Smith Machine Squat',         sets:3, reps:'10-12', equipment:['smith_machine'] },
+      // Shoulders
+      { id:'p34', bodyPart:'Shoulders', name:'Barbell Overhead Press',      sets:4, reps:'6-10',  equipment:['barbell'] },
+      { id:'p35', bodyPart:'Shoulders', name:'Dumbbell Shoulder Press',     sets:3, reps:'8-12',  equipment:['dumbbell'] },
+      { id:'p36', bodyPart:'Shoulders', name:'Arnold Press',                sets:3, reps:'8-12',  equipment:['dumbbell'] },
+      { id:'p37', bodyPart:'Shoulders', name:'Dumbbell Lateral Raise',      sets:4, reps:'12-15', equipment:['dumbbell'] },
+      { id:'p38', bodyPart:'Shoulders', name:'Cable Lateral Raise',         sets:3, reps:'12-15', equipment:['cable'] },
+      { id:'p39', bodyPart:'Shoulders', name:'Rear Delt Dumbbell Flye',     sets:3, reps:'12-15', equipment:['dumbbell'] },
+      { id:'p40', bodyPart:'Shoulders', name:'Face Pulls',                  sets:3, reps:'15-20', equipment:['cable'] },
+      { id:'p41', bodyPart:'Shoulders', name:'Barbell Upright Row',         sets:3, reps:'10-12', equipment:['barbell'] },
+      // Arms
+      { id:'p42', bodyPart:'Arms',      name:'Barbell Curl',                sets:4, reps:'8-12',  equipment:['barbell'] },
+      { id:'p43', bodyPart:'Arms',      name:'Dumbbell Curl',               sets:3, reps:'10-12', equipment:['dumbbell'] },
+      { id:'p44', bodyPart:'Arms',      name:'EZ Bar Curl',                 sets:3, reps:'8-12',  equipment:['ez_bar'] },
+      { id:'p45', bodyPart:'Arms',      name:'Incline Dumbbell Curl',       sets:3, reps:'10-12', equipment:['dumbbell','bench'] },
+      { id:'p46', bodyPart:'Arms',      name:'Hammer Curl',                 sets:3, reps:'10-12', equipment:['dumbbell'] },
+      { id:'p47', bodyPart:'Arms',      name:'Cable Curl',                  sets:3, reps:'12-15', equipment:['cable'] },
+      { id:'p48', bodyPart:'Arms',      name:'Tricep Pushdown (Rope)',      sets:4, reps:'10-15', equipment:['cable'] },
+      { id:'p49', bodyPart:'Arms',      name:'Overhead Tricep Extension',   sets:3, reps:'10-15', equipment:['dumbbell'] },
+      { id:'p50', bodyPart:'Arms',      name:'Skull Crushers',              sets:3, reps:'8-12',  equipment:['ez_bar','bench'] },
+      { id:'p51', bodyPart:'Arms',      name:'Tricep Dips',                 sets:3, reps:'8-12',  equipment:['dip_bar'] },
+      // Core
+      { id:'p52', bodyPart:'Core',      name:'Plank',                       sets:3, reps:'60s',   equipment:[] },
+      { id:'p53', bodyPart:'Core',      name:'Hanging Leg Raise',           sets:3, reps:'12-15', equipment:['pullup_bar'] },
+      { id:'p54', bodyPart:'Core',      name:'Cable Crunch',                sets:3, reps:'15-20', equipment:['cable'] },
+      { id:'p55', bodyPart:'Core',      name:'Russian Twist',               sets:3, reps:'20 ea', equipment:['dumbbell'] },
+      { id:'p56', bodyPart:'Core',      name:'Dead Bug',                    sets:3, reps:'10 ea', equipment:[] },
+      { id:'p57', bodyPart:'Core',      name:'Pallof Press',                sets:3, reps:'12 ea', equipment:['cable'] },
+      { id:'p58', bodyPart:'Core',      name:'Ab Wheel Rollout',            sets:3, reps:'8-12',  equipment:[] },
+      // Full Body
+      { id:'p59', bodyPart:'Full Body', name:'Conventional Deadlift',       sets:4, reps:'4-6',   equipment:['barbell'] },
+      { id:'p60', bodyPart:'Full Body', name:'Kettlebell Swing',            sets:4, reps:'15-20', equipment:['kettlebell'] },
+      { id:'p61', bodyPart:'Full Body', name:'Barbell Clean & Press',       sets:3, reps:'5',     equipment:['barbell'] },
+      { id:'p62', bodyPart:'Full Body', name:'Dumbbell Thruster',           sets:3, reps:'10-12', equipment:['dumbbell'] },
+      // Cardio
+      { id:'p63', bodyPart:'Cardio',    name:'Treadmill Intervals (HIIT)',  sets:1, reps:'20 min',equipment:['treadmill'] },
+      { id:'p64', bodyPart:'Cardio',    name:'Rowing Machine Steady State', sets:1, reps:'15 min',equipment:['rower'] },
+      { id:'p65', bodyPart:'Cardio',    name:'Treadmill Incline Walk',      sets:1, reps:'30 min',equipment:['treadmill'] },
+      { id:'p66', bodyPart:'Cardio',    name:'Rowing Machine Intervals',    sets:1, reps:'20 min',equipment:['rower'] },
+    ];
+
+    // ─── Default PPL Template ─────────────────────────────────────────────────
+    const TEMPLATE_PPL = [
+      { day:'Monday',    name:'Push — Chest, Shoulders, Triceps', exercises:[
+        { id:'t1',  name:'Barbell Bench Press',       sets:4, reps:'6-8',   weight:'135', completed:false },
+        { id:'t2',  name:'Overhead Press',            sets:4, reps:'6-10',  weight:'95',  completed:false },
+        { id:'t3',  name:'Incline Dumbbell Press',    sets:3, reps:'8-12',  weight:'50',  completed:false },
+        { id:'t4',  name:'Dumbbell Flyes',            sets:3, reps:'10-15', weight:'25',  completed:false },
+        { id:'t5',  name:'Cable Flyes (High)',        sets:3, reps:'12-15', weight:'30',  completed:false },
+        { id:'t6',  name:'Dumbbell Lateral Raise',    sets:4, reps:'12-15', weight:'15',  completed:false },
+        { id:'t7',  name:'Tricep Pushdown (Rope)',    sets:4, reps:'10-15', weight:'40',  completed:false },
+      ]},
+      { day:'Tuesday',   name:'Pull — Back, Biceps', exercises:[
+        { id:'t8',  name:'Barbell Row',               sets:4, reps:'6-10',  weight:'135', completed:false },
+        { id:'t9',  name:'Lat Pulldown',              sets:4, reps:'8-12',  weight:'120', completed:false },
+        { id:'t10', name:'Face Pulls',                sets:3, reps:'15-20', weight:'30',  completed:false },
+        { id:'t11', name:'Barbell Curl',              sets:4, reps:'8-12',  weight:'65',  completed:false },
+        { id:'t12', name:'Seated Cable Row',          sets:3, reps:'8-12',  weight:'110', completed:false },
+        { id:'t13', name:'Incline Dumbbell Curl',     sets:3, reps:'10-12', weight:'25',  completed:false },
+        { id:'t14', name:'Hammer Curl',               sets:3, reps:'10-12', weight:'30',  completed:false },
+      ]},
+      { day:'Wednesday', name:'Legs — Quads, Hams, Calves', exercises:[
+        { id:'t15', name:'Back Squat',                sets:5, reps:'5',     weight:'185', completed:false },
+        { id:'t16', name:'Romanian Deadlift',         sets:4, reps:'6-10',  weight:'135', completed:false },
+        { id:'t17', name:'Leg Press',                 sets:4, reps:'8-15',  weight:'300', completed:false },
+        { id:'t18', name:'Seated Calf Raise',         sets:4, reps:'15-20', weight:'100', completed:false },
+        { id:'t19', name:'Walking Lunges',            sets:3, reps:'12 ea', weight:'40',  completed:false },
+        { id:'t20', name:'Leg Extension',             sets:3, reps:'12-15', weight:'90',  completed:false },
+      ]},
+      { day:'Thursday',  name:'Rest / Active Recovery', exercises:[
+        { id:'t21', name:'Treadmill Incline Walk',    sets:1, reps:'30 min',weight:'',    completed:false },
+        { id:'t22', name:'Plank',                     sets:3, reps:'60s',   weight:'',    completed:false },
+      ]},
+      { day:'Friday',    name:'Push — Hypertrophy', exercises:[
+        { id:'t23', name:'Dumbbell Bench Press',      sets:4, reps:'8-12',  weight:'60',  completed:false },
+        { id:'t24', name:'Arnold Press',              sets:3, reps:'8-12',  weight:'35',  completed:false },
+        { id:'t25', name:'Overhead Tricep Extension', sets:3, reps:'10-15', weight:'45',  completed:false },
+        { id:'t26', name:'Chest Dips',                sets:3, reps:'8-12',  weight:'BW',  completed:false },
+        { id:'t27', name:'Cable Lateral Raise',       sets:3, reps:'12-15', weight:'12',  completed:false },
+        { id:'t28', name:'Pec Deck Flyes',            sets:3, reps:'12-15', weight:'80',  completed:false },
+      ]},
+      { day:'Saturday',  name:'Pull — Hypertrophy', exercises:[
+        { id:'t29', name:'Pull-ups',                  sets:4, reps:'AMRAP', weight:'BW',  completed:false },
+        { id:'t30', name:'Seated Cable Row',          sets:4, reps:'8-12',  weight:'110', completed:false },
+        { id:'t31', name:'Hammer Curl',               sets:3, reps:'10-12', weight:'30',  completed:false },
+        { id:'t32', name:'Single-arm Dumbbell Row',   sets:3, reps:'8-12',  weight:'60',  completed:false },
+        { id:'t33', name:'Rear Delt Dumbbell Flye',   sets:3, reps:'12-15', weight:'15',  completed:false },
+        { id:'t34', name:'Straight-arm Pulldown',     sets:3, reps:'12-15', weight:'40',  completed:false },
+      ]},
+      { day:'Sunday',    name:'Legs — Hypertrophy', exercises:[
+        { id:'t35', name:'Hack Squat Machine',        sets:4, reps:'8-12',  weight:'140', completed:false },
+        { id:'t36', name:'Leg Extension',             sets:3, reps:'12-15', weight:'90',  completed:false },
+        { id:'t37', name:'Lying Leg Curl',            sets:3, reps:'12-15', weight:'70',  completed:false },
+        { id:'t38', name:'Bulgarian Split Squat',     sets:3, reps:'10-12', weight:'40',  completed:false },
+        { id:'t39', name:'Seated Calf Raise',         sets:4, reps:'15-20', weight:'80',  completed:false },
+        { id:'t40', name:'Sumo Deadlift',             sets:3, reps:'6-8',   weight:'155', completed:false },
+      ]},
+    ];
+
+    const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    const STORAGE_KEY = 'elitefit_v2';
+
+    // This small library powers the demo viewer.
+    // Each entry contains a plain-English title, what the motion trains,
+    // and short coaching cues shown beside the 3D avatar.
+    const DEMO_LIBRARY = {
+      squat: {
+        title: 'Squat Demo',
+        description: 'A lower-body pattern that teaches hip and knee control while keeping the chest lifted.',
+        cues: ['Keep your feet around shoulder width apart.', 'Push your hips back before you drop down.', 'Let your knees track in the same direction as your toes.']
+      },
+      splitSquat: {
+        title: 'Split Squat Demo',
+        description: 'A single-leg movement that helps with balance, leg strength, and clean knee alignment.',
+        cues: ['Stay tall through the torso instead of folding forward.', 'Drop straight down so both knees bend together.', 'Press through the front foot to stand back up.']
+      },
+      overheadPress: {
+        title: 'Overhead Press Demo',
+        description: 'A shoulder-focused press that emphasizes stacked posture and controlled arm travel.',
+        cues: ['Brace your stomach before pressing upward.', 'Keep your ribs down instead of leaning back.', 'Finish with your biceps close to your ears.']
+      },
+      row: {
+        title: 'Bent-over Row Demo',
+        description: 'A pulling pattern for the upper back that trains the body to stay tight while the arms move.',
+        cues: ['Hinge at the hips and keep the back flat.', 'Pull the elbows toward the ribs, not the shoulders up.', 'Lower the hands under control each rep.']
+      },
+      pushup: {
+        title: 'Push-up Demo',
+        description: 'A horizontal pressing pattern for the chest, shoulders, and core with a straight-body plank position.',
+        cues: ['Make a straight line from head to heel.', 'Lower the chest and hips together.', 'Push the floor away until the elbows straighten.']
+      },
+      plank: {
+        title: 'Plank Demo',
+        description: 'A static core hold that teaches full-body tension without losing breathing control.',
+        cues: ['Squeeze the glutes and stomach at the same time.', 'Keep the neck long and eyes slightly ahead.', 'Breathe slowly while staying stiff through the trunk.']
+      }
+    };
+
+    // This map helps the page choose a useful demo when the user changes body part.
+    const BODY_PART_TO_DEMO = {
+      Chest: 'pushup',
+      Back: 'row',
+      Legs: 'squat',
+      Shoulders: 'overheadPress',
+      Arms: 'overheadPress',
+      Core: 'plank',
+      'Full Body': 'splitSquat',
+      Cardio: 'splitSquat'
+    };
+
+    // ─── State ────────────────────────────────────────────────────────────────
+    let schedule = loadSchedule();
+    let activeDay = 'Monday';
+    let activeDemoKey = 'squat';
+    let demoIsPlaying = true;
+    let demoMotionTime = 0;
+    let demoScene = null;
+
+    // ─── Cached DOM refs ──────────────────────────────────────────────────────
+    const $week        = document.getElementById('week');
+    const $exList      = document.getElementById('exerciseList');
+    const $dayLabel    = document.getElementById('dayLabel');
+    const $dayTitle    = document.getElementById('dayTitle');
+    const $progBox     = document.getElementById('progressBox');
+    const $progFill    = document.getElementById('progressFill');
+    const $progPct     = document.getElementById('progressPct');
+    const $suggestions = document.getElementById('suggestions');
+    const $saveInd     = document.getElementById('saveIndicator');
+    const $bodyPart    = document.getElementById('bodyPartSelect');
+    const $demoStage   = document.getElementById('demoStage');
+    const $demoSelect  = document.getElementById('demoExerciseSelect');
+    const $demoToggle  = document.getElementById('demoToggleBtn');
+    const $demoTitle   = document.getElementById('demoTitle');
+    const $demoDesc    = document.getElementById('demoDescription');
+    const $demoCueList = document.getElementById('demoCueList');
+
+    // ─── Persistence ─────────────────────────────────────────────────────────
+    function loadSchedule() {
+      try {
+        // We keep the plan in localStorage so the browser remembers the user's edits.
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(TEMPLATE_PPL));
+      } catch { return JSON.parse(JSON.stringify(TEMPLATE_PPL)); }
+    }
+
+    let _saveTimer;
+    function saveSchedule() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(schedule)); } catch { return; }
+      $saveInd.textContent = '✓ Saved'; $saveInd.className = 'save-indicator saved';
+      clearTimeout(_saveTimer);
+      _saveTimer = setTimeout(() => { $saveInd.textContent = '—'; $saveInd.className = 'save-indicator'; }, 2000);
+    }
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────
+    // Simple ID generator for new custom exercises.
+    function uid() { return Math.random().toString(36).slice(2, 11); }
+
+    // Escaping text stops user-entered exercise names from being treated as HTML.
+    function escHtml(s) {
+      return String(s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // The page always renders the currently selected day from this helper.
+    function getWorkout() {
+      return schedule.find(d => d.day === activeDay) || { day: activeDay, name: 'Rest Day', exercises: [] };
+    }
+
+    // Progress is just the percentage of exercises that were checked off.
+    function calcProgress(workout) {
+      const exs = workout.exercises;
+      if (!exs || !exs.length) return 0;
+      return Math.round(exs.filter(e => e.completed).length / exs.length * 100);
+    }
+
+    function suggestFor(bodyPart) {
+      return EXERCISE_POOL.filter(e =>
+        e.bodyPart === bodyPart &&
+        e.equipment.every(eq => EQUIPMENT.has(eq))
+      );
+    }
+
+    // The planner contains many exercise names, so we group them into a smaller set
+    // of demo motions that the avatar can show clearly.
+    function findBestDemoForExercise(name) {
+      const lowerName = String(name).toLowerCase();
+      if (lowerName.includes('split squat') || lowerName.includes('lunge')) return 'splitSquat';
+      if (lowerName.includes('squat') || lowerName.includes('leg press') || lowerName.includes('hack squat')) return 'squat';
+      if (lowerName.includes('press') && (lowerName.includes('overhead') || lowerName.includes('shoulder') || lowerName.includes('arnold'))) return 'overheadPress';
+      if (lowerName.includes('row') || lowerName.includes('pulldown') || lowerName.includes('pull-up') || lowerName.includes('pullups') || lowerName.includes('pull-ups')) return 'row';
+      if (lowerName.includes('bench') || lowerName.includes('dip') || lowerName.includes('pushdown') || lowerName.includes('push-up') || lowerName.includes('pushup')) return 'pushup';
+      if (lowerName.includes('plank') || lowerName.includes('dead bug') || lowerName.includes('crunch')) return 'plank';
+      return BODY_PART_TO_DEMO[$bodyPart.value] || 'squat';
+    }
+
+    function setDemo(key) {
+      activeDemoKey = DEMO_LIBRARY[key] ? key : 'squat';
+      $demoSelect.value = activeDemoKey;
+
+      const info = DEMO_LIBRARY[activeDemoKey];
+      $demoTitle.textContent = info.title;
+      $demoDesc.textContent = info.description;
+      $demoCueList.innerHTML = '';
+
+      info.cues.forEach(cue => {
+        const item = document.createElement('li');
+        item.textContent = cue;
+        $demoCueList.appendChild(item);
+      });
+    }
+
+    // One pose generator powers both renderers.
+    // If WebGL is available, the page uses Three.js.
+    // If not, the page falls back to a built-in canvas renderer so local files still work.
+    function getDemoPose(animationKey, elapsed) {
+      const pose = {
+        hipsY: 1.15,
+        hipsX: 0,
+        chestX: 0,
+        headX: 0,
+        leftUpperArmX: 0.08,
+        leftLowerArmX: -0.16,
+        rightUpperArmX: 0.08,
+        rightLowerArmX: -0.16,
+        leftUpperLegX: 0,
+        leftLowerLegX: 0,
+        rightUpperLegX: 0,
+        rightLowerLegX: 0
+      };
+
+      const cycle = (Math.sin(elapsed * 2) + 1) / 2;
+      const breathe = Math.sin(elapsed * 1.5) * 0.03;
+
+      if (animationKey === 'squat') {
+        pose.hipsY = 1.15 - cycle * 0.34;
+        pose.chestX = -0.24 * cycle;
+        pose.leftUpperLegX = 0.95 * cycle;
+        pose.rightUpperLegX = 0.95 * cycle;
+        pose.leftLowerLegX = -0.92 * cycle;
+        pose.rightLowerLegX = -0.92 * cycle;
+        pose.leftUpperArmX = -0.16 * cycle;
+        pose.rightUpperArmX = -0.16 * cycle;
+      } else if (animationKey === 'splitSquat') {
+        const lunge = (Math.sin(elapsed * 1.6) + 1) / 2;
+        pose.hipsY = 1.1 - lunge * 0.26;
+        pose.chestX = -0.18 * lunge;
+        pose.leftUpperLegX = 0.82 * lunge;
+        pose.leftLowerLegX = -0.78 * lunge;
+        pose.rightUpperLegX = -0.48 * lunge;
+        pose.rightLowerLegX = 0.42 * lunge;
+        pose.leftUpperArmX = 0.14;
+        pose.rightUpperArmX = 0.14;
+      } else if (animationKey === 'overheadPress') {
+        const press = (Math.sin(elapsed * 2.1) + 1) / 2;
+        pose.chestX = -0.06 + breathe;
+        pose.leftUpperArmX = -1.45 * press - 0.1;
+        pose.rightUpperArmX = -1.45 * press - 0.1;
+        pose.leftLowerArmX = -0.45 * (1 - press);
+        pose.rightLowerArmX = -0.45 * (1 - press);
+      } else if (animationKey === 'row') {
+        const row = (Math.sin(elapsed * 2.2) + 1) / 2;
+        pose.hipsX = -0.42;
+        pose.chestX = -0.26;
+        pose.leftUpperArmX = -0.3 + row * 0.72;
+        pose.rightUpperArmX = -0.3 + row * 0.72;
+        pose.leftLowerArmX = -0.68 + row * 0.5;
+        pose.rightLowerArmX = -0.68 + row * 0.5;
+        pose.leftUpperLegX = 0.16;
+        pose.rightUpperLegX = 0.16;
+        pose.leftLowerLegX = -0.14;
+        pose.rightLowerLegX = -0.14;
+      } else if (animationKey === 'pushup') {
+        const push = (Math.sin(elapsed * 2.4) + 1) / 2;
+        pose.hipsY = 0.78;
+        pose.hipsX = Math.PI / 2 - 0.12;
+        pose.chestX = -0.08 + push * 0.22;
+        pose.headX = 0.1;
+        pose.leftUpperArmX = -1.26 + push * 0.7;
+        pose.rightUpperArmX = -1.26 + push * 0.7;
+        pose.leftLowerArmX = -1.18 + push * 0.92;
+        pose.rightLowerArmX = -1.18 + push * 0.92;
+        pose.leftUpperLegX = -0.12;
+        pose.rightUpperLegX = -0.12;
+      } else if (animationKey === 'plank') {
+        pose.hipsY = 0.82;
+        pose.hipsX = Math.PI / 2 - 0.08;
+        pose.chestX = breathe;
+        pose.headX = 0.08;
+        pose.leftUpperArmX = -1.1;
+        pose.rightUpperArmX = -1.1;
+        pose.leftLowerArmX = -0.78;
+        pose.rightLowerArmX = -0.78;
+        pose.leftUpperLegX = -0.08;
+        pose.rightUpperLegX = -0.08;
+      }
+
+      return pose;
+    }
+
+    function initCanvasFallbackDemo() {
+      $demoStage.innerHTML = '';
+
+      const canvas = document.createElement('canvas');
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.style.display = 'block';
+      $demoStage.appendChild(canvas);
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        $demoStage.textContent = 'Animated demo could not start because canvas is unavailable in this browser.';
+        return null;
+      }
+
+      const observer = typeof ResizeObserver === 'function'
+        ? new ResizeObserver(() => resizeDemo())
+        : null;
+
+      function resizeDemo() {
+        const width = Math.max($demoStage.clientWidth, 280);
+        const height = Math.max($demoStage.clientHeight, 320);
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function pointFrom(start, angle, length) {
+        return {
+          x: start.x + Math.sin(angle) * length,
+          y: start.y + Math.cos(angle) * length
+        };
+      }
+
+      function blendHex(colorA, colorB, mix) {
+        const a = parseInt(colorA.slice(1), 16);
+        const b = parseInt(colorB.slice(1), 16);
+        const ar = (a >> 16) & 255, ag = (a >> 8) & 255, ab = a & 255;
+        const br = (b >> 16) & 255, bg = (b >> 8) & 255, bb = b & 255;
+        const rr = Math.round(ar + (br - ar) * mix);
+        const rg = Math.round(ag + (bg - ag) * mix);
+        const rb = Math.round(ab + (bb - ab) * mix);
+        return `rgb(${rr}, ${rg}, ${rb})`;
+      }
+
+      function drawSegment(start, end, width, fromColor, toColor) {
+        const gradient = ctx.createLinearGradient(start.x, start.y, end.x, end.y);
+        gradient.addColorStop(0, fromColor);
+        gradient.addColorStop(1, toColor);
+
+        ctx.beginPath();
+        ctx.lineCap = 'round';
+        ctx.lineWidth = width + 4;
+        ctx.strokeStyle = 'rgba(5, 11, 17, 0.42)';
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.lineCap = 'round';
+        ctx.lineWidth = width;
+        ctx.strokeStyle = gradient;
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
+        ctx.stroke();
+      }
+
+      function drawJoint(point, radius, fill) {
+        ctx.beginPath();
+        ctx.fillStyle = fill;
+        ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawEllipse(point, radiusX, radiusY, color, rotation) {
+        ctx.save();
+        ctx.translate(point.x, point.y);
+        ctx.rotate(rotation || 0);
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.ellipse(0, 0, radiusX, radiusY, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawAvatar(width, height) {
+        ctx.clearRect(0, 0, width, height);
+
+        const topGlow = ctx.createRadialGradient(width * 0.5, height * 0.16, 20, width * 0.5, height * 0.16, width * 0.55);
+        topGlow.addColorStop(0, 'rgba(93, 170, 220, 0.24)');
+        topGlow.addColorStop(1, 'rgba(9, 18, 26, 0)');
+        ctx.fillStyle = topGlow;
+        ctx.fillRect(0, 0, width, height);
+
+        const floorY = height * 0.84;
+        drawEllipse({ x: width * 0.47, y: floorY + 8 }, width * 0.22, 16, 'rgba(6, 12, 18, 0.65)', 0);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(27, 208, 177, 0.28)';
+        ctx.beginPath();
+        ctx.ellipse(width * 0.47, floorY + 6, width * 0.2, 18, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        const pose = getDemoPose(activeDemoKey, demoMotionTime);
+        const hipCenter = { x: width * 0.47, y: floorY - pose.hipsY * 112 };
+        const torsoAngle = Math.PI - (pose.hipsX + pose.chestX);
+        const torsoVector = { x: Math.sin(torsoAngle), y: Math.cos(torsoAngle) };
+        const perp = { x: torsoVector.y, y: -torsoVector.x };
+        const neckBase = pointFrom(hipCenter, torsoAngle, 82);
+        const shoulderCenter = pointFrom(hipCenter, torsoAngle, 58);
+        const headTilt = torsoAngle - pose.headX * 0.5;
+        const headCenter = pointFrom(neckBase, headTilt, 24);
+
+        const leftShoulder = { x: shoulderCenter.x + perp.x * 18, y: shoulderCenter.y + perp.y * 18 };
+        const rightShoulder = { x: shoulderCenter.x - perp.x * 18, y: shoulderCenter.y - perp.y * 18 };
+        const leftHip = { x: hipCenter.x + perp.x * 20, y: hipCenter.y + perp.y * 20 };
+        const rightHip = { x: hipCenter.x - perp.x * 20, y: hipCenter.y - perp.y * 20 };
+
+        const leftElbow = pointFrom(leftShoulder, pose.leftUpperArmX, 52);
+        const rightElbow = pointFrom(rightShoulder, pose.rightUpperArmX, 52);
+        const leftHand = pointFrom(leftElbow, pose.leftUpperArmX + pose.leftLowerArmX, 46);
+        const rightHand = pointFrom(rightElbow, pose.rightUpperArmX + pose.rightLowerArmX, 46);
+
+        const leftKnee = pointFrom(leftHip, pose.hipsX + pose.leftUpperLegX, 74);
+        const rightKnee = pointFrom(rightHip, pose.hipsX + pose.rightUpperLegX, 74);
+        const leftFoot = pointFrom(leftKnee, pose.hipsX + pose.leftUpperLegX + pose.leftLowerLegX, 70);
+        const rightFoot = pointFrom(rightKnee, pose.hipsX + pose.rightUpperLegX + pose.rightLowerLegX, 70);
+
+        drawSegment(leftHip, leftKnee, 20, '#425d84', '#2b4260');
+        drawSegment(rightHip, rightKnee, 20, '#425d84', '#243953');
+        drawSegment(leftKnee, leftFoot, 18, '#354f72', '#22364e');
+        drawSegment(rightKnee, rightFoot, 18, '#354f72', '#22364e');
+
+        drawEllipse(hipCenter, 31, 23, '#2b4260', torsoAngle);
+        drawSegment(hipCenter, neckBase, 34, '#ffffff', '#d4e8f0');
+
+        drawSegment(leftShoulder, leftElbow, 16, '#ffffff', '#dbeaf1');
+        drawSegment(rightShoulder, rightElbow, 16, '#ffffff', '#dbeaf1');
+        drawSegment(leftElbow, leftHand, 14, '#d8ae91', '#bb8767');
+        drawSegment(rightElbow, rightHand, 14, '#d8ae91', '#bb8767');
+
+        drawJoint(leftHand, 7, '#c69377');
+        drawJoint(rightHand, 7, '#c69377');
+
+        drawEllipse(headCenter, 20, 23, '#c69377', headTilt);
+        drawEllipse({ x: headCenter.x - 2, y: headCenter.y - 4 }, 21, 20, '#2d241d', headTilt);
+
+        const ponytailRoot = pointFrom(headCenter, headTilt + Math.PI, 8);
+        const ponytailEnd = pointFrom(ponytailRoot, headTilt + Math.PI / 2.4, 26);
+        drawSegment(ponytailRoot, ponytailEnd, 10, '#3a3028', '#211913');
+
+        drawJoint(leftShoulder, 8, '#eef5f8');
+        drawJoint(rightShoulder, 8, '#eef5f8');
+        drawJoint(leftElbow, 7, '#d1a386');
+        drawJoint(rightElbow, 7, '#d1a386');
+        drawJoint(leftHip, 8, '#314a6c');
+        drawJoint(rightHip, 8, '#314a6c');
+        drawJoint(leftKnee, 8, '#314a6c');
+        drawJoint(rightKnee, 8, '#314a6c');
+
+        drawEllipse({ x: leftFoot.x + 10, y: leftFoot.y + 3 }, 16, 8, '#ebfbff', pose.hipsX + pose.leftUpperLegX + pose.leftLowerLegX);
+        drawEllipse({ x: rightFoot.x + 10, y: rightFoot.y + 3 }, 16, 8, '#ebfbff', pose.hipsX + pose.rightUpperLegX + pose.rightLowerLegX);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.fillRect(width * 0.08, height * 0.12, width * 0.01, height * 0.55);
+        ctx.fillRect(width * 0.86, height * 0.18, width * 0.008, height * 0.4);
+
+        const shine = ctx.createLinearGradient(width * 0.18, 0, width * 0.7, height);
+        shine.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
+        shine.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.strokeStyle = shine;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(14, 14, width - 28, height - 28);
+
+        const label = window.THREE ? 'WebGL demo' : 'Offline-ready demo';
+        ctx.fillStyle = blendHex('#9fd4eb', '#10b981', 0.25);
+        ctx.font = '600 12px Segoe UI';
+        ctx.fillText(label, 20, height - 20);
+      }
+
+      function animate() {
+        if (demoIsPlaying) demoMotionTime += 1 / 60;
+        drawAvatar(canvas.clientWidth || 280, canvas.clientHeight || 320);
+        requestAnimationFrame(animate);
+      }
+
+      resizeDemo();
+      if (observer) observer.observe($demoStage);
+      window.addEventListener('resize', resizeDemo);
+      animate();
+
+      return { resizeDemo };
+    }
+
+    // This function builds the 3D avatar from simple shapes.
+    // Using grouped pivots makes the animation easier to understand because each
+    // body part rotates around a joint-like parent object.
+    function initDemoScene() {
+      if (!window.THREE) {
+        return initCanvasFallbackDemo();
+      }
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      const clock = new THREE.Clock();
+      const observer = typeof ResizeObserver === 'function'
+        ? new ResizeObserver(() => resizeDemo())
+        : null;
+
+      camera.position.set(0, 1.75, 5.6);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      $demoStage.appendChild(renderer.domElement);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 1.6));
+
+      const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
+      keyLight.position.set(4, 8, 5);
+      scene.add(keyLight);
+
+      const rimLight = new THREE.DirectionalLight(0x89d5ff, 1.1);
+      rimLight.position.set(-4, 5, -3);
+      scene.add(rimLight);
+
+      const floor = new THREE.Mesh(
+        new THREE.CircleGeometry(2.55, 48),
+        new THREE.MeshStandardMaterial({ color: 0x112432, roughness: 0.92, metalness: 0.05 })
+      );
+      floor.rotation.x = -Math.PI / 2;
+      floor.position.y = 0.02;
+      scene.add(floor);
+
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(2.25, 2.45, 48),
+        new THREE.MeshBasicMaterial({ color: 0x1bd0b1, opacity: 0.26, transparent: true, side: THREE.DoubleSide })
+      );
+      ring.rotation.x = -Math.PI / 2;
+      ring.position.y = 0.025;
+      scene.add(ring);
+
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0xc69377, roughness: 0.92, metalness: 0.02 });
+      const topMat = new THREE.MeshStandardMaterial({ color: 0xe9f2f8, roughness: 0.85, metalness: 0.02 });
+      const pantsMat = new THREE.MeshStandardMaterial({ color: 0x2b4260, roughness: 0.88, metalness: 0.03 });
+      const shoeMat = new THREE.MeshStandardMaterial({ color: 0xe6fbff, roughness: 0.75, metalness: 0.04 });
+      const hairMat = new THREE.MeshStandardMaterial({ color: 0x2d241d, roughness: 0.96, metalness: 0.01 });
+
+      const avatar = new THREE.Group();
+      avatar.position.y = 0.15;
+      avatar.rotation.y = -0.18;
+      scene.add(avatar);
+
+      function makeLimb(parent, options) {
+        const pivot = new THREE.Group();
+        pivot.position.set(options.x || 0, options.y || 0, options.z || 0);
+        parent.add(pivot);
+
+        const mesh = new THREE.Mesh(
+          new THREE.CapsuleGeometry(options.radius, options.length, 10, 18),
+          options.material
+        );
+        mesh.position.y = -((options.length / 2) + options.radius);
+        pivot.add(mesh);
+
+        return { pivot, mesh, endY: -((options.length + options.radius * 2)) };
+      }
+
+      const hips = new THREE.Group();
+      hips.position.y = 1.15;
+      avatar.add(hips);
+
+      const pelvis = new THREE.Mesh(new THREE.SphereGeometry(0.26, 24, 24), pantsMat);
+      pelvis.scale.set(1.45, 0.72, 1.1);
+      hips.add(pelvis);
+
+      const waist = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 0.3, 24), topMat);
+      waist.position.y = 0.19;
+      hips.add(waist);
+
+      const chestPivot = new THREE.Group();
+      chestPivot.position.y = 0.32;
+      hips.add(chestPivot);
+
+      const upperTorso = new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.24, 0.58, 24), topMat);
+      upperTorso.position.y = 0.29;
+      chestPivot.add(upperTorso);
+
+      const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.12, 18), skinMat);
+      neck.position.y = 0.66;
+      chestPivot.add(neck);
+
+      const headPivot = new THREE.Group();
+      headPivot.position.y = 0.78;
+      chestPivot.add(headPivot);
+
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 26, 26), skinMat);
+      head.scale.set(1, 1.08, 0.96);
+      headPivot.add(head);
+
+      const hair = new THREE.Mesh(new THREE.SphereGeometry(0.195, 24, 24), hairMat);
+      hair.scale.set(1.02, 1.05, 1.02);
+      hair.position.set(0, 0.02, -0.02);
+      headPivot.add(hair);
+
+      const ponytail = new THREE.Mesh(new THREE.CapsuleGeometry(0.06, 0.24, 8, 12), hairMat);
+      ponytail.position.set(0, -0.04, -0.17);
+      ponytail.rotation.x = -0.35;
+      headPivot.add(ponytail);
+
+      const leftUpperArm = makeLimb(chestPivot, { x: 0.38, y: 0.5, radius: 0.065, length: 0.44, material: topMat });
+      const leftLowerArm = makeLimb(leftUpperArm.pivot, { y: leftUpperArm.endY, radius: 0.055, length: 0.38, material: skinMat });
+      const rightUpperArm = makeLimb(chestPivot, { x: -0.38, y: 0.5, radius: 0.065, length: 0.44, material: topMat });
+      const rightLowerArm = makeLimb(rightUpperArm.pivot, { y: rightUpperArm.endY, radius: 0.055, length: 0.38, material: skinMat });
+
+      const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.07, 18, 18), skinMat);
+      leftHand.position.y = leftLowerArm.endY - 0.07;
+      leftLowerArm.pivot.add(leftHand);
+      const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.07, 18, 18), skinMat);
+      rightHand.position.y = rightLowerArm.endY - 0.07;
+      rightLowerArm.pivot.add(rightHand);
+
+      const leftUpperLeg = makeLimb(hips, { x: 0.19, y: -0.02, radius: 0.095, length: 0.6, material: pantsMat });
+      const leftLowerLeg = makeLimb(leftUpperLeg.pivot, { y: leftUpperLeg.endY, radius: 0.08, length: 0.58, material: pantsMat });
+      const rightUpperLeg = makeLimb(hips, { x: -0.19, y: -0.02, radius: 0.095, length: 0.6, material: pantsMat });
+      const rightLowerLeg = makeLimb(rightUpperLeg.pivot, { y: rightUpperLeg.endY, radius: 0.08, length: 0.58, material: pantsMat });
+
+      const leftFoot = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.08, 0.34), shoeMat);
+      leftFoot.position.set(0.02, leftLowerLeg.endY - 0.06, 0.08);
+      leftLowerLeg.pivot.add(leftFoot);
+      const rightFoot = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.08, 0.34), shoeMat);
+      rightFoot.position.set(-0.02, rightLowerLeg.endY - 0.06, 0.08);
+      rightLowerLeg.pivot.add(rightFoot);
+
+      const joints = {
+        hips,
+        chest: chestPivot,
+        head: headPivot,
+        leftUpperArm: leftUpperArm.pivot,
+        leftLowerArm: leftLowerArm.pivot,
+        rightUpperArm: rightUpperArm.pivot,
+        rightLowerArm: rightLowerArm.pivot,
+        leftUpperLeg: leftUpperLeg.pivot,
+        leftLowerLeg: leftLowerLeg.pivot,
+        rightUpperLeg: rightUpperLeg.pivot,
+        rightLowerLeg: rightLowerLeg.pivot
+      };
+
+      function resizeDemo() {
+        const width = Math.max($demoStage.clientWidth, 280);
+        const height = Math.max($demoStage.clientHeight, 320);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height, false);
+      }
+
+      function applyPose(targetPose) {
+        // We blend toward the next pose instead of snapping instantly.
+        // That gives the demo smooth motion and makes the movement easier to read.
+        joints.hips.position.y += (targetPose.hipsY - joints.hips.position.y) * 0.16;
+        joints.hips.rotation.x += (targetPose.hipsX - joints.hips.rotation.x) * 0.16;
+        joints.chest.rotation.x += (targetPose.chestX - joints.chest.rotation.x) * 0.16;
+        joints.head.rotation.x += (targetPose.headX - joints.head.rotation.x) * 0.16;
+        joints.leftUpperArm.rotation.x += (targetPose.leftUpperArmX - joints.leftUpperArm.rotation.x) * 0.18;
+        joints.leftLowerArm.rotation.x += (targetPose.leftLowerArmX - joints.leftLowerArm.rotation.x) * 0.18;
+        joints.rightUpperArm.rotation.x += (targetPose.rightUpperArmX - joints.rightUpperArm.rotation.x) * 0.18;
+        joints.rightLowerArm.rotation.x += (targetPose.rightLowerArmX - joints.rightLowerArm.rotation.x) * 0.18;
+        joints.leftUpperLeg.rotation.x += (targetPose.leftUpperLegX - joints.leftUpperLeg.rotation.x) * 0.18;
+        joints.leftLowerLeg.rotation.x += (targetPose.leftLowerLegX - joints.leftLowerLeg.rotation.x) * 0.18;
+        joints.rightUpperLeg.rotation.x += (targetPose.rightUpperLegX - joints.rightUpperLeg.rotation.x) * 0.18;
+        joints.rightLowerLeg.rotation.x += (targetPose.rightLowerLegX - joints.rightLowerLeg.rotation.x) * 0.18;
+      }
+
+      function animate() {
+        const delta = clock.getDelta();
+        if (demoIsPlaying) demoMotionTime += delta;
+        const targetPose = getDemoPose(activeDemoKey, demoMotionTime);
+
+        applyPose(targetPose);
+        avatar.rotation.y = -0.18 + Math.sin(demoMotionTime * 0.6) * 0.04;
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+
+      resizeDemo();
+      if (observer) observer.observe($demoStage);
+      window.addEventListener('resize', resizeDemo);
+      animate();
+
+      return { resizeDemo };
+    }
+
+    // ─── Mutations ────────────────────────────────────────────────────────────
+    // Returns true if added; false if it was a duplicate name on the same day
+    function addExercise(ex) {
+      const existing = getWorkout().exercises;
+      if (existing.some(e => e.name.toLowerCase() === ex.name.toLowerCase())) return false;
+      schedule = schedule.map(d => {
+        if (d.day !== activeDay) return d;
+        return { ...d, exercises: [...d.exercises, ex] };
+      });
+      if (!schedule.find(d => d.day === activeDay)) {
+        schedule.push({ day: activeDay, name: 'Custom Workout', exercises: [ex] });
+      }
+      saveSchedule();
+      return true;
+    }
+
+    function toggleExercise(id) {
+      schedule = schedule.map(d => {
+        if (d.day !== activeDay) return d;
+        return { ...d, exercises: d.exercises.map(e => e.id === id ? { ...e, completed: !e.completed } : e) };
+      });
+      saveSchedule();
+      render();
+    }
+
+    function removeExercise(id) {
+      schedule = schedule.map(d => {
+        if (d.day !== activeDay) return d;
+        return { ...d, exercises: d.exercises.filter(e => e.id !== id) };
+      });
+      saveSchedule();
+      render();
+    }
+
+    // ─── Render ───────────────────────────────────────────────────────────────
+    function renderWeek() {
+      $week.innerHTML = '';
+      DAYS.forEach(day => {
+        const data    = schedule.find(d => d.day === day);
+        const hasWork = data && data.exercises.length > 0;
+        const btn     = document.createElement('button');
+        btn.type      = 'button';
+        btn.className = 'week-btn' + (day === activeDay ? ' active' : '');
+        btn.innerHTML = `<span>${escHtml(day.slice(0,3))}</span><span class="week-dot${hasWork ? ' has-workout' : ''}"></span>`;
+        btn.addEventListener('click', () => { activeDay = day; $suggestions.innerHTML = ''; render(); });
+        $week.appendChild(btn);
+      });
+    }
+
+    function renderProgress() {
+      const workout = getWorkout();
+      const pct     = calcProgress(workout);
+      if (workout.exercises && workout.exercises.length > 0) {
+        $progBox.style.display = '';
+        $progFill.style.width  = pct + '%';
+        $progPct.textContent   = pct + '%';
+      } else {
+        $progBox.style.display = 'none';
+      }
+    }
+
+    function renderExercises() {
+      const workout = getWorkout();
+      $exList.innerHTML = '';
+      if (!workout.exercises || !workout.exercises.length) {
+        $exList.innerHTML = '<div class="empty-state">No exercises yet — add some below or pick a body part above.</div>';
+        return;
+      }
+      workout.exercises.forEach((ex, idx) => {
+        const row   = document.createElement('div');
+        row.className = 'ex-row ex-grid' + (ex.completed ? ' done' : '');
+
+        const chk   = document.createElement('input');
+        chk.type = 'checkbox'; chk.checked = !!ex.completed;
+        chk.addEventListener('change', () => toggleExercise(ex.id));
+
+        const name  = document.createElement('div');
+        name.className = 'ex-name ex-demo-link';
+        name.textContent = `${idx + 1}. ${ex.name}`;
+        name.title = 'Show matching demo movement';
+        name.tabIndex = 0;
+        name.setAttribute('role', 'button');
+        name.addEventListener('click', () => setDemo(findBestDemoForExercise(ex.name)));
+        name.addEventListener('keydown', evt => {
+          if (evt.key === 'Enter' || evt.key === ' ') {
+            evt.preventDefault();
+            setDemo(findBestDemoForExercise(ex.name));
+          }
+        });
+
+        const vol   = document.createElement('div');
+        vol.className   = 'ex-tag';
+        vol.textContent = `${ex.sets} × ${ex.reps}`;
+
+        const wt    = document.createElement('div');
+        wt.className   = 'ex-tag';
+        wt.textContent = ex.weight ? `${ex.weight} lbs` : '—';
+
+        const del   = document.createElement('button');
+        del.type = 'button'; del.className = 'btn-danger'; del.title = 'Remove exercise';
+        del.textContent = '✕';
+        del.addEventListener('click', () => removeExercise(ex.id));
+
+        row.append(chk, name, vol, wt, del);
+        $exList.appendChild(row);
+      });
+    }
+
+    function renderSuggestions(bodyPart) {
+      $suggestions.innerHTML = '';
+      const list = suggestFor(bodyPart);
+      if (!list.length) {
+        $suggestions.textContent = 'No suggestions for this body part with current equipment.';
+        return;
+      }
+      const panel = document.createElement('div');
+      panel.className = 'suggestions-panel';
+      panel.innerHTML = `<h4>Suggestions — ${escHtml(bodyPart)} (24/7 Fitness HK)</h4>`;
+
+      list.forEach(item => {
+        const current     = getWorkout().exercises;
+        const alreadyDone = current.some(e => e.name.toLowerCase() === item.name.toLowerCase());
+
+        const row  = document.createElement('div');
+        row.className = 'suggest-row';
+
+        const info = document.createElement('div');
+        info.className = 'suggest-info';
+        info.innerHTML = `<strong>${escHtml(item.name)}</strong>`
+          + (alreadyDone ? '<span class="suggest-added">✓ added</span>' : '')
+          + `<div class="suggest-meta">${item.sets} sets × ${escHtml(item.reps)}</div>`;
+
+        const btn  = document.createElement('button');
+        btn.type      = 'button';
+        btn.textContent = alreadyDone ? 'Added' : '+ Add';
+        btn.disabled  = alreadyDone;
+        btn.addEventListener('click', () => {
+          const ok = addExercise({ id: uid(), name: item.name, sets: item.sets, reps: item.reps, weight: '', completed: false });
+          if (ok) { render(); renderSuggestions(bodyPart); }
+        });
+
+        row.append(info, btn);
+        panel.appendChild(row);
+      });
+      $suggestions.appendChild(panel);
+    }
+
+    function render() {
+      const workout = getWorkout();
+      $dayLabel.textContent = activeDay + "'s Plan";
+      $dayTitle.textContent = workout.name || 'Rest Day';
+      renderWeek();
+      renderProgress();
+      renderExercises();
+    }
+
+    // ─── Event Handlers ───────────────────────────────────────────────────────
+    // Adding a custom exercise reads the form, creates an exercise object,
+    // then rerenders the list so the new row appears immediately.
+    document.getElementById('addForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const name   = document.getElementById('exerciseName').value.trim();
+      const sets   = Math.max(1, parseInt(document.getElementById('exerciseSets').value) || 1);
+      const reps   = document.getElementById('exerciseReps').value.trim() || '10';
+      const weight = document.getElementById('exerciseWeight').value.trim();
+      const ok = addExercise({ id: uid(), name, sets, reps, weight, completed: false });
+      if (ok) {
+        e.target.reset();
+        document.getElementById('exerciseSets').value = 3;
+        document.getElementById('exerciseReps').value = '10';
+        render();
+      }
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (!confirm('Reset to default PPL template? All saved changes will be lost.')) return;
+      schedule = JSON.parse(JSON.stringify(TEMPLATE_PPL));
+      saveSchedule();
+      $suggestions.innerHTML = '';
+      render();
+    });
+
+    document.getElementById('suggestBtn').addEventListener('click', () => {
+      renderSuggestions($bodyPart.value);
+    });
+
+    document.getElementById('autoAddBtn').addEventListener('click', () => {
+      const part  = $bodyPart.value;
+      const picks = suggestFor(part).slice(0, 5);
+      let added   = 0;
+      picks.forEach(item => {
+        if (addExercise({ id: uid(), name: item.name, sets: item.sets, reps: item.reps, weight: '', completed: false })) added++;
+      });
+      if (added > 0) { render(); renderSuggestions(part); }
+    });
+
+    $bodyPart.addEventListener('change', () => {
+      setDemo(BODY_PART_TO_DEMO[$bodyPart.value] || 'squat');
+    });
+
+    $demoSelect.addEventListener('change', () => {
+      setDemo($demoSelect.value);
+    });
+
+    $demoToggle.addEventListener('click', () => {
+      demoIsPlaying = !demoIsPlaying;
+      $demoToggle.textContent = demoIsPlaying ? 'Pause Demo' : 'Play Demo';
+    });
+
+    // ─── Init ─────────────────────────────────────────────────────────────────
+    demoScene = initDemoScene();
+    setDemo(activeDemoKey);
+    render();
+
+  </script>
+</body>
+</html>

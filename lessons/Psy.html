@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Counselling Psychology Interactive Lesson</title>
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap');
+
+		:root {
+			--bg: #f6efe5;
+			--paper: rgba(255, 252, 248, 0.88);
+			--paper-strong: #fffaf3;
+			--ink: #1f2a2e;
+			--muted: #5a6a68;
+			--line: rgba(31, 42, 46, 0.12);
+			--teal: #2f6f6d;
+			--teal-deep: #204b53;
+			--sage: #88a58b;
+			--gold: #c8923e;
+			--coral: #d86f57;
+			--rose: #b45267;
+			--shadow: 0 24px 60px rgba(36, 47, 48, 0.12);
+			--radius-lg: 28px;
+			--radius-md: 20px;
+			--radius-sm: 14px;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html {
+			scroll-behavior: smooth;
+		}
+
+		body {
+			margin: 0;
+			font-family: 'Manrope', sans-serif;
+			color: var(--ink);
+			background:
+				radial-gradient(circle at 15% 20%, rgba(216, 111, 87, 0.12), transparent 22%),
+				radial-gradient(circle at 85% 12%, rgba(47, 111, 109, 0.18), transparent 24%),
+				radial-gradient(circle at 50% 80%, rgba(200, 146, 62, 0.10), transparent 22%),
+				linear-gradient(180deg, #f1e6d5 0%, #f8f3ea 35%, #f5ede3 100%);
+			min-height: 100vh;
+			overflow-x: hidden;
+		}
+
+		body::before {
+			content: "";
+			position: fixed;
+			inset: 0;
+			pointer-events: none;
+			opacity: 0.18;
+			background-image:
+				linear-gradient(rgba(47, 111, 109, 0.08) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(47, 111, 109, 0.08) 1px, transparent 1px);
+			background-size: 48px 48px;
+			mask-image: radial-gradient(circle at center, black 42%, transparent 82%);
+		}
+
+		a {
+			color: inherit;
+		}
+
+		.shell {
+			width: min(1360px, calc(100% - 32px));
+			margin: 0 auto 64px;
+			position: relative;
+			z-index: 1;
+		}
+
+		.hero {
+			margin-top: 24px;
+			background: linear-gradient(135deg, rgba(32, 75, 83, 0.96), rgba(47, 111, 109, 0.92) 55%, rgba(136, 165, 139, 0.92));
+			border-radius: 36px;
+			color: #f8f7f3;
+			padding: 28px;
+			box-shadow: var(--shadow);
+			position: relative;
+			overflow: hidden;
+		}
+
+		.hero::before,
+		.hero::after {
+			content: "";
+			position: absolute;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.08);
+			filter: blur(4px);
+		}
+
+		.hero::before {
+			width: 320px;
+			height: 320px;
+			top: -90px;
+			right: -80px;
+		}
+
+		.hero::after {
+			width: 240px;
+			height: 240px;
+			bottom: -120px;
+			left: -70px;
+		}
+
+		.hero-grid {
+			display: grid;
+			grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.85fr);
+			gap: 24px;
+			align-items: center;
+		}
+
+		.eyebrow {
+			display: inline-flex;
+			align-items: center;
+			gap: 10px;
+			padding: 8px 14px;
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.12);
+			letter-spacing: 0.14em;
+			text-transform: uppercase;
+			font-size: 0.74rem;
+			font-weight: 800;
+		}
+
+		.psi-badge {
+			width: 34px;
+			height: 34px;
+			border-radius: 50%;
+			display: inline-grid;
+			place-items: center;
+			background: rgba(255, 255, 255, 0.16);
+			font-size: 1.15rem;
+			font-weight: 800;
+		}
+
+		h1,
+		h2,
+		h3 {
+			margin: 0;
+			line-height: 1.05;
+		}
+
+		h1,
+		h2.section-title {
+			font-family: 'Cormorant Garamond', serif;
+			letter-spacing: 0.01em;
+		}
+
+		.hero h1 {
+			font-size: clamp(3rem, 5vw, 5.5rem);
+			margin-top: 18px;
+			max-width: 10ch;
+		}
+
+		.hero-copy {
+			font-size: 1.05rem;
+			line-height: 1.8;
+			color: rgba(247, 247, 242, 0.88);
+			margin: 20px 0 28px;
+			max-width: 62ch;
+		}
+
+		.hero-actions,
+		.stat-row,
+		.nav-row,
+		.button-row,
+		.chip-row,
+		.option-grid,
+		.glossary-grid,
+		.quiz-grid,
+		.overview-grid,
+		.practice-grid,
+		.approach-grid,
+		.triad-grid,
+		.policy-grid,
+		.foot-grid {
+			display: grid;
+			gap: 16px;
+		}
+
+		.hero-actions {
+			grid-template-columns: repeat(2, max-content);
+			align-items: center;
+		}
+
+		.button,
+		.ghost-button,
+		.nav-button,
+		.skill-button,
+		.case-button,
+		.ethics-button,
+		.quiz-button {
+			border: none;
+			cursor: pointer;
+			font: inherit;
+			transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, color 180ms ease, border-color 180ms ease;
+		}
+
+		.button,
+		.ghost-button {
+			padding: 14px 18px;
+			border-radius: 999px;
+			font-weight: 700;
+		}
+
+		.button {
+			background: #f8f3ea;
+			color: var(--teal-deep);
+			box-shadow: 0 16px 30px rgba(19, 29, 31, 0.14);
+		}
+
+		.button:hover,
+		.ghost-button:hover,
+		.nav-button:hover,
+		.skill-button:hover,
+		.case-button:hover,
+		.ethics-button:hover,
+		.quiz-button:hover {
+			transform: translateY(-2px);
+		}
+
+		.ghost-button {
+			background: transparent;
+			color: #f8f3ea;
+			border: 1px solid rgba(255, 255, 255, 0.25);
+		}
+
+		.hero-visual {
+			min-height: 100%;
+			display: grid;
+			gap: 18px;
+			align-content: center;
+		}
+
+		.mind-board,
+		.card,
+		.panel,
+		.quiz-card,
+		.foot-card {
+			background: var(--paper);
+			backdrop-filter: blur(10px);
+			border: 1px solid rgba(255, 255, 255, 0.4);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--shadow);
+		}
+
+		.mind-board {
+			padding: 22px;
+			color: var(--ink);
+		}
+
+		.mind-graphic {
+			position: relative;
+			display: grid;
+			place-items: center;
+			min-height: 280px;
+		}
+
+		.mind-ring {
+			position: absolute;
+			border-radius: 50%;
+			border: 1px dashed rgba(47, 111, 109, 0.38);
+			animation: drift 14s linear infinite;
+		}
+
+		.mind-ring.one {
+			width: 230px;
+			height: 230px;
+		}
+
+		.mind-ring.two {
+			width: 310px;
+			height: 310px;
+			animation-direction: reverse;
+			animation-duration: 18s;
+		}
+
+		.mind-core {
+			width: 118px;
+			height: 118px;
+			border-radius: 50%;
+			display: grid;
+			place-items: center;
+			background: radial-gradient(circle at 30% 30%, #f9d89f, #c8923e 72%);
+			color: #fff8e7;
+			font-size: 3rem;
+			font-weight: 800;
+			box-shadow: inset 0 0 0 10px rgba(255, 248, 231, 0.18), 0 14px 34px rgba(32, 75, 83, 0.25);
+		}
+
+		.mind-node {
+			position: absolute;
+			padding: 10px 12px;
+			border-radius: 999px;
+			background: rgba(255, 250, 243, 0.92);
+			border: 1px solid rgba(47, 111, 109, 0.18);
+			font-size: 0.86rem;
+			font-weight: 700;
+			box-shadow: 0 10px 24px rgba(31, 42, 46, 0.08);
+		}
+
+		.mind-node:nth-child(4) { top: 14px; left: 50%; transform: translateX(-50%); }
+		.mind-node:nth-child(5) { top: 48%; right: -2px; transform: translateY(-50%); }
+		.mind-node:nth-child(6) { bottom: 20px; left: 18%; }
+		.mind-node:nth-child(7) { top: 46%; left: -6px; transform: translateY(-50%); }
+
+		.mind-caption {
+			margin-top: 10px;
+			padding-top: 14px;
+			border-top: 1px solid var(--line);
+			font-size: 0.95rem;
+			color: var(--muted);
+			line-height: 1.7;
+		}
+
+		.stat-row {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+
+		.stat {
+			padding: 16px;
+			border-radius: var(--radius-md);
+			background: rgba(255, 255, 255, 0.12);
+			border: 1px solid rgba(255, 255, 255, 0.16);
+		}
+
+		.stat strong {
+			display: block;
+			font-size: 1.7rem;
+			margin-bottom: 6px;
+		}
+
+		.sticky-nav {
+			position: sticky;
+			top: 16px;
+			z-index: 20;
+			margin: 18px 0 28px;
+		}
+
+		.nav-row {
+			grid-template-columns: repeat(6, minmax(0, 1fr));
+			padding: 10px;
+			border-radius: 999px;
+			background: rgba(255, 250, 243, 0.7);
+			border: 1px solid rgba(31, 42, 46, 0.08);
+			backdrop-filter: blur(10px);
+		}
+
+		.nav-button {
+			padding: 12px 14px;
+			border-radius: 999px;
+			background: transparent;
+			color: var(--muted);
+			font-weight: 700;
+		}
+
+		.nav-button.active {
+			background: var(--teal-deep);
+			color: #f8f4ee;
+			box-shadow: 0 12px 22px rgba(32, 75, 83, 0.22);
+		}
+
+		section.lesson-section {
+			margin: 34px 0;
+		}
+
+		.section-header {
+			display: grid;
+			gap: 12px;
+			margin-bottom: 18px;
+		}
+
+		.section-tag {
+			color: var(--teal);
+			font-size: 0.76rem;
+			text-transform: uppercase;
+			font-weight: 800;
+			letter-spacing: 0.18em;
+		}
+
+		.section-title {
+			font-size: clamp(2.2rem, 4vw, 3.4rem);
+		}
+
+		.section-copy {
+			max-width: 72ch;
+			color: var(--muted);
+			line-height: 1.8;
+		}
+
+		.overview-grid {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+
+		.card {
+			padding: 24px;
+			border-radius: var(--radius-lg);
+		}
+
+		.card h3,
+		.panel h3,
+		.quiz-card h3 {
+			font-size: 1.12rem;
+			margin-bottom: 10px;
+		}
+
+		.card p,
+		.panel p,
+		.quiz-card p,
+		.foot-card p,
+		li {
+			color: var(--muted);
+			line-height: 1.72;
+		}
+
+		.icon {
+			width: 46px;
+			height: 46px;
+			border-radius: 14px;
+			display: grid;
+			place-items: center;
+			margin-bottom: 18px;
+			background: linear-gradient(135deg, rgba(47, 111, 109, 0.14), rgba(200, 146, 62, 0.18));
+			color: var(--teal-deep);
+			font-size: 1.28rem;
+			font-weight: 800;
+		}
+
+		.practice-grid,
+		.triad-grid,
+		.policy-grid,
+		.foot-grid {
+			grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+		}
+
+		.button-row,
+		.chip-row,
+		.option-grid,
+		.glossary-grid,
+		.quiz-grid,
+		.approach-grid {
+			grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+		}
+
+		.skill-button,
+		.case-button,
+		.ethics-button,
+		.quiz-button {
+			padding: 14px 16px;
+			border-radius: 18px;
+			background: rgba(255, 250, 243, 0.82);
+			border: 1px solid rgba(31, 42, 46, 0.08);
+			color: var(--ink);
+			font-weight: 700;
+			text-align: left;
+		}
+
+		.skill-button.active,
+		.case-button.active,
+		.ethics-button.active,
+		.quiz-button.active {
+			background: var(--teal-deep);
+			color: #fbf7f0;
+			box-shadow: 0 14px 30px rgba(32, 75, 83, 0.22);
+		}
+
+		.panel {
+			padding: 26px;
+		}
+
+		.panel.highlight {
+			background: linear-gradient(180deg, rgba(255, 250, 243, 0.96), rgba(247, 243, 234, 0.92));
+		}
+
+		.list {
+			margin: 14px 0 0;
+			padding-left: 18px;
+		}
+
+		.list li + li {
+			margin-top: 8px;
+		}
+
+		.dialogue {
+			display: grid;
+			gap: 14px;
+			margin-top: 22px;
+		}
+
+		.bubble {
+			padding: 16px 18px;
+			border-radius: 22px;
+			max-width: 85%;
+			position: relative;
+		}
+
+		.bubble.client {
+			background: rgba(216, 111, 87, 0.14);
+			border-top-left-radius: 6px;
+		}
+
+		.bubble.therapist {
+			margin-left: auto;
+			background: rgba(47, 111, 109, 0.14);
+			border-top-right-radius: 6px;
+		}
+
+		.bubble-label {
+			display: block;
+			font-size: 0.72rem;
+			text-transform: uppercase;
+			letter-spacing: 0.12em;
+			font-weight: 800;
+			margin-bottom: 6px;
+			color: var(--teal-deep);
+		}
+
+		.result-box,
+		.mini-box {
+			margin-top: 18px;
+			padding: 16px 18px;
+			border-radius: 18px;
+			background: rgba(47, 111, 109, 0.08);
+			border: 1px solid rgba(47, 111, 109, 0.15);
+		}
+
+		.result-box strong,
+		.mini-box strong {
+			color: var(--teal-deep);
+		}
+
+		.result-box ul,
+		.mini-box ul {
+			margin: 10px 0 0;
+			padding-left: 18px;
+		}
+
+		.meter {
+			height: 14px;
+			border-radius: 999px;
+			background: rgba(31, 42, 46, 0.08);
+			overflow: hidden;
+			margin-top: 14px;
+		}
+
+		.meter-fill {
+			height: 100%;
+			border-radius: inherit;
+			background: linear-gradient(90deg, var(--coral), var(--gold), var(--teal));
+			width: 0;
+			transition: width 260ms ease;
+		}
+
+		.triangle-stage {
+			display: grid;
+			place-items: center;
+			min-height: 500px;
+			position: relative;
+			padding: 14px 20px 28px;
+		}
+
+		.triangle {
+			width: min(560px, 92vw);
+			height: 430px;
+			position: relative;
+		}
+
+		.triangle::before {
+			content: "";
+			position: absolute;
+			inset: 56px 112px 58px;
+			border-radius: 50%;
+			background: radial-gradient(circle, rgba(255, 250, 243, 0.18) 0%, rgba(255, 250, 243, 0.08) 45%, transparent 68%);
+			border: 1px dashed rgba(32, 75, 83, 0.14);
+		}
+
+		.triangle-node {
+			position: absolute;
+			width: 176px;
+			min-height: 112px;
+			padding: 14px;
+			border-radius: 18px;
+			background: rgba(255, 250, 243, 0.96);
+			border: 1px solid rgba(31, 42, 46, 0.08);
+			box-shadow: 0 14px 28px rgba(31, 42, 46, 0.08);
+			text-align: center;
+			display: grid;
+			align-content: center;
+			gap: 4px;
+			z-index: 1;
+		}
+
+		.triangle-node strong {
+			display: block;
+			text-transform: uppercase;
+			font-size: 0.74rem;
+			letter-spacing: 0.14em;
+			color: var(--teal);
+			margin-bottom: 8px;
+		}
+
+		.triangle-node span {
+			line-height: 1.45;
+			font-size: 0.96rem;
+		}
+
+		.triangle-node.thoughts { top: 0; left: 50%; transform: translateX(-50%); }
+		.triangle-node.emotions { bottom: 48px; left: 10px; }
+		.triangle-node.behaviour { bottom: 48px; right: 10px; }
+
+		.bridge-lines {
+			position: absolute;
+			inset: 0;
+			pointer-events: none;
+			z-index: 0;
+		}
+
+		.bridge-lines svg {
+			width: 100%;
+			height: 100%;
+		}
+
+		.cycle-arrow {
+			fill: none;
+			stroke: rgba(32, 75, 83, 0.52);
+			stroke-width: 2.6;
+			stroke-linecap: round;
+			stroke-dasharray: 7 9;
+			marker-end: url(#cycleArrowHead);
+		}
+
+		.cycle-legend {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 10px;
+			margin: 14px 0 6px;
+		}
+
+		.cycle-step {
+			padding: 10px 12px;
+			border-radius: 999px;
+			background: rgba(255, 250, 243, 0.9);
+			border: 1px solid rgba(31, 42, 46, 0.08);
+			box-shadow: 0 10px 24px rgba(31, 42, 46, 0.06);
+			font-size: 0.76rem;
+			font-weight: 800;
+			letter-spacing: 0.05em;
+			text-transform: uppercase;
+			text-align: center;
+			color: var(--teal);
+		}
+
+		.scenario-strip {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin-top: 14px;
+		}
+
+		.scenario-pill {
+			padding: 9px 14px;
+			border-radius: 999px;
+			background: rgba(31, 42, 46, 0.06);
+			color: var(--muted);
+			font-size: 0.88rem;
+			font-weight: 700;
+		}
+
+		.formula-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 14px;
+			margin-top: 18px;
+		}
+
+		.formula-block {
+			padding: 16px;
+			border-radius: 18px;
+			background: rgba(255, 250, 243, 0.78);
+			border: 1px solid rgba(31, 42, 46, 0.08);
+		}
+
+		.formula-block strong {
+			display: block;
+			margin-bottom: 8px;
+			color: var(--teal-deep);
+		}
+
+		.ethics-wheel {
+			width: min(320px, 82vw);
+			aspect-ratio: 1 / 1;
+			margin: 8px auto 0;
+			border-radius: 50%;
+			position: relative;
+			background: conic-gradient(from -30deg, rgba(200, 146, 62, 0.22), rgba(216, 111, 87, 0.22), rgba(180, 82, 103, 0.24), rgba(47, 111, 109, 0.22), rgba(136, 165, 139, 0.22), rgba(200, 146, 62, 0.22));
+			border: 10px solid rgba(255, 250, 243, 0.72);
+			box-shadow: inset 0 0 0 1px rgba(31, 42, 46, 0.08), 0 20px 40px rgba(31, 42, 46, 0.12);
+		}
+
+		.ethics-wheel::before {
+			content: "";
+			position: absolute;
+			inset: 34px;
+			border-radius: 50%;
+			border: 1px dashed rgba(32, 75, 83, 0.18);
+		}
+
+		.ethics-hub {
+			position: absolute;
+			inset: 50%;
+			transform: translate(-50%, -50%);
+			width: 110px;
+			height: 110px;
+			border-radius: 50%;
+			background: var(--paper-strong);
+			display: grid;
+			place-items: center;
+			text-align: center;
+			font-weight: 800;
+			color: var(--teal-deep);
+			padding: 10px;
+			box-shadow: 0 12px 28px rgba(31, 42, 46, 0.12);
+		}
+
+		.wheel-label {
+			position: absolute;
+			width: 110px;
+			text-align: center;
+			font-size: 0.78rem;
+			line-height: 1.25;
+			font-weight: 800;
+			color: var(--teal-deep);
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+		}
+
+		.wheel-label.one { top: 6%; left: 50%; transform: translateX(-50%); }
+		.wheel-label.two { top: 26%; right: 6%; }
+		.wheel-label.three { bottom: 20%; right: 10%; }
+		.wheel-label.four { bottom: 6%; left: 50%; transform: translateX(-50%); }
+		.wheel-label.five { bottom: 20%; left: 10%; }
+		.wheel-label.six { top: 26%; left: 6%; }
+
+		.quiz-card {
+			padding: 22px;
+		}
+
+		.quiz-options {
+			display: grid;
+			gap: 10px;
+			margin-top: 14px;
+		}
+
+		.quiz-feedback {
+			margin-top: 10px;
+			font-size: 0.95rem;
+			font-weight: 700;
+			min-height: 1.3em;
+		}
+
+		.score-box {
+			padding: 18px 20px;
+			border-radius: 18px;
+			background: rgba(47, 111, 109, 0.08);
+			border: 1px solid rgba(47, 111, 109, 0.15);
+			margin-top: 20px;
+		}
+
+		.glossary-grid {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+
+		.term {
+			padding: 18px;
+			border-radius: 18px;
+			background: rgba(255, 250, 243, 0.78);
+			border: 1px solid rgba(31, 42, 46, 0.08);
+		}
+
+		.term strong {
+			display: block;
+			margin-bottom: 8px;
+			color: var(--teal-deep);
+		}
+
+		.foot-grid {
+			margin-top: 18px;
+		}
+
+		.foot-card {
+			padding: 24px;
+		}
+
+		.sr-only {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			border: 0;
+		}
+
+		@keyframes drift {
+			from { transform: rotate(0deg); }
+			to { transform: rotate(360deg); }
+		}
+
+		.reveal {
+			opacity: 0;
+			transform: translateY(20px);
+			animation: rise 0.7s ease forwards;
+		}
+
+		.reveal.delay-1 { animation-delay: 0.08s; }
+		.reveal.delay-2 { animation-delay: 0.16s; }
+		.reveal.delay-3 { animation-delay: 0.24s; }
+
+		@keyframes rise {
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		@media (max-width: 1080px) {
+			.hero-grid,
+			.practice-grid,
+			.triad-grid,
+			.policy-grid,
+			.foot-grid,
+			.overview-grid,
+			.glossary-grid {
+				grid-template-columns: 1fr 1fr;
+			}
+
+			.nav-row {
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				border-radius: 28px;
+			}
+		}
+
+		@media (max-width: 760px) {
+			.shell {
+				width: min(100% - 20px, 1000px);
+			}
+
+			.hero {
+				padding: 22px;
+				border-radius: 28px;
+			}
+
+			.hero-grid,
+			.overview-grid,
+			.practice-grid,
+			.triad-grid,
+			.policy-grid,
+			.foot-grid,
+			.glossary-grid,
+			.formula-grid,
+			.stat-row,
+			.hero-actions,
+			.nav-row {
+				grid-template-columns: 1fr;
+			}
+
+			.hero h1 {
+				max-width: none;
+			}
+
+			.triangle-node {
+				width: 138px;
+				font-size: 0.88rem;
+			}
+
+			.triangle-stage {
+				min-height: 440px;
+				padding: 16px 10px 28px;
+			}
+
+			.triangle {
+				width: min(360px, 94vw);
+				height: 360px;
+			}
+
+			.triangle::before {
+				inset: 48px 62px 52px;
+			}
+
+			.triangle-node {
+				width: 144px;
+				min-height: 104px;
+			}
+
+			.triangle-node.thoughts { top: 0; }
+			.triangle-node.emotions { left: -2px; bottom: 32px; }
+			.triangle-node.behaviour { right: -2px; bottom: 32px; }
+
+			.cycle-legend {
+				grid-template-columns: 1fr;
+				gap: 8px;
+			}
+
+			.cycle-step {
+				font-size: 0.68rem;
+				padding: 6px 10px;
+			}
+
+			.wheel-label {
+				width: 88px;
+				font-size: 0.68rem;
+				letter-spacing: 0.05em;
+			}
+
+			.bubble {
+				max-width: 100%;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="shell">
+		<header class="hero reveal">
+			<div class="hero-grid">
+				<div>
+					<div class="eyebrow">
+						<span class="psi-badge">Ψ</span>
+						University-Level Interactive Lesson
+					</div>
+					<h1>Counselling Psychology</h1>
+					<p class="hero-copy">
+						A guided lesson through the foundations, theories, skills, ethics, formulation methods, multicultural practice, evidence base, and professional identity of counselling psychology. The page is built as a studio: you can compare approaches, test therapist responses, manipulate a CBT model, and work through ethical reasoning.
+					</p>
+					<div class="hero-actions">
+						<a class="button" href="#curriculum">Start the lesson</a>
+						<a class="ghost-button" href="#assessment">Jump to assessment</a>
+					</div>
+					<div class="stat-row" style="margin-top: 28px;">
+						<div class="stat">
+							<strong>8</strong>
+							Core curriculum areas
+						</div>
+						<div class="stat">
+							<strong>4</strong>
+							Interactive visual demos
+						</div>
+						<div class="stat">
+							<strong>Ψ</strong>
+							Psychology-centred visual identity
+						</div>
+					</div>
+				</div>
+
+				<div class="hero-visual reveal delay-1">
+					<div class="mind-board">
+						<div class="mind-graphic" aria-hidden="true">
+							<div class="mind-ring one"></div>
+							<div class="mind-ring two"></div>
+							<div class="mind-core">Ψ</div>
+							<div class="mind-node">Therapeutic alliance</div>
+							<div class="mind-node">Assessment</div>
+							<div class="mind-node">Ethics</div>
+							<div class="mind-node">Culture</div>
+						</div>
+						<div class="mind-caption">
+							Counselling psychology studies distress and growth together. It treats people as meaning-making individuals situated in relationships, culture, systems, and lifespan development.
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<nav class="sticky-nav reveal delay-2" aria-label="Lesson sections">
+			<div class="nav-row" id="sectionNav">
+				<button class="nav-button active" data-target="curriculum">Curriculum</button>
+				<button class="nav-button" data-target="approaches">Approaches</button>
+				<button class="nav-button" data-target="skills-lab">Skills Lab</button>
+				<button class="nav-button" data-target="formulation">Formulation</button>
+				<button class="nav-button" data-target="ethics">Ethics</button>
+				<button class="nav-button" data-target="assessment">Assessment</button>
+			</div>
+		</nav>
+
+		<main>
+			<section class="lesson-section reveal" id="curriculum">
+				<div class="section-header">
+					<div class="section-tag">Curriculum Map</div>
+					<h2 class="section-title">What university counselling psychology usually covers</h2>
+					<p class="section-copy">
+						Counselling psychology programmes are usually organised around scientific foundations, therapeutic theory, relational skill, client diversity, research literacy, and reflective professional practice. The cards below map the major content areas expected in higher education.
+					</p>
+				</div>
+
+				<div class="overview-grid">
+					<article class="card reveal delay-1">
+						<div class="icon">1</div>
+						<h3>Discipline foundations</h3>
+						<p>History of psychology, the emergence of counselling psychology, the scientist-practitioner model, mental health systems, and the distinction between counselling, clinical, psychiatry, coaching, and social work.</p>
+					</article>
+					<article class="card reveal delay-2">
+						<div class="icon">2</div>
+						<h3>Human development</h3>
+						<p>Lifespan development, attachment, identity, trauma, resilience, family systems, and how social context shapes coping across childhood, adolescence, adulthood, and later life.</p>
+					</article>
+					<article class="card reveal delay-3">
+						<div class="icon">3</div>
+						<h3>Therapeutic models</h3>
+						<p>Person-centred, psychodynamic, CBT, behavioural, existential, narrative, systemic, multicultural, and integrative approaches, with focus on mechanisms of change and indications for use.</p>
+					</article>
+					<article class="card reveal delay-1">
+						<div class="icon">4</div>
+						<h3>Relational skills</h3>
+						<p>Active listening, empathy, paraphrasing, reflecting feeling, immediacy, collaborative goal-setting, rupture repair, and ending work ethically and sensitively.</p>
+					</article>
+					<article class="card reveal delay-2">
+						<div class="icon">5</div>
+						<h3>Assessment and formulation</h3>
+						<p>Intake interviewing, risk screening, case formulation, diagnosis literacy, psychometrics, 5Ps or biopsychosocial thinking, and treatment planning tied to client goals.</p>
+					</article>
+					<article class="card reveal delay-3">
+						<div class="icon">6</div>
+						<h3>Ethics and law</h3>
+						<p>Confidentiality, consent, capacity, competence, documentation, record keeping, safeguarding, dual relationships, supervision, and professional boundaries.</p>
+					</article>
+					<article class="card reveal delay-1">
+						<div class="icon">7</div>
+						<h3>Diversity and social justice</h3>
+						<p>Cultural humility, power, oppression, disability, gender and sexuality, religion, migration, systemic inequality, and adaptation of therapy across cultural contexts.</p>
+					</article>
+					<article class="card reveal delay-2">
+						<div class="icon">8</div>
+						<h3>Research and reflection</h3>
+						<p>Quantitative and qualitative methods, process-outcome research, evidence-based practice, self-awareness, reflective journals, supervision, burnout prevention, and practitioner identity.</p>
+					</article>
+				</div>
+			</section>
+
+			<section class="lesson-section reveal" id="approaches">
+				<div class="section-header">
+					<div class="section-tag">Major Approaches</div>
+					<h2 class="section-title">Compare the main therapeutic approaches</h2>
+					<p class="section-copy">
+						Different approaches explain distress differently. Use the selector to compare the assumptions, therapist stance, tools, named examples, and best-fit contexts of the major approaches taught in counselling psychology.
+					</p>
+				</div>
+
+				<div class="practice-grid">
+					<div class="panel highlight">
+						<div class="button-row" id="approachButtons"></div>
+						<div class="result-box" id="approachDisplay"></div>
+					</div>
+					<aside class="panel">
+						<h3>Visual orientation spectrum</h3>
+						<p>Each model sits on a shifting balance between insight, emotion, behaviour, relationship, and social context. This is not a rigid ranking; it shows teaching emphasis.</p>
+						<div class="scenario-strip" id="approachTags"></div>
+						<div style="margin-top: 20px;">
+							<div style="display: flex; justify-content: space-between; gap: 12px; font-size: 0.86rem; color: var(--muted); font-weight: 700;">
+								<span>Individual skill change</span>
+								<span>Relational + cultural meaning</span>
+							</div>
+							<div class="meter">
+								<div class="meter-fill" id="approachMeter"></div>
+							</div>
+						</div>
+						<div class="mini-box" id="approachMini"></div>
+					</aside>
+				</div>
+			</section>
+
+			<section class="lesson-section reveal" id="skills-lab">
+				<div class="section-header">
+					<div class="section-tag">Verbal Demonstration</div>
+					<h2 class="section-title">Therapeutic microskills lab</h2>
+					<p class="section-copy">
+						Counselling psychology is not only theory. It is a disciplined interpersonal practice. Select a client moment, then choose a therapist response style to see how wording can either deepen or flatten the conversation.
+					</p>
+				</div>
+
+				<div class="practice-grid">
+					<div class="panel highlight">
+						<h3>Client moment</h3>
+						<div class="chip-row" id="caseButtons"></div>
+						<div class="dialogue">
+							<div class="bubble client">
+								<span class="bubble-label">Client</span>
+								<div id="clientLine"></div>
+							</div>
+							<div class="bubble therapist">
+								<span class="bubble-label">Therapist</span>
+								<div id="therapistLine">Choose a response style below.</div>
+							</div>
+						</div>
+						<div class="button-row" style="margin-top: 20px;" id="skillButtons"></div>
+						<div class="result-box" id="skillsFeedback"></div>
+					</div>
+
+					<aside class="panel">
+						<h3>Skills taught in training</h3>
+						<ul class="list">
+							<li>Attending behaviour: tone, pacing, minimal encouragers, posture, and silence.</li>
+							<li>Empathy: accurate understanding of feeling plus meaning.</li>
+							<li>Paraphrase: restating content to organise experience.</li>
+							<li>Reflection of feeling: naming emotion carefully enough that the client feels met rather than analysed.</li>
+							<li>Open questions: expanding perspective without interrogating.</li>
+							<li>Immediacy and challenge: used carefully to explore process in the room.</li>
+						</ul>
+						<div class="mini-box">
+							The strongest counselling responses are usually collaborative, non-defensive, and specific. Premature advice, reassurance, or overinterpretation often weakens alliance.
+						</div>
+					</aside>
+				</div>
+			</section>
+
+			<section class="lesson-section reveal" id="formulation">
+				<div class="section-header">
+					<div class="section-tag">Visual Demonstration</div>
+					<h2 class="section-title">Formulation studio: how problems are mapped</h2>
+					<p class="section-copy">
+						Formulation connects the person’s current distress to patterns, context, strengths, and maintaining cycles. Counselling psychology often favours collaborative formulation over reducing the person to a label.
+					</p>
+				</div>
+
+				<div class="triad-grid">
+					<div class="panel highlight">
+						<h3>CBT triangle demonstration</h3>
+						<p>Choose a scenario. Watch how thoughts, emotions, and behaviour interact. This visual model is widely taught because it helps clients see cycles they can interrupt.</p>
+						<div class="button-row" id="triangleButtons"></div>
+						<div class="cycle-legend" aria-hidden="true">
+							<div class="cycle-step">Thoughts trigger emotions</div>
+							<div class="cycle-step">Emotions shape behaviour</div>
+							<div class="cycle-step">Behaviour reinforces thoughts</div>
+						</div>
+						<div class="triangle-stage">
+							<div class="triangle">
+								<div class="triangle-node thoughts">
+									<strong>Thoughts</strong>
+									<span id="triangleThoughts"></span>
+								</div>
+								<div class="triangle-node emotions">
+									<strong>Emotions</strong>
+									<span id="triangleEmotions"></span>
+								</div>
+								<div class="triangle-node behaviour">
+									<strong>Behaviour</strong>
+									<span id="triangleBehaviour"></span>
+								</div>
+							</div>
+							<div class="bridge-lines" aria-hidden="true">
+								<svg viewBox="0 0 100 100" preserveAspectRatio="none">
+									<defs>
+										<marker id="cycleArrowHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+											<path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(32, 75, 83, 0.42)"></path>
+										</marker>
+									</defs>
+									<path class="cycle-arrow" d="M54 20 C74 24, 82 42, 78 61"></path>
+									<path class="cycle-arrow" d="M72 73 C54 84, 34 84, 18 73"></path>
+									<path class="cycle-arrow" d="M22 61 C18 42, 26 24, 46 20"></path>
+								</svg>
+							</div>
+						</div>
+						<div class="result-box" id="triangleSummary"></div>
+					</div>
+
+					<aside class="panel">
+						<h3>5P collaborative formulation</h3>
+						<p>University training often teaches a 5P structure. It keeps assessment descriptive, contextual, and treatment-oriented.</p>
+						<div class="formula-grid" id="formulaGrid"></div>
+						<div class="mini-box" id="formulaSummary"></div>
+					</aside>
+				</div>
+			</section>
+
+			<section class="lesson-section reveal" id="ethics">
+				<div class="section-header">
+					<div class="section-tag">Professional Practice</div>
+					<h2 class="section-title">Ethics, multicultural competence, and professional identity</h2>
+					<p class="section-copy">
+						Counselling psychology is ethically dense. Therapists must balance autonomy, beneficence, non-maleficence, justice, fidelity, and respect for culture while staying within competence and supervision structures.
+					</p>
+				</div>
+
+				<div class="policy-grid">
+					<div class="panel highlight">
+						<h3>Ethical decision simulator</h3>
+						<div class="button-row" id="ethicsButtons"></div>
+						<div class="result-box" id="ethicsDisplay"></div>
+					</div>
+
+					<aside class="panel">
+						<h3>Wheel of professional principles</h3>
+						<div class="ethics-wheel" aria-hidden="true">
+							<div class="ethics-hub">Reflective practice</div>
+							<div class="wheel-label one">Autonomy</div>
+							<div class="wheel-label two">Beneficence</div>
+							<div class="wheel-label three">Justice</div>
+							<div class="wheel-label four">Fidelity</div>
+							<div class="wheel-label five">Non-maleficence</div>
+							<div class="wheel-label six">Cultural humility</div>
+						</div>
+						<div class="mini-box">
+							Ethical judgement in counselling psychology is not only rule-following. It requires case formulation, awareness of bias, legal awareness, supervision, and documenting why a decision protects the client.
+						</div>
+					</aside>
+				</div>
+			</section>
+
+			<section class="lesson-section reveal" id="assessment">
+				<div class="section-header">
+					<div class="section-tag">Assessment</div>
+					<h2 class="section-title">Check your understanding</h2>
+					<p class="section-copy">
+						The quiz covers theory, practice, ethics, and formulation. Select one answer per item, then score the lesson.
+					</p>
+				</div>
+
+				<div class="quiz-grid" id="quizContainer"></div>
+				<div class="score-box">
+					<button class="button" id="scoreButton" type="button">Score the lesson</button>
+					<div id="scoreOutput" style="margin-top: 12px; color: var(--muted); font-weight: 700;">No score yet.</div>
+				</div>
+			</section>
+
+			<section class="lesson-section reveal" id="glossary">
+				<div class="section-header">
+					<div class="section-tag">Glossary</div>
+					<h2 class="section-title">Key terms you should leave with</h2>
+				</div>
+				<div class="glossary-grid">
+					<div class="term"><strong>Therapeutic alliance</strong>Working relationship built from bond, goals, and tasks. It predicts outcome across many therapies.</div>
+					<div class="term"><strong>Formulation</strong>An organised explanation of how problems developed and are maintained, used to guide treatment.</div>
+					<div class="term"><strong>Transference</strong>Patterns from earlier relationships that are repeated or expected within therapy.</div>
+					<div class="term"><strong>Countertransference</strong>The therapist’s emotional reactions to the client, used reflectively rather than acted out.</div>
+					<div class="term"><strong>Cultural humility</strong>An ongoing stance of openness, self-questioning, and correction rather than claiming cultural mastery.</div>
+					<div class="term"><strong>Evidence-based practice</strong>Integration of research evidence, clinical expertise, and client values.</div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="lesson-section reveal">
+			<div class="section-header">
+				<div class="section-tag">Professional Outlook</div>
+				<h2 class="section-title">Where this field goes next</h2>
+				<p class="section-copy">Contemporary counselling psychology also studies digital therapy, community mental health, trauma-informed care, prevention, positive psychology, and how to make services more equitable.</p>
+			</div>
+			<div class="foot-grid">
+				<div class="foot-card">
+					<h3>Common practice settings</h3>
+					<p>Universities, hospitals, primary care, private practice, employee assistance, schools, community agencies, rehabilitation, and online therapy services.</p>
+				</div>
+				<div class="foot-card">
+					<h3>Professional habits</h3>
+					<p>Supervision, outcome monitoring, self-reflection, peer consultation, continuing education, and deliberate boundary management are part of competent practice.</p>
+				</div>
+			</div>
+		</footer>
+	</div>
+
+	<script>
+		const approaches = [
+			{
+				key: 'person-centred',
+				title: 'Person-centred',
+				stance: 'The client has an inherent tendency toward growth when offered empathy, congruence, and unconditional positive regard.',
+				tools: ['Reflective listening', 'Non-directive exploration', 'Emotion clarification'],
+				fit: 'Useful when the client needs acceptance, identity exploration, or a corrective relational experience.',
+				emphasis: 74,
+				tags: ['Relationship', 'Emotion', 'Self-concept'],
+				examples: ['Classic Rogerian therapy', 'Emotion-focused therapy influences', 'Non-directive counselling practice'],
+				mini: 'Carl Rogers made the therapist’s way of being, not only technique, central to change.'
+			},
+			{
+				key: 'cbt',
+				title: 'Cognitive Behavioural Therapy',
+				stance: 'Distress is linked to learned patterns of thinking and behaviour that can be tested and changed.',
+				tools: ['Cognitive restructuring', 'Behavioural experiments', 'Exposure', 'Homework'],
+				fit: 'Strong evidence base for anxiety, depression, panic, OCD-related difficulties, and many structured treatment goals.',
+				emphasis: 34,
+				tags: ['Skills', 'Structure', 'Collaboration'],
+				examples: ['Beckian CBT', 'REBT', 'DBT', 'ACT', 'MBCT', 'Schema therapy', 'Compassion-focused therapy', 'Exposure and Response Prevention', 'Trauma-Focused CBT'],
+				countNote: 'There is no single fixed number of CBT types because the CBT family keeps expanding. University courses commonly teach several major branches rather than one final list.',
+				mini: 'CBT is often taught alongside case formulation and outcome monitoring because it translates theory into testable interventions.'
+			},
+			{
+				key: 'psychodynamic',
+				title: 'Psychodynamic',
+				stance: 'Current distress can reflect unconscious conflict, attachment templates, defence mechanisms, and repeated relational patterns.',
+				tools: ['Interpretation', 'Exploring patterns', 'Transference work', 'Free association'],
+				fit: 'Useful when recurring relational problems, identity themes, or long-standing emotional conflicts are central.',
+				emphasis: 82,
+				tags: ['Insight', 'Attachment', 'Relational history'],
+				examples: ['Brief psychodynamic therapy', 'Attachment-based psychodynamic work', 'Object relations approaches', 'Interpersonal psychodynamic therapy'],
+				mini: 'Psychodynamic work asks not only what is happening, but why this pattern keeps returning.'
+			},
+			{
+				key: 'existential',
+				title: 'Existential',
+				stance: 'Distress emerges through struggles with freedom, responsibility, death, isolation, and meaning.',
+				tools: ['Meaning exploration', 'Values clarification', 'Authenticity work'],
+				fit: 'Useful for life transitions, identity questions, grief, purposelessness, and moral conflict.',
+				emphasis: 88,
+				tags: ['Meaning', 'Choice', 'Responsibility'],
+				examples: ['Existential analysis', 'Logotherapy', 'Meaning-centred counselling', 'Yalom-inspired therapy'],
+				mini: 'Existential approaches treat symptoms partly as signals about how a person is living, not only as errors to eliminate.'
+			},
+			{
+				key: 'systemic',
+				title: 'Systemic and family',
+				stance: 'Problems are maintained within patterns of interaction, roles, communication, and wider systems rather than only inside one person.',
+				tools: ['Circular questioning', 'Genograms', 'Reframing', 'System mapping'],
+				fit: 'Useful for family conflict, couple work, adolescent presentations, and cases shaped by strong contextual pressures.',
+				emphasis: 92,
+				tags: ['Systems', 'Context', 'Patterns'],
+				examples: ['Structural family therapy', 'Bowen family systems theory', 'Strategic family therapy', 'Narrative family therapy'],
+				mini: 'Systemic thinking is crucial in university education because many problems make little sense outside relationships and social structures.'
+			},
+			{
+				key: 'multicultural',
+				title: 'Multicultural and social justice',
+				stance: 'Distress must be understood in relation to culture, identity, power, oppression, privilege, and access to care.',
+				tools: ['Cultural formulation', 'Power analysis', 'Advocacy', 'Adapted interventions'],
+				fit: 'Essential across all cases, especially where marginalisation, migration, discrimination, or identity negotiation are central.',
+				emphasis: 100,
+				tags: ['Culture', 'Power', 'Justice'],
+				examples: ['Culturally adapted CBT', 'Liberation psychology informed practice', 'Anti-oppressive counselling', 'Intersectional case formulation'],
+				mini: 'In current training, multicultural competence is not a separate add-on. It changes how every other approach is practiced.'
+			}
+		];
+
+		const caseMoments = [
+			{
+				key: 'burnout',
+				label: 'Burnout',
+				client: 'I keep telling everyone I am fine, but every morning I sit in my car before work and hope I do not have to go in.'
+			},
+			{
+				key: 'grief',
+				label: 'Grief',
+				client: 'People keep saying I should be over it by now. It makes me feel like I am grieving wrong.'
+			},
+			{
+				key: 'identity',
+				label: 'Identity conflict',
+				client: 'At home I am expected to be one version of myself, and at university another. I feel split in half.'
+			}
+		];
+
+		const responseStyles = {
+			reflection: {
+				label: 'Reflection of feeling',
+				line: {
+					burnout: 'A part of you sounds exhausted enough to dread the day before it even starts, and you have been carrying that alone.',
+					grief: 'You are not only grieving the loss itself, you are also carrying the pressure of other people deciding what your grief should look like.',
+					identity: 'It sounds painful to keep switching between identities and still feel that neither space fully lets you be whole.'
+				},
+				feedback: 'Strong counselling move. It names emotion and meaning without taking over the client’s story, which usually deepens alliance and elaboration.'
+			},
+			paraphrase: {
+				label: 'Paraphrase',
+				line: {
+					burnout: 'You are functioning on the surface, but work has become so draining that even arriving there feels heavy.',
+					grief: 'Other people’s expectations are making your grieving process feel judged rather than supported.',
+					identity: 'You feel pressure to perform differently in different settings and it leaves you uncertain about your own self-definition.'
+				},
+				feedback: 'Useful organising skill. It helps clarify content and can slow down confusing narratives, though it may feel less emotionally resonant than reflection.'
+			},
+			open: {
+				label: 'Open question',
+				line: {
+					burnout: 'When you are sitting in the car, what thoughts or feelings are usually loudest for you right then?',
+					grief: 'What would grieving in a way that feels true to you look like, if you set other people’s timelines aside?',
+					identity: 'Where do you feel most yourself, even briefly, and what is different about that space?'
+				},
+				feedback: 'Good exploration tool when it follows attunement. Open questions invite detail, but they work best after the client feels understood.'
+			},
+			reassurance: {
+				label: 'Premature reassurance',
+				line: {
+					burnout: 'You will be okay. Everyone feels this way sometimes, and it will probably pass soon.',
+					grief: 'Do not worry, time heals everything and you will move on eventually.',
+					identity: 'It is normal. You just need to stop overthinking and be confident.'
+				},
+				feedback: 'Weak counselling move. It reduces complexity, can feel dismissive, and often shuts down deeper material.'
+			},
+			challenge: {
+				label: 'Gentle challenge',
+				line: {
+					burnout: 'You say you are fine, but your body is already telling a different story each morning. What do you make of that gap?',
+					grief: 'You know other people’s rules for grief are hurting you. What keeps those rules more powerful than your own experience right now?',
+					identity: 'You are working hard to fit both worlds. I am wondering what it costs you to keep protecting everyone else from your conflict.'
+				},
+				feedback: 'Potentially powerful when timing is right. Challenge is useful only after safety and alliance are established; otherwise it can feel exposing or adversarial.'
+			}
+		};
+
+		const triangleScenarios = [
+			{
+				key: 'presentation',
+				label: 'Presentation anxiety',
+				thoughts: 'If I stumble once, everyone will see I do not belong here.',
+				emotions: 'Anxiety, shame, dread',
+				behaviour: 'Avoid eye contact, over-prepare, speak too quickly, consider skipping class',
+				summary: 'The catastrophic thought increases anxiety, which drives safety behaviours. Those behaviours prevent disconfirmation, so the fear remains believable.'
+			},
+			{
+				key: 'rejection',
+				label: 'Perceived rejection',
+				thoughts: 'They have not replied because I am annoying and they regret inviting me.',
+				emotions: 'Sadness, tension, insecurity',
+				behaviour: 'Repeated checking, withdrawing, sending apologetic messages',
+				summary: 'The interpretation creates emotional pain and reassurance-seeking. The resulting behaviour can actually increase relational strain, reinforcing the original fear.'
+			},
+			{
+				key: 'low-mood',
+				label: 'Low mood cycle',
+				thoughts: 'Nothing I do will make much difference, so why try?',
+				emotions: 'Flatness, hopelessness, guilt',
+				behaviour: 'Stay in bed longer, cancel plans, stop doing rewarding activities',
+				summary: 'This is a classic depression-maintaining loop. Reduced activity lowers reward and mastery, which then makes the hopeless thought feel even more accurate.'
+			}
+		];
+
+		const formulationBlocks = [
+			{
+				title: 'Presenting',
+				text: 'What is happening now? Symptoms, context, goals, risk, and the client’s own account of the problem.'
+			},
+			{
+				title: 'Predisposing',
+				text: 'What made the person vulnerable? Attachment patterns, earlier trauma, temperament, chronic stress, beliefs, and social conditions.'
+			},
+			{
+				title: 'Precipitating',
+				text: 'What triggered the current episode? Loss, transition, conflict, health change, academic pressure, migration, or identity threat.'
+			},
+			{
+				title: 'Perpetuating',
+				text: 'What keeps the problem going? Avoidance, relationship patterns, substance use, sleep disruption, shame, hostile environments, or unhelpful coping cycles.'
+			},
+			{
+				title: 'Protective',
+				text: 'What strengths and resources exist? Motivation, supportive relationships, faith, insight, creativity, routines, humour, or community.'
+			},
+			{
+				title: 'Plan',
+				text: 'What follows from the formulation? Collaborative goals, therapy model, referrals, risk planning, supervision questions, and outcome tracking.'
+			}
+		];
+
+		const ethicsScenarios = [
+			{
+				key: 'confidentiality',
+				label: 'Confidentiality pressure',
+				title: 'A parent asks for full session details from their adult child’s therapy.',
+				guidance: 'Start with autonomy and confidentiality. Clarify consent, legal status, and what information the client wants shared. Explore whether a joint discussion would be helpful, but do not surrender confidential material without a valid ethical and legal basis.',
+				principles: ['Autonomy', 'Fidelity', 'Justice'],
+				action: 'Document the request, review consent boundaries, and seek supervision if family pressure is escalating.'
+			},
+			{
+				key: 'risk',
+				label: 'Risk disclosure',
+				title: 'A client discloses suicidal intent but asks you not to tell anyone.',
+				guidance: 'Confidentiality is not absolute. Assess immediacy, means, intent, and protective factors. Explain the limits of confidentiality clearly and involve the least intrusive safety actions necessary to protect life.',
+				principles: ['Non-maleficence', 'Beneficence', 'Fidelity'],
+				action: 'Create a safety response, consult policy and supervision immediately, and document your reasoning step by step.'
+			},
+			{
+				key: 'culture',
+				label: 'Cultural mismatch',
+				title: 'A therapist interprets a client’s spiritual practice as avoidance without understanding its cultural meaning.',
+				guidance: 'Pause interpretation. Move into cultural humility and inquiry before pathologising. Ask how the practice is understood by the client and their community, and consider whether the therapist’s framework is too narrow.',
+				principles: ['Justice', 'Cultural humility', 'Beneficence'],
+				action: 'Repair if needed, learn the cultural context, and adapt the formulation so it is not based on therapist assumptions.'
+			}
+		];
+
+		const quizItems = [
+			{
+				question: 'Which statement best captures the counselling psychology view of formulation?',
+				options: [
+					'It replaces all need for assessment data.',
+					'It is a collaborative explanation linking distress, context, patterns, and treatment direction.',
+					'It is only relevant in psychodynamic therapy.',
+					'It is the same thing as a diagnosis.'
+				],
+				answer: 1,
+				explain: 'Formulation organises assessment into a contextual, change-oriented understanding rather than simply assigning a label.'
+			},
+			{
+				question: 'Why is premature reassurance usually weak in therapy?',
+				options: [
+					'It always breaks confidentiality.',
+					'It can minimise the client’s experience before it has been understood.',
+					'It is only allowed in CBT.',
+					'It proves the therapist is too empathetic.'
+				],
+				answer: 1,
+				explain: 'Reassurance often reduces complexity too early and can shut down exploration.'
+			},
+			{
+				question: 'In the CBT triangle, which process most often maintains the cycle?',
+				options: [
+					'Thoughts, emotions, and behaviour reinforcing one another.',
+					'The client forgetting homework once.',
+					'Only biological vulnerability.',
+					'The therapist using silence.'
+				],
+				answer: 0,
+				explain: 'The model is specifically about reciprocal influence among cognition, affect, and action.'
+			},
+			{
+				question: 'A multicultural counselling stance primarily requires:',
+				options: [
+					'Applying identical interventions to everyone for fairness.',
+					'Cultural humility, awareness of power, and adaptation to client context.',
+					'Avoiding all discussion of identity to remain neutral.',
+					'Only referring clients to someone of the same background.'
+				],
+				answer: 1,
+				explain: 'Current training emphasises humility, power-awareness, and adaptation rather than assumed expertise.'
+			},
+			{
+				question: 'What is the most appropriate first orientation when a client discloses imminent suicide risk?',
+				options: [
+					'Protect confidentiality at all costs.',
+					'Wait until the next session to see if it improves.',
+					'Assess risk and take proportionate safety action within ethical and legal limits.',
+					'Debate the philosophy of autonomy without acting.'
+				],
+				answer: 2,
+				explain: 'Immediate risk requires assessment and protective action, while still explaining limits of confidentiality.'
+			}
+		];
+
+		let currentApproach = approaches[0].key;
+		let currentCase = caseMoments[0].key;
+		let currentSkill = 'reflection';
+		let currentTriangle = triangleScenarios[0].key;
+		let currentEthics = ethicsScenarios[0].key;
+
+		function buildButtons(containerId, items, clickHandler, className, labelField = 'label') {
+			const container = document.getElementById(containerId);
+			container.innerHTML = '';
+
+			items.forEach((item) => {
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = className;
+				button.textContent = item[labelField];
+				button.dataset.key = item.key;
+				button.addEventListener('click', () => clickHandler(item.key));
+				container.appendChild(button);
+			});
+		}
+
+		function setActiveButton(containerId, key) {
+			document.querySelectorAll(`#${containerId} button`).forEach((button) => {
+				button.classList.toggle('active', button.dataset.key === key);
+			});
+		}
+
+		function renderApproaches(key = currentApproach) {
+			currentApproach = key;
+			const selected = approaches.find((item) => item.key === key);
+			setActiveButton('approachButtons', key);
+			const examplesMarkup = selected.examples
+				? `<p><strong>Named examples:</strong></p><ul>${selected.examples.map((example) => `<li>${example}</li>`).join('')}</ul>`
+				: '';
+			const cbtNoteMarkup = selected.countNote
+				? `<p><strong>About CBT varieties:</strong> ${selected.countNote}</p>`
+				: '';
+
+			document.getElementById('approachDisplay').innerHTML = `
+				<h3>${selected.title}</h3>
+				<p><strong>Core stance:</strong> ${selected.stance}</p>
+				<p><strong>Typical tools:</strong> ${selected.tools.join(', ')}.</p>
+				<p><strong>Best-fit contexts:</strong> ${selected.fit}</p>
+				${examplesMarkup}
+				${cbtNoteMarkup}
+			`;
+
+			document.getElementById('approachTags').innerHTML = selected.tags
+				.map((tag) => `<span class="scenario-pill">${tag}</span>`)
+				.join('');
+
+			document.getElementById('approachMini').textContent = selected.mini;
+			document.getElementById('approachMeter').style.width = `${selected.emphasis}%`;
+		}
+
+		function renderSkills(caseKey = currentCase, skillKey = currentSkill) {
+			currentCase = caseKey;
+			currentSkill = skillKey;
+
+			const client = caseMoments.find((item) => item.key === currentCase);
+			const response = responseStyles[currentSkill];
+
+			setActiveButton('caseButtons', currentCase);
+			setActiveButton('skillButtons', currentSkill);
+
+			document.getElementById('clientLine').textContent = client.client;
+			document.getElementById('therapistLine').textContent = response.line[currentCase];
+			document.getElementById('skillsFeedback').innerHTML = `
+				<strong>${response.label}</strong><br>
+				${response.feedback}
+			`;
+		}
+
+		function renderTriangle(key = currentTriangle) {
+			currentTriangle = key;
+			const selected = triangleScenarios.find((item) => item.key === key);
+			setActiveButton('triangleButtons', key);
+			document.getElementById('triangleThoughts').textContent = selected.thoughts;
+			document.getElementById('triangleEmotions').textContent = selected.emotions;
+			document.getElementById('triangleBehaviour').textContent = selected.behaviour;
+			document.getElementById('triangleSummary').textContent = selected.summary;
+		}
+
+		function renderFormula() {
+			document.getElementById('formulaGrid').innerHTML = formulationBlocks
+				.map((block) => `
+					<div class="formula-block">
+						<strong>${block.title}</strong>
+						<div>${block.text}</div>
+					</div>
+				`)
+				.join('');
+
+			document.getElementById('formulaSummary').textContent = 'Good formulation is dynamic. It changes as new evidence appears, it uses the client’s language where possible, and it links directly to what the therapist will do next.';
+		}
+
+		function renderEthics(key = currentEthics) {
+			currentEthics = key;
+			const selected = ethicsScenarios.find((item) => item.key === key);
+			setActiveButton('ethicsButtons', key);
+			document.getElementById('ethicsDisplay').innerHTML = `
+				<h3>${selected.title}</h3>
+				<p>${selected.guidance}</p>
+				<p><strong>Principles in tension:</strong> ${selected.principles.join(', ')}.</p>
+				<p><strong>Immediate action:</strong> ${selected.action}</p>
+			`;
+		}
+
+		function renderQuiz() {
+			const container = document.getElementById('quizContainer');
+			container.innerHTML = '';
+
+			quizItems.forEach((item, index) => {
+				const card = document.createElement('article');
+				card.className = 'quiz-card';
+				card.innerHTML = `
+					<h3>Question ${index + 1}</h3>
+					<p>${item.question}</p>
+					<div class="quiz-options" id="quiz-options-${index}"></div>
+					<div class="quiz-feedback" id="quiz-feedback-${index}"></div>
+				`;
+				container.appendChild(card);
+
+				const optionsWrap = card.querySelector(`#quiz-options-${index}`);
+				item.options.forEach((option, optionIndex) => {
+					const button = document.createElement('button');
+					button.type = 'button';
+					button.className = 'quiz-button';
+					button.textContent = option;
+					button.dataset.question = String(index);
+					button.dataset.option = String(optionIndex);
+					button.addEventListener('click', () => selectQuizOption(index, optionIndex));
+					optionsWrap.appendChild(button);
+				});
+			});
+		}
+
+		const quizState = Array(quizItems.length).fill(null);
+
+		function selectQuizOption(questionIndex, optionIndex) {
+			quizState[questionIndex] = optionIndex;
+			document.querySelectorAll(`button[data-question="${questionIndex}"]`).forEach((button) => {
+				const isActive = Number(button.dataset.option) === optionIndex;
+				button.classList.toggle('active', isActive);
+			});
+			document.getElementById(`quiz-feedback-${questionIndex}`).textContent = '';
+		}
+
+		function scoreQuiz() {
+			let score = 0;
+			quizItems.forEach((item, index) => {
+				const feedback = document.getElementById(`quiz-feedback-${index}`);
+				if (quizState[index] === item.answer) {
+					score += 1;
+					feedback.textContent = `Correct. ${item.explain}`;
+					feedback.style.color = 'var(--teal-deep)';
+				} else if (quizState[index] === null) {
+					feedback.textContent = 'No answer selected yet.';
+					feedback.style.color = 'var(--rose)';
+				} else {
+					feedback.textContent = `Not quite. ${item.explain}`;
+					feedback.style.color = 'var(--coral)';
+				}
+			});
+
+			const percentage = Math.round((score / quizItems.length) * 100);
+			let evaluation = 'You have the foundations in place.';
+
+			if (percentage === 100) {
+				evaluation = 'Excellent. You are handling both conceptual and applied material at a strong university level.';
+			} else if (percentage >= 80) {
+				evaluation = 'Strong result. Review the missed items and you will have a solid command of the module.';
+			} else if (percentage < 60) {
+				evaluation = 'Revisit the interactive sections, especially microskills, formulation, and ethics, before treating this as mastered.';
+			}
+
+			document.getElementById('scoreOutput').textContent = `Score: ${score}/${quizItems.length} (${percentage}%). ${evaluation}`;
+		}
+
+		function setupNavigation() {
+			document.querySelectorAll('#sectionNav .nav-button').forEach((button) => {
+				button.addEventListener('click', () => {
+					const target = document.getElementById(button.dataset.target);
+					if (target) {
+						target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					}
+				});
+			});
+
+			const sections = Array.from(document.querySelectorAll('section.lesson-section'));
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					if (!entry.isIntersecting) {
+						return;
+					}
+
+					document.querySelectorAll('#sectionNav .nav-button').forEach((button) => {
+						button.classList.toggle('active', button.dataset.target === entry.target.id);
+					});
+				});
+			}, { threshold: 0.35 });
+
+			sections.forEach((section) => observer.observe(section));
+		}
+
+		buildButtons('approachButtons', approaches, renderApproaches, 'skill-button', 'title');
+		buildButtons('caseButtons', caseMoments, (key) => renderSkills(key, currentSkill), 'case-button');
+		buildButtons('skillButtons', Object.entries(responseStyles).map(([key, value]) => ({ key, label: value.label })), (key) => renderSkills(currentCase, key), 'skill-button');
+		buildButtons('triangleButtons', triangleScenarios, renderTriangle, 'case-button');
+		buildButtons('ethicsButtons', ethicsScenarios, renderEthics, 'ethics-button');
+
+		renderApproaches();
+		renderSkills();
+		renderTriangle();
+		renderFormula();
+		renderEthics();
+		renderQuiz();
+		setupNavigation();
+
+		document.getElementById('scoreButton').addEventListener('click', scoreQuiz);
+	</script>
+</body>
+</html>

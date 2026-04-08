@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Substance Abuse Project Planner</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #f4efe7;
+			--paper: rgba(255, 252, 247, 0.88);
+			--panel: rgba(255, 248, 238, 0.96);
+			--ink: #1f2521;
+			--muted: #5f695f;
+			--line: rgba(90, 73, 53, 0.16);
+			--accent: #c45f3c;
+			--accent-strong: #9f4327;
+			--accent-soft: rgba(196, 95, 60, 0.12);
+			--olive: #5b6f48;
+			--teal: #315c5d;
+			--gold: #d9a441;
+			--shadow: 0 22px 60px rgba(72, 47, 24, 0.14);
+			--radius-xl: 30px;
+			--radius-lg: 22px;
+			--radius-md: 16px;
+			--radius-sm: 12px;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html {
+			scroll-behavior: smooth;
+		}
+
+		body {
+			margin: 0;
+			min-height: 100vh;
+			font-family: 'Outfit', sans-serif;
+			color: var(--ink);
+			background:
+				radial-gradient(circle at top left, rgba(217, 164, 65, 0.22), transparent 32%),
+				radial-gradient(circle at 85% 20%, rgba(49, 92, 93, 0.16), transparent 26%),
+				linear-gradient(180deg, #efe6d8 0%, #f7f2eb 46%, #efe8df 100%);
+		}
+
+		body::before,
+		body::after {
+			content: "";
+			position: fixed;
+			inset: auto;
+			pointer-events: none;
+			z-index: 0;
+			filter: blur(4px);
+		}
+
+		body::before {
+			width: 320px;
+			height: 320px;
+			left: -80px;
+			bottom: 12%;
+			background: radial-gradient(circle, rgba(196, 95, 60, 0.16), transparent 65%);
+		}
+
+		body::after {
+			width: 420px;
+			height: 420px;
+			right: -120px;
+			top: 10%;
+			background: radial-gradient(circle, rgba(91, 111, 72, 0.16), transparent 65%);
+		}
+
+		.shell {
+			position: relative;
+			z-index: 1;
+			width: min(1320px, calc(100% - 32px));
+			margin: 28px auto 48px;
+		}
+
+		.hero {
+			position: relative;
+			overflow: hidden;
+			border: 1px solid rgba(255, 255, 255, 0.55);
+			background:
+				linear-gradient(135deg, rgba(255, 249, 242, 0.94), rgba(255, 246, 235, 0.86)),
+				linear-gradient(135deg, rgba(196, 95, 60, 0.06), rgba(49, 92, 93, 0.05));
+			box-shadow: var(--shadow);
+			border-radius: 34px;
+			padding: 30px;
+		}
+
+		.hero-grid {
+			display: grid;
+			grid-template-columns: 1.4fr 0.9fr;
+			gap: 24px;
+			align-items: end;
+		}
+
+		.eyebrow {
+			display: inline-flex;
+			align-items: center;
+			gap: 10px;
+			padding: 8px 14px;
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.72);
+			border: 1px solid rgba(95, 105, 95, 0.12);
+			color: var(--teal);
+			font-size: 0.8rem;
+			font-weight: 700;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+		}
+
+		h1,
+		h2,
+		h3,
+		h4 {
+			margin: 0;
+			font-family: 'Space Grotesk', sans-serif;
+			letter-spacing: -0.03em;
+		}
+
+		.hero h1 {
+			font-size: clamp(2.3rem, 4vw, 4.6rem);
+			line-height: 0.96;
+			margin-top: 18px;
+			max-width: 11ch;
+		}
+
+		.hero p {
+			margin: 16px 0 0;
+			max-width: 64ch;
+			color: var(--muted);
+			font-size: 1rem;
+			line-height: 1.65;
+		}
+
+		.hero-stats {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 14px;
+		}
+
+		.stat-card {
+			padding: 18px;
+			border-radius: 20px;
+			background: rgba(255, 255, 255, 0.64);
+			border: 1px solid rgba(95, 105, 95, 0.1);
+			backdrop-filter: blur(14px);
+		}
+
+		.stat-label {
+			font-size: 0.76rem;
+			text-transform: uppercase;
+			letter-spacing: 0.12em;
+			color: var(--muted);
+			margin-bottom: 10px;
+		}
+
+		.stat-value {
+			font-family: 'Space Grotesk', sans-serif;
+			font-size: 1.6rem;
+			font-weight: 700;
+		}
+
+		.layout {
+			display: grid;
+			grid-template-columns: minmax(0, 1.12fr) minmax(380px, 0.88fr);
+			gap: 24px;
+			margin-top: 24px;
+		}
+
+		.panel,
+		.preview {
+			border-radius: var(--radius-xl);
+			border: 1px solid rgba(255, 255, 255, 0.55);
+			background: var(--paper);
+			box-shadow: var(--shadow);
+			backdrop-filter: blur(16px);
+		}
+
+		.panel {
+			padding: 26px;
+		}
+
+		.preview {
+			position: sticky;
+			top: 18px;
+			align-self: start;
+			padding: 24px;
+		}
+
+		.section {
+			padding: 22px;
+			background: var(--panel);
+			border: 1px solid var(--line);
+			border-radius: var(--radius-lg);
+		}
+
+		.section + .section {
+			margin-top: 18px;
+		}
+
+		.section-head {
+			display: flex;
+			justify-content: space-between;
+			gap: 12px;
+			align-items: start;
+			margin-bottom: 18px;
+		}
+
+		.section-kicker {
+			display: inline-block;
+			margin-bottom: 8px;
+			color: var(--accent);
+			text-transform: uppercase;
+			letter-spacing: 0.12em;
+			font-size: 0.74rem;
+			font-weight: 700;
+		}
+
+		.section p {
+			margin: 0;
+			color: var(--muted);
+			line-height: 1.6;
+		}
+
+		.field-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 14px;
+		}
+
+		.field-grid.three {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+
+		label.field,
+		.field-block {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+		}
+
+		.field-label {
+			font-size: 0.83rem;
+			font-weight: 700;
+			letter-spacing: 0.04em;
+			color: var(--ink);
+			text-transform: uppercase;
+		}
+
+		input[type="text"],
+		input[type="number"],
+		textarea,
+		select {
+			width: 100%;
+			border: 1px solid rgba(92, 86, 74, 0.18);
+			background: rgba(255, 255, 255, 0.88);
+			color: var(--ink);
+			border-radius: 14px;
+			padding: 14px 14px;
+			font: inherit;
+			transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+		}
+
+		textarea {
+			min-height: 110px;
+			resize: vertical;
+		}
+
+		input:focus,
+		textarea:focus,
+		select:focus {
+			outline: none;
+			border-color: rgba(196, 95, 60, 0.55);
+			box-shadow: 0 0 0 4px rgba(196, 95, 60, 0.12);
+		}
+
+		.mode-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 12px;
+		}
+
+		.mode-card {
+			position: relative;
+			text-align: left;
+			border: 1px solid rgba(92, 86, 74, 0.16);
+			border-radius: 18px;
+			background: rgba(255, 255, 255, 0.72);
+			padding: 16px;
+			cursor: pointer;
+			transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease, background 0.24s ease;
+		}
+
+		.mode-card:hover,
+		.mode-card:focus-visible {
+			transform: translateY(-2px);
+			border-color: rgba(196, 95, 60, 0.38);
+			box-shadow: 0 12px 24px rgba(75, 45, 24, 0.1);
+			outline: none;
+		}
+
+		.mode-card.active {
+			background: linear-gradient(135deg, rgba(196, 95, 60, 0.14), rgba(217, 164, 65, 0.12));
+			border-color: rgba(196, 95, 60, 0.56);
+		}
+
+		.mode-card h3 {
+			font-size: 1rem;
+		}
+
+		.mode-card p {
+			margin-top: 8px;
+			font-size: 0.92rem;
+		}
+
+		.pill-grid {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+
+		.pill {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 10px 12px;
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.75);
+			border: 1px solid rgba(92, 86, 74, 0.14);
+			cursor: pointer;
+			transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+		}
+
+		.pill:hover {
+			transform: translateY(-1px);
+		}
+
+		.pill input {
+			accent-color: var(--accent);
+			width: 16px;
+			height: 16px;
+			margin: 0;
+		}
+
+		.pill.active {
+			border-color: rgba(196, 95, 60, 0.45);
+			background: rgba(196, 95, 60, 0.1);
+		}
+
+		.inline-entry {
+			display: flex;
+			gap: 10px;
+			margin-top: 14px;
+		}
+
+		.ghost,
+		.primary,
+		.soft,
+		.chip-button {
+			border: none;
+			border-radius: 999px;
+			font: inherit;
+			cursor: pointer;
+			transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+		}
+
+		.primary,
+		.ghost,
+		.soft {
+			padding: 12px 18px;
+			font-weight: 700;
+		}
+
+		.primary {
+			background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+			color: white;
+			box-shadow: 0 12px 24px rgba(159, 67, 39, 0.22);
+		}
+
+		.ghost {
+			background: rgba(255, 255, 255, 0.76);
+			color: var(--ink);
+			border: 1px solid rgba(92, 86, 74, 0.16);
+		}
+
+		.soft {
+			background: rgba(49, 92, 93, 0.1);
+			color: var(--teal);
+		}
+
+		.primary:hover,
+		.ghost:hover,
+		.soft:hover,
+		.chip-button:hover {
+			transform: translateY(-1px);
+		}
+
+		.chip-button {
+			padding: 10px 14px;
+			background: var(--accent-soft);
+			color: var(--accent-strong);
+			font-weight: 700;
+			white-space: nowrap;
+		}
+
+		.tag-list {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin-top: 14px;
+		}
+
+		.tag {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 10px 12px;
+			border-radius: 999px;
+			background: rgba(49, 92, 93, 0.09);
+			color: var(--teal);
+			font-size: 0.92rem;
+			font-weight: 600;
+		}
+
+		.tag button {
+			width: 22px;
+			height: 22px;
+			border: none;
+			border-radius: 50%;
+			background: rgba(49, 92, 93, 0.14);
+			color: var(--teal);
+			cursor: pointer;
+			font: inherit;
+			line-height: 1;
+		}
+
+		.action-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin-top: 18px;
+		}
+
+		.preview-head {
+			display: flex;
+			justify-content: space-between;
+			gap: 12px;
+			align-items: center;
+			margin-bottom: 18px;
+		}
+
+		.preview-title p {
+			margin-top: 8px;
+			color: var(--muted);
+			line-height: 1.55;
+		}
+
+		.status-pill {
+			padding: 10px 14px;
+			border-radius: 999px;
+			background: rgba(91, 111, 72, 0.12);
+			color: var(--olive);
+			font-size: 0.8rem;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+		}
+
+		.preview-block {
+			border-top: 1px solid var(--line);
+			padding-top: 18px;
+			margin-top: 18px;
+		}
+
+		.preview-block:first-of-type {
+			border-top: none;
+			margin-top: 0;
+			padding-top: 0;
+		}
+
+		.summary-box {
+			padding: 18px;
+			border-radius: 20px;
+			background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(196,95,60,0.08));
+			border: 1px solid rgba(196, 95, 60, 0.14);
+		}
+
+		.summary-box p {
+			margin: 10px 0 0;
+			color: var(--muted);
+			line-height: 1.65;
+		}
+
+		.mini-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 12px;
+			margin-top: 12px;
+		}
+
+		.mini-card {
+			padding: 14px;
+			border-radius: 16px;
+			background: rgba(255, 255, 255, 0.8);
+			border: 1px solid rgba(92, 86, 74, 0.12);
+		}
+
+		.mini-card span {
+			display: block;
+			font-size: 0.76rem;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--muted);
+			margin-bottom: 8px;
+			font-weight: 700;
+		}
+
+		.bullet-list,
+		.timeline {
+			list-style: none;
+			padding: 0;
+			margin: 12px 0 0;
+		}
+
+		.bullet-list li,
+		.timeline li {
+			display: flex;
+			gap: 12px;
+			align-items: flex-start;
+			padding: 11px 0;
+			border-bottom: 1px solid rgba(92, 86, 74, 0.1);
+			line-height: 1.55;
+			color: var(--muted);
+		}
+
+		.bullet-list li:last-child,
+		.timeline li:last-child {
+			border-bottom: none;
+		}
+
+		.list-mark {
+			flex: 0 0 28px;
+			height: 28px;
+			border-radius: 50%;
+			background: rgba(196, 95, 60, 0.12);
+			color: var(--accent-strong);
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 0.9rem;
+			font-weight: 800;
+			margin-top: 1px;
+		}
+
+		.timeline-label {
+			display: block;
+			font-family: 'Space Grotesk', sans-serif;
+			color: var(--ink);
+			margin-bottom: 4px;
+		}
+
+		.footer-note {
+			margin-top: 18px;
+			padding-top: 18px;
+			border-top: 1px solid var(--line);
+			color: var(--muted);
+			font-size: 0.92rem;
+			line-height: 1.6;
+		}
+
+		.visually-hidden {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
+			border: 0;
+		}
+
+		@media (max-width: 1100px) {
+			.hero-grid,
+			.layout {
+				grid-template-columns: 1fr;
+			}
+
+			.preview {
+				position: relative;
+				top: 0;
+			}
+		}
+
+		@media (max-width: 760px) {
+			.shell {
+				width: min(100% - 20px, 1320px);
+				margin-top: 14px;
+			}
+
+			.hero,
+			.panel,
+			.preview {
+				padding: 18px;
+				border-radius: 24px;
+			}
+
+			.hero h1 {
+				max-width: none;
+			}
+
+			.hero-stats,
+			.field-grid,
+			.field-grid.three,
+			.mode-grid,
+			.mini-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.inline-entry {
+				flex-direction: column;
+			}
+
+			.preview-head {
+				flex-direction: column;
+				align-items: flex-start;
+			}
+		}
+
+		@keyframes fadeUp {
+			from {
+				opacity: 0;
+				transform: translateY(14px);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.hero,
+		.panel,
+		.preview,
+		.section {
+			animation: fadeUp 0.55s ease both;
+		}
+
+		.section:nth-child(2) {
+			animation-delay: 0.05s;
+		}
+
+		.section:nth-child(3) {
+			animation-delay: 0.1s;
+		}
+
+		.section:nth-child(4) {
+			animation-delay: 0.15s;
+		}
+	</style>
+</head>
+<body>
+	<main class="shell">
+		<section class="hero">
+			<div class="hero-grid">
+				<div>
+					<div class="eyebrow">Interactive planner for health education projects</div>
+					<h1>Substance Abuse and Addiction Project Planner</h1>
+					<p>
+						Build a tailored project plan for a school presentation, awareness campaign, research report, documentary, or workshop.
+						Adjust the mode of presentation, content focus, formats, and intended outcomes, then use the generated brief as your working plan.
+					</p>
+				</div>
+				<div class="hero-stats">
+					<article class="stat-card">
+						<div class="stat-label">Planning Modes</div>
+						<div class="stat-value" id="hero-mode-count">5</div>
+					</article>
+					<article class="stat-card">
+						<div class="stat-label">Content Options</div>
+						<div class="stat-value" id="hero-topic-count">8</div>
+					</article>
+					<article class="stat-card">
+						<div class="stat-label">Project Outputs</div>
+						<div class="stat-value" id="hero-format-count">6</div>
+					</article>
+				</div>
+			</div>
+		</section>
+
+		<section class="layout">
+			<div class="panel">
+				<section class="section">
+					<div class="section-head">
+						<div>
+							<span class="section-kicker">Project setup</span>
+							<h2>Define the project frame</h2>
+						</div>
+					</div>
+					<div class="field-grid">
+						<label class="field">
+							<span class="field-label">Project title</span>
+							<input id="projectTitle" type="text" value="Substance Abuse and Addiction Awareness Project">
+						</label>
+						<label class="field">
+							<span class="field-label">Target audience</span>
+							<select id="audience">
+								<option value="secondary students" selected>Secondary students</option>
+								<option value="upper secondary students">Upper secondary students</option>
+								<option value="parents and caregivers">Parents and caregivers</option>
+								<option value="teachers and school staff">Teachers and school staff</option>
+								<option value="community members">Community members</option>
+								<option value="mixed audience">Mixed audience</option>
+							</select>
+						</label>
+					</div>
+					<div class="field-grid three" style="margin-top: 14px;">
+						<label class="field">
+							<span class="field-label">Project length</span>
+							<select id="durationWeeks">
+								<option value="1">1 week</option>
+								<option value="2">2 weeks</option>
+								<option value="3" selected>3 weeks</option>
+								<option value="4">4 weeks</option>
+								<option value="5">5 weeks</option>
+								<option value="6">6 weeks</option>
+							</select>
+						</label>
+						<label class="field">
+							<span class="field-label">Team size</span>
+							<input id="teamSize" type="number" min="1" max="12" value="4">
+						</label>
+						<label class="field">
+							<span class="field-label">Presentation time</span>
+							<select id="presentationLength">
+								<option value="5-7 minutes">5-7 minutes</option>
+								<option value="8-10 minutes" selected>8-10 minutes</option>
+								<option value="12-15 minutes">12-15 minutes</option>
+								<option value="15-20 minutes">15-20 minutes</option>
+								<option value="Flexible / exhibit style">Flexible / exhibit style</option>
+							</select>
+						</label>
+					</div>
+					<label class="field" style="margin-top: 14px;">
+						<span class="field-label">Teacher brief or project note</span>
+						<textarea id="projectNote" placeholder="Add any special instructions, class requirements, local context, or teacher expectations.">Focus on prevention, informed decision-making, and responsible use of evidence.</textarea>
+					</label>
+				</section>
+
+				<section class="section">
+					<div class="section-head">
+						<div>
+							<span class="section-kicker">Presentation mode</span>
+							<h2>Choose how the project should be delivered</h2>
+						</div>
+					</div>
+					<div class="mode-grid" id="modeGrid"></div>
+					<label class="field" style="margin-top: 14px;">
+						<span class="field-label">Custom presentation angle</span>
+						<input id="customModeNote" type="text" placeholder="Example: Youth-led campaign with interactive Q&A and resource station">
+					</label>
+				</section>
+
+				<section class="section">
+					<div class="section-head">
+						<div>
+							<span class="section-kicker">Content builder</span>
+							<h2>Select the content that must appear</h2>
+						</div>
+					</div>
+					<div class="pill-grid" id="contentGrid"></div>
+					<div class="inline-entry">
+						<input id="customContentInput" type="text" placeholder="Add a custom content section">
+						<button id="addContentButton" class="chip-button" type="button">Add content item</button>
+					</div>
+					<div class="tag-list" id="customContentTags"></div>
+				</section>
+
+				<section class="section">
+					<div class="section-head">
+						<div>
+							<span class="section-kicker">Output design</span>
+							<h2>Tailor the formats and desired outcomes</h2>
+						</div>
+					</div>
+					<div class="field-grid">
+						<div class="field-block">
+							<span class="field-label">Output formats</span>
+							<div class="pill-grid" id="formatGrid"></div>
+							<div class="inline-entry">
+								<input id="customFormatInput" type="text" placeholder="Add a custom format">
+								<button id="addFormatButton" class="chip-button" type="button">Add format</button>
+							</div>
+							<div class="tag-list" id="customFormatTags"></div>
+						</div>
+						<div class="field-block">
+							<span class="field-label">Project outcomes</span>
+							<div class="pill-grid" id="outcomeGrid"></div>
+							<div class="inline-entry">
+								<input id="customOutcomeInput" type="text" placeholder="Add a custom outcome">
+								<button id="addOutcomeButton" class="chip-button" type="button">Add outcome</button>
+							</div>
+							<div class="tag-list" id="customOutcomeTags"></div>
+						</div>
+					</div>
+					<div class="action-row">
+						<button class="primary" id="loadDemoButton" type="button">Load sample plan</button>
+						<button class="ghost" id="resetButton" type="button">Reset planner</button>
+					</div>
+				</section>
+			</div>
+
+			<aside class="preview" aria-live="polite">
+				<div class="preview-head">
+					<div class="preview-title">
+						<span class="section-kicker">Generated brief</span>
+						<h2 id="previewTitle">Substance Abuse and Addiction Awareness Project</h2>
+						<p id="previewSubtitle"></p>
+					</div>
+					<div class="status-pill" id="statusPill">Campaign mode</div>
+				</div>
+
+				<div class="preview-block">
+					<div class="summary-box">
+						<h3>Project concept</h3>
+						<p id="summaryText"></p>
+						<div class="mini-grid">
+							<div class="mini-card">
+								<span>Core question</span>
+								<strong id="essentialQuestion"></strong>
+							</div>
+							<div class="mini-card">
+								<span>Main deliverable</span>
+								<strong id="primaryDeliverable"></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="preview-block">
+					<h3>Recommended structure</h3>
+					<ul class="bullet-list" id="structureList"></ul>
+				</div>
+
+				<div class="preview-block">
+					<h3>Timeline</h3>
+					<ul class="timeline" id="timelineList"></ul>
+				</div>
+
+				<div class="preview-block">
+					<h3>Success outcomes</h3>
+					<ul class="bullet-list" id="outcomeList"></ul>
+				</div>
+
+				<div class="preview-block">
+					<h3>Presentation checklist</h3>
+					<ul class="bullet-list" id="formatList"></ul>
+				</div>
+
+				<div class="action-row">
+					<button class="primary" id="copyBriefButton" type="button">Copy brief</button>
+					<button class="soft" id="downloadTextButton" type="button">Download text</button>
+					<button class="ghost" id="downloadJsonButton" type="button">Download JSON</button>
+					<button class="ghost" id="printButton" type="button">Print</button>
+				</div>
+
+				<div class="footer-note" id="footerNote"></div>
+			</aside>
+		</section>
+	</main>
+
+	<script>
+		const modePresets = [
+			{
+				id: 'campaign',
+				label: 'Awareness campaign',
+				status: 'Campaign mode',
+				description: 'Best for persuasive messaging, visible action steps, and audience engagement.',
+				tone: 'clear, urgent, and youth-friendly',
+				structure: ['Hook with a myth-versus-fact opener', 'Explain risk factors and common pathways into addiction', 'Present real consequences across health, school, and relationships', 'Show prevention strategies and support resources', 'Close with a practical call to action'],
+				formats: ['Slide deck', 'Poster series', 'Infographic'],
+				deliverable: 'Awareness package for school or community display'
+			},
+			{
+				id: 'documentary',
+				label: 'Mini documentary',
+				status: 'Documentary mode',
+				description: 'Best for storytelling, interviews, evidence, and a stronger narrative arc.',
+				tone: 'reflective, evidence-based, and human-centered',
+				structure: ['Open with a focused case study or scenario', 'Define addiction using accurate health language', 'Use expert evidence, statistics, and short commentary', 'Compare causes, warning signs, and treatment pathways', 'End with reflection and support options'],
+				formats: ['Video segment', 'Narrated slides', 'Research handout'],
+				deliverable: 'Short documentary-style presentation with supporting notes'
+			},
+			{
+				id: 'workshop',
+				label: 'Interactive workshop',
+				status: 'Workshop mode',
+				description: 'Best for activities, discussion, and audience participation instead of a one-way talk.',
+				tone: 'active, practical, and discussion-led',
+				structure: ['Warm-up poll or quick scenario', 'Teach the key facts in short chunks', 'Run a myth-busting or decision-making activity', 'Discuss where and how to seek help', 'End with a take-away reflection or pledge'],
+				formats: ['Facilitator slides', 'Worksheet', 'Exit ticket'],
+				deliverable: 'Interactive classroom workshop with learner tasks'
+			},
+			{
+				id: 'debate',
+				label: 'Debate and policy panel',
+				status: 'Debate mode',
+				description: 'Best for comparing viewpoints, laws, prevention policies, and social impact.',
+				tone: 'balanced, analytical, and argument-driven',
+				structure: ['Set the issue and define key terms', 'Present contrasting perspectives with evidence', 'Examine legal, ethical, and social factors', 'Evaluate what prevention or intervention policies work best', 'Conclude with a reasoned class position'],
+				formats: ['Panel script', 'Evidence cards', 'Policy brief'],
+				deliverable: 'Structured debate or panel discussion package'
+			},
+			{
+				id: 'research',
+				label: 'Research report showcase',
+				status: 'Research mode',
+				description: 'Best for formal academic work with citation, investigation, and careful synthesis.',
+				tone: 'formal, precise, and academically structured',
+				structure: ['Introduce the topic and research question', 'Review causes and contributing influences', 'Analyze effects using reliable evidence', 'Compare prevention, treatment, and recovery responses', 'Present conclusions and informed recommendations'],
+				formats: ['Written report', 'Slide presentation', 'Annotated bibliography'],
+				deliverable: 'Formal research presentation with written report'
+			}
+		];
+
+		const contentOptions = [
+			'Definitions and key vocabulary',
+			'Causes and risk factors',
+			'Types of substances commonly abused',
+			'Signs, symptoms, and warning behaviors',
+			'Effects on the brain and body',
+			'Mental health and social impact',
+			'Prevention strategies',
+			'Treatment, recovery, and support services'
+		];
+
+		const formatOptions = [
+			'Slide deck',
+			'Poster series',
+			'Infographic',
+			'Written report',
+			'Video segment',
+			'Interactive worksheet'
+		];
+
+		const outcomeOptions = [
+			'Build awareness of addiction as a health issue',
+			'Correct common myths and misinformation',
+			'Show practical prevention strategies',
+			'Encourage empathy and non-stigmatizing language',
+			'Promote help-seeking and support resources',
+			'Develop research, presentation, and teamwork skills'
+		];
+
+		const defaultState = {
+			title: 'Substance Abuse and Addiction Awareness Project',
+			audience: 'secondary students',
+			durationWeeks: 3,
+			teamSize: 4,
+			presentationLength: '8-10 minutes',
+			projectNote: 'Focus on prevention, informed decision-making, and responsible use of evidence.',
+			modeId: 'campaign',
+			customModeNote: '',
+			selectedContent: [
+				'Causes and risk factors',
+				'Signs, symptoms, and warning behaviors',
+				'Effects on the brain and body',
+				'Prevention strategies',
+				'Treatment, recovery, and support services'
+			],
+			selectedFormats: ['Slide deck', 'Poster series', 'Infographic'],
+			selectedOutcomes: [
+				'Build awareness of addiction as a health issue',
+				'Correct common myths and misinformation',
+				'Show practical prevention strategies',
+				'Promote help-seeking and support resources'
+			],
+			customContent: [],
+			customFormats: [],
+			customOutcomes: []
+		};
+
+		const state = structuredClone(defaultState);
+
+		const elements = {
+			projectTitle: document.getElementById('projectTitle'),
+			audience: document.getElementById('audience'),
+			durationWeeks: document.getElementById('durationWeeks'),
+			teamSize: document.getElementById('teamSize'),
+			presentationLength: document.getElementById('presentationLength'),
+			projectNote: document.getElementById('projectNote'),
+			customModeNote: document.getElementById('customModeNote'),
+			modeGrid: document.getElementById('modeGrid'),
+			contentGrid: document.getElementById('contentGrid'),
+			formatGrid: document.getElementById('formatGrid'),
+			outcomeGrid: document.getElementById('outcomeGrid'),
+			customContentInput: document.getElementById('customContentInput'),
+			customFormatInput: document.getElementById('customFormatInput'),
+			customOutcomeInput: document.getElementById('customOutcomeInput'),
+			customContentTags: document.getElementById('customContentTags'),
+			customFormatTags: document.getElementById('customFormatTags'),
+			customOutcomeTags: document.getElementById('customOutcomeTags'),
+			previewTitle: document.getElementById('previewTitle'),
+			previewSubtitle: document.getElementById('previewSubtitle'),
+			summaryText: document.getElementById('summaryText'),
+			essentialQuestion: document.getElementById('essentialQuestion'),
+			primaryDeliverable: document.getElementById('primaryDeliverable'),
+			structureList: document.getElementById('structureList'),
+			timelineList: document.getElementById('timelineList'),
+			outcomeList: document.getElementById('outcomeList'),
+			formatList: document.getElementById('formatList'),
+			footerNote: document.getElementById('footerNote'),
+			statusPill: document.getElementById('statusPill'),
+			heroModeCount: document.getElementById('hero-mode-count'),
+			heroTopicCount: document.getElementById('hero-topic-count'),
+			heroFormatCount: document.getElementById('hero-format-count'),
+			loadDemoButton: document.getElementById('loadDemoButton'),
+			resetButton: document.getElementById('resetButton'),
+			addContentButton: document.getElementById('addContentButton'),
+			addFormatButton: document.getElementById('addFormatButton'),
+			addOutcomeButton: document.getElementById('addOutcomeButton'),
+			copyBriefButton: document.getElementById('copyBriefButton'),
+			downloadTextButton: document.getElementById('downloadTextButton'),
+			downloadJsonButton: document.getElementById('downloadJsonButton'),
+			printButton: document.getElementById('printButton')
+		};
+
+		const escapeHtml = (value) => value
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#39;');
+
+		const getMode = () => modePresets.find((mode) => mode.id === state.modeId) || modePresets[0];
+
+		const syncFormFromState = () => {
+			elements.projectTitle.value = state.title;
+			elements.audience.value = state.audience;
+			elements.durationWeeks.value = String(state.durationWeeks);
+			elements.teamSize.value = String(state.teamSize);
+			elements.presentationLength.value = state.presentationLength;
+			elements.projectNote.value = state.projectNote;
+			elements.customModeNote.value = state.customModeNote;
+		};
+
+		const makePill = (text, groupName, checked, onChange) => {
+			const label = document.createElement('label');
+			label.className = `pill${checked ? ' active' : ''}`;
+			const input = document.createElement('input');
+			input.type = 'checkbox';
+			input.name = groupName;
+			input.checked = checked;
+			input.addEventListener('change', () => {
+				label.classList.toggle('active', input.checked);
+				onChange(input.checked);
+			});
+			const span = document.createElement('span');
+			span.textContent = text;
+			label.append(input, span);
+			return label;
+		};
+
+		const renderModeCards = () => {
+			elements.modeGrid.innerHTML = modePresets.map((mode) => `
+				<button class="mode-card${state.modeId === mode.id ? ' active' : ''}" type="button" data-mode-id="${mode.id}">
+					<h3>${escapeHtml(mode.label)}</h3>
+					<p>${escapeHtml(mode.description)}</p>
+				</button>
+			`).join('');
+
+			elements.modeGrid.querySelectorAll('[data-mode-id]').forEach((button) => {
+				button.addEventListener('click', () => {
+					state.modeId = button.dataset.modeId;
+					renderModeCards();
+					renderPreview();
+				});
+			});
+		};
+
+		const renderSelectionGrid = (container, options, selectedSet, groupName, updateFn) => {
+			container.innerHTML = '';
+			options.forEach((option) => {
+				const pill = makePill(option, groupName, selectedSet.includes(option), (isChecked) => {
+					if (isChecked) {
+						if (!selectedSet.includes(option)) {
+							selectedSet.push(option);
+						}
+					} else {
+						const index = selectedSet.indexOf(option);
+						if (index >= 0) {
+							selectedSet.splice(index, 1);
+						}
+					}
+					updateFn();
+				});
+				container.appendChild(pill);
+			});
+		};
+
+		const renderTagGroup = (container, values, onRemove) => {
+			container.innerHTML = values.map((value, index) => `
+				<span class="tag">
+					${escapeHtml(value)}
+					<button type="button" data-index="${index}" aria-label="Remove ${escapeHtml(value)}">×</button>
+				</span>
+			`).join('');
+
+			container.querySelectorAll('button[data-index]').forEach((button) => {
+				button.addEventListener('click', () => {
+					onRemove(Number(button.dataset.index));
+				});
+			});
+		};
+
+		const addUniqueItem = (inputElement, targetList, rerender) => {
+			const value = inputElement.value.trim();
+			if (!value) {
+				return;
+			}
+			if (!targetList.includes(value)) {
+				targetList.push(value);
+				rerender();
+			}
+			inputElement.value = '';
+			inputElement.focus();
+		};
+
+		const sentenceList = (items) => {
+			if (items.length === 0) {
+				return 'a balanced overview of the topic';
+			}
+			if (items.length === 1) {
+				return items[0];
+			}
+			if (items.length === 2) {
+				return `${items[0]} and ${items[1]}`;
+			}
+			return `${items.slice(0, -1).join(', ')}, and ${items.at(-1)}`;
+		};
+
+		const buildTimeline = (weeks, mode) => {
+			const totalWeeks = Number(weeks);
+			if (totalWeeks <= 1) {
+				return [
+					{ title: 'Day 1-2: Research sprint', detail: 'Gather evidence, define terms, and divide roles.' },
+					{ title: 'Day 3-4: Build content', detail: `Develop the ${mode.label.toLowerCase()} materials and confirm accurate sources.` },
+					{ title: 'Day 5: Rehearse and refine', detail: 'Check timing, transitions, and audience takeaways.' }
+				];
+			}
+
+			const timeline = [
+				{ title: 'Week 1: Inquiry and source gathering', detail: 'Define the problem, collect evidence, and allocate responsibilities.' },
+				{ title: 'Week 2: Content design', detail: `Develop the core sections, visuals, and ${mode.label.toLowerCase()} flow.` }
+			];
+
+			if (totalWeeks >= 3) {
+				timeline.push({ title: 'Week 3: Production and rehearsal', detail: 'Polish the final output, test clarity, and rehearse timing.' });
+			}
+			if (totalWeeks >= 4) {
+				timeline.push({ title: 'Week 4: Feedback and revision', detail: 'Use teacher or peer feedback to strengthen accuracy and delivery.' });
+			}
+			if (totalWeeks >= 5) {
+				timeline.push({ title: 'Week 5: Extension work', detail: 'Add audience interaction, final visuals, or a resource handout.' });
+			}
+			if (totalWeeks >= 6) {
+				timeline.push({ title: 'Week 6: Final showcase', detail: 'Deliver the project and collect reflection on impact and learning.' });
+			}
+
+			return timeline;
+		};
+
+		const createBriefText = () => {
+			const mode = getMode();
+			const contentItems = [...state.selectedContent, ...state.customContent];
+			const formatItems = [...state.selectedFormats, ...state.customFormats];
+			const outcomeItems = [...state.selectedOutcomes, ...state.customOutcomes];
+			const timeline = buildTimeline(state.durationWeeks, mode);
+			const customAngle = state.customModeNote ? ` Custom angle: ${state.customModeNote}.` : '';
+
+			return [
+				state.title,
+				'',
+				`Mode: ${mode.label}`,
+				`Audience: ${state.audience}`,
+				`Team size: ${state.teamSize}`,
+				`Presentation time: ${state.presentationLength}`,
+				`Project length: ${state.durationWeeks} week(s)`,
+				'',
+				'Project concept',
+				`Create a ${mode.tone} project about substance abuse and addiction for ${state.audience}. The project should cover ${sentenceList(contentItems)} and be delivered through ${sentenceList(formatItems)}.${customAngle}`,
+				'',
+				'Recommended structure',
+				...mode.structure.map((item, index) => `${index + 1}. ${item}`),
+				'',
+				'Success outcomes',
+				...outcomeItems.map((item, index) => `${index + 1}. ${item}`),
+				'',
+				'Timeline',
+				...timeline.map((item) => `- ${item.title}: ${item.detail}`),
+				'',
+				'Teacher note',
+				state.projectNote
+			].join('\n');
+		};
+
+		const renderPreview = () => {
+			const mode = getMode();
+			const contentItems = [...state.selectedContent, ...state.customContent];
+			const formatItems = [...state.selectedFormats, ...state.customFormats];
+			const outcomeItems = [...state.selectedOutcomes, ...state.customOutcomes];
+			const timelineItems = buildTimeline(state.durationWeeks, mode);
+			const essentialQuestion = `How can ${state.audience} better understand the causes, effects, and prevention of substance abuse and addiction?`;
+			const summary = `This ${mode.label.toLowerCase()} is designed for ${state.audience} and should feel ${mode.tone}. It should highlight ${sentenceList(contentItems.slice(0, 4))}${contentItems.length > 4 ? `, plus ${contentItems.length - 4} additional focus area(s)` : ''}, while aiming to ${sentenceList(outcomeItems.slice(0, 3))}.`;
+			const subtitle = `${state.durationWeeks} week plan • ${state.teamSize} team member${state.teamSize === 1 ? '' : 's'} • ${state.presentationLength}`;
+			const footer = state.projectNote.trim()
+				? `Planning note: ${state.projectNote.trim()}`
+				: 'Planning note: Keep language accurate, non-stigmatizing, and appropriate for the intended audience.';
+
+			elements.previewTitle.textContent = state.title || 'Untitled project';
+			elements.previewSubtitle.textContent = subtitle;
+			elements.statusPill.textContent = mode.status;
+			elements.summaryText.textContent = summary;
+			elements.essentialQuestion.textContent = essentialQuestion;
+			elements.primaryDeliverable.textContent = formatItems[0] || mode.deliverable;
+			elements.footerNote.textContent = footer;
+
+			elements.structureList.innerHTML = mode.structure.map((item, index) => `
+				<li>
+					<span class="list-mark">${index + 1}</span>
+					<div>${escapeHtml(item)}</div>
+				</li>
+			`).join('');
+
+			elements.timelineList.innerHTML = timelineItems.map((item, index) => `
+				<li>
+					<span class="list-mark">${index + 1}</span>
+					<div>
+						<span class="timeline-label">${escapeHtml(item.title)}</span>
+						<div>${escapeHtml(item.detail)}</div>
+					</div>
+				</li>
+			`).join('');
+
+			elements.outcomeList.innerHTML = outcomeItems.map((item, index) => `
+				<li>
+					<span class="list-mark">${index + 1}</span>
+					<div>${escapeHtml(item)}</div>
+				</li>
+			`).join('');
+
+			elements.formatList.innerHTML = formatItems.map((item, index) => `
+				<li>
+					<span class="list-mark">${index + 1}</span>
+					<div>${escapeHtml(item)}</div>
+				</li>
+			`).join('');
+		};
+
+		const renderAll = () => {
+			elements.heroModeCount.textContent = String(modePresets.length);
+			elements.heroTopicCount.textContent = String(contentOptions.length + state.customContent.length);
+			elements.heroFormatCount.textContent = String(formatOptions.length + state.customFormats.length);
+
+			renderModeCards();
+
+			renderSelectionGrid(elements.contentGrid, contentOptions, state.selectedContent, 'content', () => {
+				renderPreview();
+			});
+			renderSelectionGrid(elements.formatGrid, formatOptions, state.selectedFormats, 'format', () => {
+				renderPreview();
+			});
+			renderSelectionGrid(elements.outcomeGrid, outcomeOptions, state.selectedOutcomes, 'outcome', () => {
+				renderPreview();
+			});
+
+			renderTagGroup(elements.customContentTags, state.customContent, (index) => {
+				state.customContent.splice(index, 1);
+				renderAll();
+			});
+			renderTagGroup(elements.customFormatTags, state.customFormats, (index) => {
+				state.customFormats.splice(index, 1);
+				renderAll();
+			});
+			renderTagGroup(elements.customOutcomeTags, state.customOutcomes, (index) => {
+				state.customOutcomes.splice(index, 1);
+				renderAll();
+			});
+
+			renderPreview();
+		};
+
+		const updateStateFromForm = () => {
+			state.title = elements.projectTitle.value.trim() || 'Untitled project';
+			state.audience = elements.audience.value;
+			state.durationWeeks = Number(elements.durationWeeks.value) || 1;
+			state.teamSize = Math.max(1, Number(elements.teamSize.value) || 1);
+			elements.teamSize.value = String(state.teamSize);
+			state.presentationLength = elements.presentationLength.value;
+			state.projectNote = elements.projectNote.value.trim();
+			state.customModeNote = elements.customModeNote.value.trim();
+			renderPreview();
+		};
+
+		const resetState = () => {
+			Object.assign(state, structuredClone(defaultState));
+			syncFormFromState();
+			renderAll();
+		};
+
+		const loadDemoState = () => {
+			Object.assign(state, structuredClone(defaultState), {
+				title: 'Youth Addiction Prevention Media Campaign',
+				audience: 'upper secondary students',
+				durationWeeks: 4,
+				teamSize: 5,
+				presentationLength: '12-15 minutes',
+				projectNote: 'Include local support resources, one myth-busting activity, and one audience interaction segment.',
+				modeId: 'workshop',
+				customModeNote: 'Student-led workshop with a reflection wall and QR-linked support resources.',
+				selectedContent: [
+					'Definitions and key vocabulary',
+					'Causes and risk factors',
+					'Mental health and social impact',
+					'Prevention strategies',
+					'Treatment, recovery, and support services'
+				],
+				selectedFormats: ['Slide deck', 'Interactive worksheet', 'Infographic'],
+				selectedOutcomes: [
+					'Correct common myths and misinformation',
+					'Show practical prevention strategies',
+					'Encourage empathy and non-stigmatizing language',
+					'Promote help-seeking and support resources'
+				],
+				customContent: ['Local youth support services'],
+				customFormats: ['Exit reflection wall'],
+				customOutcomes: ['Leave the audience with one concrete help-seeking action']
+			});
+			syncFormFromState();
+			renderAll();
+		};
+
+		const downloadFile = (content, filename, type) => {
+			const blob = new Blob([content], { type });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = filename;
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+			URL.revokeObjectURL(url);
+		};
+
+		const handleCopyBrief = async () => {
+			const text = createBriefText();
+			try {
+				await navigator.clipboard.writeText(text);
+				elements.copyBriefButton.textContent = 'Copied';
+				setTimeout(() => {
+					elements.copyBriefButton.textContent = 'Copy brief';
+				}, 1400);
+			} catch (error) {
+				console.error(error);
+				alert('Clipboard access was blocked. Use the Download text option instead.');
+			}
+		};
+
+		const bindFormEvents = () => {
+			[
+				elements.projectTitle,
+				elements.audience,
+				elements.durationWeeks,
+				elements.teamSize,
+				elements.presentationLength,
+				elements.projectNote,
+				elements.customModeNote
+			].forEach((element) => {
+				element.addEventListener('input', updateStateFromForm);
+				element.addEventListener('change', updateStateFromForm);
+			});
+
+			elements.addContentButton.addEventListener('click', () => {
+				addUniqueItem(elements.customContentInput, state.customContent, renderAll);
+			});
+			elements.addFormatButton.addEventListener('click', () => {
+				addUniqueItem(elements.customFormatInput, state.customFormats, renderAll);
+			});
+			elements.addOutcomeButton.addEventListener('click', () => {
+				addUniqueItem(elements.customOutcomeInput, state.customOutcomes, renderAll);
+			});
+
+			[elements.customContentInput, elements.customFormatInput, elements.customOutcomeInput].forEach((input) => {
+				input.addEventListener('keydown', (event) => {
+					if (event.key === 'Enter') {
+						event.preventDefault();
+						if (input === elements.customContentInput) {
+							addUniqueItem(elements.customContentInput, state.customContent, renderAll);
+						} else if (input === elements.customFormatInput) {
+							addUniqueItem(elements.customFormatInput, state.customFormats, renderAll);
+						} else {
+							addUniqueItem(elements.customOutcomeInput, state.customOutcomes, renderAll);
+						}
+					}
+				});
+			});
+
+			elements.loadDemoButton.addEventListener('click', loadDemoState);
+			elements.resetButton.addEventListener('click', resetState);
+			elements.copyBriefButton.addEventListener('click', handleCopyBrief);
+			elements.downloadTextButton.addEventListener('click', () => {
+				downloadFile(createBriefText(), 'substance-abuse-project-brief.txt', 'text/plain;charset=utf-8');
+			});
+			elements.downloadJsonButton.addEventListener('click', () => {
+				downloadFile(JSON.stringify(state, null, 2), 'substance-abuse-project-plan.json', 'application/json;charset=utf-8');
+			});
+			elements.printButton.addEventListener('click', () => {
+				window.print();
+			});
+		};
+
+		syncFormFromState();
+		bindFormEvents();
+		renderAll();
+	</script>
+</body>
+</html>

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE Rate of Reaction Mastery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafaf9; /* Warm stone background */
+            color: #292524;
+        }
+        
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Custom styling to hide default details marker */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+            background: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            border: 1px solid #e7e5e4;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-stone-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-stopwatch text-orange-600 text-2xl"></i>
+                <span class="font-bold text-xl text-stone-800">HKDSE Kinetics<span class="text-orange-600">Mastery</span></span>
+            </div>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-stone-600">
+                <a href="#measurement" class="hover:text-orange-600 transition">Measurement</a>
+                <a href="#calculations" class="hover:text-orange-600 transition">Calculations</a>
+                <a href="#factors" class="hover:text-orange-600 transition">Collision Theory</a>
+                <a href="#maxwell" class="hover:text-orange-600 transition">Maxwell-Boltzmann</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-br from-orange-600 to-red-800 text-white py-16">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <div class="inline-block bg-orange-900/50 px-4 py-1.5 rounded-full text-orange-200 text-sm font-semibold mb-4 border border-orange-500">Topic IX Aligned</div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Rate of Reaction</h1>
+            <p class="text-lg md:text-xl text-orange-100 max-w-2xl mx-auto mb-8">Master the collision theory, understand the factors affecting reaction rates, and learn how to interpret the Maxwell-Boltzmann distribution curve for the HKDSE.</p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12 space-y-16">
+
+        <!-- SECTION 1: MEASURING RATE -->
+        <section id="measurement" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-3">
+                <span class="bg-orange-100 text-orange-600 p-2 rounded-lg"><i class="fas fa-chart-line"></i></span>
+                Following the Progress of a Reaction
+            </h2>
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-stone-200">
+                <p class="text-stone-600 mb-6 leading-relaxed">
+                    Rate of reaction is the change in concentration (or amount) of a reactant or product per unit time. In the laboratory, we choose a method based on the observable macroscopic changes of the specific reaction.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Method 1 -->
+                    <div class="bg-stone-50 border border-stone-200 rounded-xl p-5 hover:shadow-md transition">
+                        <div class="text-blue-500 text-3xl mb-3"><i class="fas fa-gas-pump"></i></div>
+                        <h4 class="font-bold text-stone-800 mb-2">Volume of Gas Produced</h4>
+                        <p class="text-sm text-stone-600 mb-3">Used when a gas is a product. Measured using a gas syringe or inverted measuring cylinder.</p>
+                        <div class="bg-white p-2 rounded border border-stone-200 text-xs font-mono text-stone-700">
+                            Mg(s) + 2HCl(aq) &rarr; MgCl₂(aq) + <strong>H₂(g)</strong>
+                        </div>
+                    </div>
+                    
+                    <!-- Method 2 -->
+                    <div class="bg-stone-50 border border-stone-200 rounded-xl p-5 hover:shadow-md transition">
+                        <div class="text-red-500 text-3xl mb-3"><i class="fas fa-weight-hanging"></i></div>
+                        <h4 class="font-bold text-stone-800 mb-2">Decrease in Mass</h4>
+                        <p class="text-sm text-stone-600 mb-3">Used when a heavy gas (like CO₂) escapes from the system. Measured using an electronic balance.</p>
+                        <div class="bg-white p-2 rounded border border-stone-200 text-xs font-mono text-stone-700">
+                            CaCO₃(s) + 2HCl(aq) &rarr; CaCl₂(aq) + H₂O(l) + <strong>CO₂(g)</strong>
+                        </div>
+                    </div>
+
+                    <!-- Method 3 -->
+                    <div class="bg-stone-50 border border-stone-200 rounded-xl p-5 hover:shadow-md transition">
+                        <div class="text-purple-500 text-3xl mb-3"><i class="fas fa-eye"></i></div>
+                        <h4 class="font-bold text-stone-800 mb-2">Colorimetry / Transmittance</h4>
+                        <p class="text-sm text-stone-600 mb-3">Used when a colored species is consumed or formed. A colorimeter measures absorbance.</p>
+                        <div class="bg-white p-2 rounded border border-stone-200 text-xs font-mono text-stone-700">
+                            <strong>Br₂(aq)</strong> + HCOOH(aq) &rarr; 2HBr(aq) + CO₂(g)<br>
+                            <span class="text-orange-500">Brown</span> &rarr; <span class="text-stone-400">Colorless</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: CALCULATIONS & GRAPHS -->
+        <section id="calculations" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-3">
+                <span class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i class="fas fa-calculator"></i></span>
+                Graphical Analysis & Calculations
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Graph Theory -->
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-stone-200">
+                    <h3 class="text-xl font-bold text-stone-800 mb-4 border-b border-stone-100 pb-2">Interpreting Rate Graphs</h3>
+                    <p class="text-sm text-stone-600 mb-4">In a typical concentration-time or volume-time graph, the curve gets less steep over time as reactants are consumed.</p>
+                    
+                    <ul class="space-y-4">
+                        <li class="p-3 bg-stone-50 rounded-lg border border-stone-200">
+                            <strong class="text-blue-700 block mb-1">1. Initial Rate (t = 0)</strong>
+                            <span class="text-sm text-stone-600">The rate at the very beginning. Found by drawing a tangent at t=0 and calculating its slope. This is the <strong>maximum rate</strong>.</span>
+                        </li>
+                        <li class="p-3 bg-stone-50 rounded-lg border border-stone-200">
+                            <strong class="text-emerald-700 block mb-1">2. Instantaneous Rate</strong>
+                            <span class="text-sm text-stone-600">The rate at a specific time 't'. Found by drawing a tangent to the curve at that exact time and calculating its slope (Δy / Δx).</span>
+                        </li>
+                        <li class="p-3 bg-stone-50 rounded-lg border border-stone-200">
+                            <strong class="text-purple-700 block mb-1">3. Average Rate</strong>
+                            <span class="text-sm text-stone-600">The overall rate over a time interval. Calculated as: <br><code class="mt-2 block bg-white p-2 rounded border border-stone-200 text-center text-xs">Total Change in Amount / Total Time Taken</code></span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Calculation Demonstration -->
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-6 md:p-8 rounded-2xl shadow-sm border border-blue-200">
+                        <div class="flex items-center gap-2 mb-4">
+                            <i class="fas fa-clipboard-list text-blue-600 text-xl"></i>
+                            <h3 class="text-xl font-bold text-blue-900">DSE Calculation Walkthrough</h3>
+                        </div>
+                        
+                        <p class="text-sm text-blue-800 mb-5 font-medium leading-relaxed">
+                            Excess CaCO₃(s) reacts with 50.0 cm³ of 2.0 M HCl(aq). The mass of the reaction mixture decreases by 0.88 g in the first 40 seconds.
+                        </p>
+                        
+                        <details class="group bg-white rounded-lg border border-blue-200 overflow-hidden mb-3">
+                            <summary class="font-bold text-stone-700 cursor-pointer p-4 bg-blue-100/50 flex items-center justify-between hover:bg-blue-100 transition text-sm">
+                                <span>Q1: Average rate of mass loss (g s⁻¹)?</span>
+                                <i class="fas fa-chevron-down text-blue-400 transition-transform duration-300 group-open:-rotate-180"></i>
+                            </summary>
+                            <div class="p-4 text-sm text-stone-700 border-t border-blue-100 bg-white font-mono leading-relaxed">
+                                Rate = Change in mass / Time<br>
+                                Rate = 0.88 g / 40 s<br>
+                                Rate = <strong class="text-blue-600">0.022 g s⁻¹</strong>
+                            </div>
+                        </details>
+
+                        <details class="group bg-white rounded-lg border border-blue-200 overflow-hidden mb-3">
+                            <summary class="font-bold text-stone-700 cursor-pointer p-4 bg-blue-100/50 flex items-center justify-between hover:bg-blue-100 transition text-sm">
+                                <span>Q2: Average rate of CO₂ production (mol s⁻¹)?</span>
+                                <i class="fas fa-chevron-down text-blue-400 transition-transform duration-300 group-open:-rotate-180"></i>
+                            </summary>
+                            <div class="p-4 text-sm text-stone-700 border-t border-blue-100 bg-white font-mono leading-relaxed">
+                                <span class="text-stone-400 italic font-sans text-xs mb-1 block">Step 1: The mass loss is due to CO₂ escaping.</span>
+                                Molar mass of CO₂ = 12.0 + 2(16.0) = 44.0 g mol⁻¹<br>
+                                Moles of CO₂ = 0.88 g / 44.0 g mol⁻¹ = 0.02 mol<br><br>
+                                <span class="text-stone-400 italic font-sans text-xs mb-1 block">Step 2: Calculate rate in moles per second.</span>
+                                Rate = 0.02 mol / 40 s<br>
+                                Rate = <strong class="text-blue-600">0.0005 mol s⁻¹</strong>
+                            </div>
+                        </details>
+
+                        <details class="group bg-white rounded-lg border border-blue-200 overflow-hidden">
+                            <summary class="font-bold text-stone-700 cursor-pointer p-4 bg-blue-100/50 flex items-center justify-between hover:bg-blue-100 transition text-sm">
+                                <span>Q3: What happens to the rate at t = 60s? Explain.</span>
+                                <i class="fas fa-chevron-down text-blue-400 transition-transform duration-300 group-open:-rotate-180"></i>
+                            </summary>
+                            <div class="p-4 text-sm text-stone-700 border-t border-blue-100 bg-white leading-relaxed">
+                                The rate <strong>decreases</strong>. <br><br>
+                                <strong>Reason:</strong> As the reaction proceeds, the concentration of HCl(aq) decreases. The reactant particles are further apart, leading to a lower frequency of effective collisions.
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: COLLISION THEORY -->
+        <section id="factors" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-3">
+                <span class="bg-red-100 text-red-600 p-2 rounded-lg"><i class="fas fa-meteor"></i></span>
+                Collision Theory & Factors
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-stone-200">
+                    <h3 class="text-xl font-bold text-stone-800 mb-4 border-b border-stone-100 pb-2">The Golden Rules of Collision</h3>
+                    <p class="text-stone-600 mb-4 text-sm">For a reaction to occur, reactant particles must collide. However, not all collisions result in a reaction. An <strong>effective collision</strong> requires two things:</p>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                            <div>
+                                <strong class="text-stone-800">Energy &ge; Activation Energy (E<sub>a</sub>)</strong>
+                                <p class="text-sm text-stone-600">Particles must collide with kinetic energy greater than or equal to the minimum energy required to break bonds.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                            <div>
+                                <strong class="text-stone-800">Correct Orientation</strong>
+                                <p class="text-sm text-stone-600">The reactive parts of the molecules must be aligned perfectly when they strike each other.</p>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg text-sm text-yellow-800">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> <strong>HKDSE Keyword Alert:</strong> Always use the phrase <em>"frequency of effective collisions"</em> rather than just "more collisions" or "faster collisions" to score the mark.
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Factors Accordion -->
+                    <details class="bg-white rounded-xl border border-stone-200 overflow-hidden group shadow-sm" open>
+                        <summary class="font-bold text-stone-800 cursor-pointer p-4 bg-stone-50 flex items-center justify-between hover:bg-stone-100 transition">
+                            <span class="flex items-center gap-2"><i class="fas fa-compress-arrows-alt text-blue-500 w-6"></i> Concentration / Pressure</span>
+                            <i class="fas fa-chevron-down text-stone-400 transition-transform duration-300 group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="p-4 text-sm text-stone-600 border-t border-stone-100">
+                            Higher concentration means more particles per unit volume. The particles are closer together, leading to a higher frequency of collisions, and thus a higher <strong>frequency of effective collisions</strong>. Rate increases.
+                        </div>
+                    </details>
+
+                    <details class="bg-white rounded-xl border border-stone-200 overflow-hidden group shadow-sm">
+                        <summary class="font-bold text-stone-800 cursor-pointer p-4 bg-stone-50 flex items-center justify-between hover:bg-stone-100 transition">
+                            <span class="flex items-center gap-2"><i class="fas fa-cubes text-emerald-500 w-6"></i> Surface Area (Solid Reactants)</span>
+                            <i class="fas fa-chevron-down text-stone-400 transition-transform duration-300 group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="p-4 text-sm text-stone-600 border-t border-stone-100">
+                            Breaking a solid into a powder exposes more particles to the fluid reactants. This increases the contact area, increasing the frequency of collisions, and thus the <strong>frequency of effective collisions</strong>. Rate increases.
+                        </div>
+                    </details>
+
+                    <!-- Catalyst DSE Question -->
+                    <details class="bg-red-50 rounded-xl border border-red-200 overflow-hidden group shadow-sm">
+                        <summary class="font-bold text-red-900 cursor-pointer p-4 bg-red-100 flex items-center justify-between hover:bg-red-200 transition">
+                            <span class="flex items-center gap-2"><i class="fas fa-file-signature text-red-600"></i> DSE Question: Catalyst Action</span>
+                            <i class="fas fa-chevron-down text-red-600 transition-transform duration-300 group-open:-rotate-180"></i>
+                        </summary>
+                        <div class="p-5 text-sm text-stone-800 border-t border-red-100 bg-white">
+                            <p class="italic mb-4 text-stone-700">"State the effect of adding a suitable catalyst on the rate of a chemical reaction and explain how the catalyst works. <span class="float-right font-bold">(3 marks)</span>"</p>
+                            
+                            <div class="space-y-2 text-sm text-stone-700">
+                                <div class="flex gap-2 items-start"><span class="font-bold text-red-600">1.</span> <span>The rate of reaction increases.</span></div>
+                                <div class="flex gap-2 items-start"><span class="font-bold text-red-600">2.</span> <span>A catalyst provides an <strong>alternative reaction pathway</strong>...</span></div>
+                                <div class="flex gap-2 items-start"><span class="font-bold text-red-600">3.</span> <span>...which has a <strong>lower activation energy</strong>.</span></div>
+                                <div class="flex gap-2 items-start"><span class="font-bold text-emerald-600 mt-2"><i class="fas fa-check"></i></span> <span class="mt-2 text-emerald-700 font-semibold">(Bonus connection): Therefore, a larger fraction of particles will have energy &ge; E<sub>a</sub>, increasing the frequency of effective collisions.</span></div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: MAXWELL-BOLTZMANN SIMULATOR -->
+        <section id="maxwell" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 flex items-center gap-3">
+                <span class="bg-purple-100 text-purple-600 p-2 rounded-lg"><i class="fas fa-chart-area"></i></span>
+                Maxwell-Boltzmann Simulator
+            </h2>
+            
+            <div class="bg-stone-900 rounded-2xl p-6 md:p-8 shadow-xl text-stone-200 border border-stone-800">
+                <p class="text-stone-400 mb-6 text-center max-w-2xl mx-auto text-sm md:text-base">
+                    The Maxwell-Boltzmann distribution shows the spread of kinetic energies among gas particles. The area under the curve represents the total number of particles. Use the controls to see how Temperature and Catalysts affect the area of particles with enough energy to react.
+                </p>
+
+                <div class="flex flex-col lg:flex-row gap-8 items-center">
+                    
+                    <!-- Controls -->
+                    <div class="w-full lg:w-1/3 space-y-6">
+                        <div class="bg-stone-800 p-5 rounded-xl border border-stone-700">
+                            <h4 class="font-bold text-rose-400 mb-3 text-sm uppercase tracking-wide">1. Temperature Control</h4>
+                            <div class="flex items-center gap-4 mb-2">
+                                <span class="text-xs text-stone-400">Normal</span>
+                                <input type="range" id="temp-slider" min="1" max="2" step="0.05" value="1" class="w-full h-2 bg-stone-700 rounded-lg appearance-none cursor-pointer accent-rose-500">
+                                <span class="text-xs text-rose-400 font-bold">Hot</span>
+                            </div>
+                            <p class="text-xs text-stone-500 mt-3" id="temp-desc">Curve peaks higher and further left. Fewer particles have high energy.</p>
+                        </div>
+
+                        <div class="bg-stone-800 p-5 rounded-xl border border-stone-700">
+                            <h4 class="font-bold text-emerald-400 mb-3 text-sm uppercase tracking-wide">2. Catalyst Control</h4>
+                            <label class="flex items-center cursor-pointer relative">
+                                <input type="checkbox" id="catalyst-toggle" class="sr-only peer">
+                                <div class="w-11 h-6 bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                <span class="ml-3 text-sm font-medium text-stone-300">Add Catalyst</span>
+                            </label>
+                            <p class="text-xs text-stone-500 mt-3" id="cat-desc">Activation energy (E<sub>a</sub>) remains at its normal high position.</p>
+                        </div>
+
+                        <div class="bg-stone-800 p-4 rounded-xl border border-stone-700 text-xs">
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="w-3 h-3 bg-rose-500 rounded-sm"></div>
+                                <span>Area = Particles able to react</span>
+                            </div>
+                            <div class="text-stone-400 mt-2 italic">
+                                Notice that increasing the temperature does NOT lower E<sub>a</sub>. It shifts the curve so more particles exceed the existing E<sub>a</sub>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Canvas -->
+                    <div class="w-full lg:w-2/3 canvas-container">
+                        <canvas id="mb-canvas" width="600" height="400"></canvas>
+                    </div>
+                </div>
+
+                <!-- DSE Standard Answer for Temperature -->
+                <div class="mt-8 bg-stone-800/50 border border-stone-700 rounded-lg p-5">
+                    <h4 class="text-stone-300 font-bold mb-2 text-sm"><i class="fas fa-pen-nib text-stone-400 mr-2"></i>DSE Marking Scheme: Why does Temperature increase rate?</h4>
+                    <p class="text-sm text-stone-400 leading-relaxed font-mono">
+                        "When temperature increases, the average kinetic energy of the particles increases. <span class="text-rose-400">The distribution curve flattens and shifts to the right</span>. A significantly <span class="text-rose-400">larger fraction of particles</span> now possess kinetic energy greater than or equal to the activation energy (E<sub>a</sub>). Thus, the <span class="text-rose-400">frequency of effective collisions increases</span>, increasing the reaction rate."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-900 text-stone-400 py-8 text-center text-sm border-t border-stone-800 mt-12">
+        <p>&copy; 2024 HKDSE Kinetics Mastery. Tailored for Hong Kong Chemistry Students.</p>
+    </footer>
+
+    <!-- Interactive Canvas Script -->
+    <script>
+        const canvas = document.getElementById('mb-canvas');
+        const ctx = canvas.getContext('2d');
+        const tempSlider = document.getElementById('temp-slider');
+        const catalystToggle = document.getElementById('catalyst-toggle');
+        const tempDesc = document.getElementById('temp-desc');
+        const catDesc = document.getElementById('cat-desc');
+
+        // Distribution math function approximation: y = A * x^2 * e^(-x/T)
+        // Scaled for canvas aesthetics
+        function calculateY(x, T) {
+            const scaledX = x / 40; 
+            // A math trick to keep area roughly constant while shifting peak:
+            const amplitude = 500 / (T * T * T); 
+            return amplitude * Math.pow(scaledX, 2) * Math.exp(-scaledX / T);
+        }
+
+        function drawGraph() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const paddingBottom = 40;
+            const paddingLeft = 50;
+            const graphWidth = width - paddingLeft - 20;
+            const graphHeight = height - paddingBottom - 20;
+
+            const T = parseFloat(tempSlider.value);
+            const hasCatalyst = catalystToggle.checked;
+
+            // Activation Energies (X-coordinates)
+            const Ea_normal = 350;
+            const Ea_cat = 220;
+            const currentEa = hasCatalyst ? Ea_cat : Ea_normal;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // --- Draw Axes ---
+            ctx.beginPath();
+            ctx.strokeStyle = '#57534e'; // stone-600
+            ctx.lineWidth = 2;
+            // Y axis
+            ctx.moveTo(paddingLeft, 20);
+            ctx.lineTo(paddingLeft, height - paddingBottom);
+            // X axis
+            ctx.lineTo(width - 20, height - paddingBottom);
+            ctx.stroke();
+
+            ctx.fillStyle = '#78716c'; // stone-500
+            ctx.font = '14px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Kinetic Energy', width / 2, height - 10);
+            
+            ctx.save();
+            ctx.translate(20, height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('Number of Particles', 0, 0);
+            ctx.restore();
+
+            // --- Draw Reference Curve (T=1) if T > 1 ---
+            if (T > 1.05) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#d6d3d1'; // light grey dashed
+                ctx.setLineDash([5, 5]);
+                ctx.lineWidth = 2;
+                for (let x = 0; x <= graphWidth; x++) {
+                    let y = calculateY(x, 1);
+                    let canvasY = height - paddingBottom - y;
+                    if (x === 0) ctx.moveTo(paddingLeft + x, canvasY);
+                    else ctx.lineTo(paddingLeft + x, canvasY);
+                }
+                ctx.stroke();
+                ctx.setLineDash([]); // reset
+                
+                ctx.fillStyle = '#a8a29e';
+                ctx.font = '12px Inter';
+                ctx.fillText('Lower Temp', paddingLeft + 100, height - paddingBottom - calculateY(100, 1) - 10);
+            }
+
+            // --- Calculate Main Curve ---
+            let curvePoints = [];
+            for (let x = 0; x <= graphWidth; x++) {
+                let y = calculateY(x, T);
+                let canvasY = height - paddingBottom - y;
+                curvePoints.push({x: paddingLeft + x, y: canvasY, rawX: x});
+            }
+
+            // --- Fill Area under curve (E > Ea) ---
+            ctx.beginPath();
+            let startedFill = false;
+            for (let i = 0; i < curvePoints.length; i++) {
+                if (curvePoints[i].rawX >= currentEa) {
+                    if (!startedFill) {
+                        ctx.moveTo(curvePoints[i].x, height - paddingBottom);
+                        startedFill = true;
+                    }
+                    ctx.lineTo(curvePoints[i].x, curvePoints[i].y);
+                }
+            }
+            if (startedFill) {
+                ctx.lineTo(curvePoints[curvePoints.length - 1].x, height - paddingBottom);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(244, 63, 94, 0.4)'; // rose-500 with opacity
+                ctx.fill();
+            }
+
+            // --- Draw Main Curve ---
+            ctx.beginPath();
+            ctx.strokeStyle = '#f43f5e'; // rose-500
+            ctx.lineWidth = 3;
+            for (let i = 0; i < curvePoints.length; i++) {
+                if (i === 0) ctx.moveTo(curvePoints[i].x, curvePoints[i].y);
+                else ctx.lineTo(curvePoints[i].x, curvePoints[i].y);
+            }
+            ctx.stroke();
+
+            // --- Draw Ea Lines ---
+            ctx.beginPath();
+            ctx.strokeStyle = '#10b981'; // emerald-500
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            
+            // Uncatalyzed Ea
+            ctx.moveTo(paddingLeft + Ea_normal, 20);
+            ctx.lineTo(paddingLeft + Ea_normal, height - paddingBottom);
+            
+            // Catalyzed Ea
+            if (hasCatalyst) {
+                ctx.moveTo(paddingLeft + Ea_cat, 40);
+                ctx.lineTo(paddingLeft + Ea_cat, height - paddingBottom);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Text Labels for Ea
+            ctx.fillStyle = '#10b981';
+            ctx.font = 'bold 14px Inter';
+            ctx.textAlign = 'left';
+            if (!hasCatalyst) {
+                ctx.fillText('Ea', paddingLeft + Ea_normal + 5, 40);
+            } else {
+                ctx.fillStyle = '#a8a29e'; // muted original Ea
+                ctx.fillText('Ea (uncatalyzed)', paddingLeft + Ea_normal + 5, 40);
+                ctx.fillStyle = '#10b981'; // bright new Ea
+                ctx.fillText("Ea' (catalyzed)", paddingLeft + Ea_cat + 5, 60);
+            }
+
+            // Update Descriptions
+            if (T === 1) {
+                tempDesc.innerHTML = "Normal Temperature. Small fraction of particles have E &ge; E<sub>a</sub>.";
+            } else {
+                tempDesc.innerHTML = "High Temperature! Curve flattens and shifts right. <span class='text-rose-400 font-bold'>Larger shaded area</span> (more effective collisions).";
+            }
+
+            if (hasCatalyst) {
+                catDesc.innerHTML = "Catalyst added! Provides alternative pathway with <span class='text-emerald-400 font-bold'>lower E<sub>a</sub></span>. Shaded area massively increases.";
+            } else {
+                catDesc.innerHTML = "No catalyst. Activation energy remains at its normal high position.";
+            }
+        }
+
+        // Event Listeners
+        tempSlider.addEventListener('input', drawGraph);
+        catalystToggle.addEventListener('change', drawGraph);
+
+        // Initial Draw
+        drawGraph();
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+Launch by double clicking .bat file or .vbs file.
+
+If you cannot launch with double clicking the .bat or .vbs file:
+
+Input this command in cmd:
+start "" "%LOCALAPPDATA%\Programs\Python\Python314\pythonw.exe" "%USERPROFILE%\Downloads\ActivityTracker.py"
+
+Edit the command at your own need.
+
+Have fun!

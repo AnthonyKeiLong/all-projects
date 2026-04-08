@@ -1,0 +1,2291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Hong Kong: Landscapes of Rock, Relief and Coast</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+	<link
+		rel="stylesheet"
+		href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+		integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+		crossorigin=""
+	>
+	<style>
+		:root {
+			--bg: #f4efe5;
+			--panel: rgba(255, 250, 242, 0.92);
+			--ink: #1d2a2f;
+			--muted: #57656b;
+			--line: #c8bca9;
+			--accent: #a54b2a;
+			--accent-dark: #7d371d;
+			--sand: #d8ad62;
+			--sea: #86c6d9;
+			--sea-dark: #2d6f88;
+			--ridge: #557b43;
+			--slope: #8c5f46;
+			--volcanic: #c55a3d;
+			--granite: #d7a96a;
+			--sedimentary: #6b8ea7;
+			--shadow: 0 18px 45px rgba(55, 42, 24, 0.12);
+			--radius-xl: 30px;
+			--radius-lg: 22px;
+			--radius-md: 16px;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+			min-height: 100vh;
+			font-family: "Space Grotesk", sans-serif;
+			color: var(--ink);
+			background:
+				radial-gradient(circle at top left, rgba(214, 152, 101, 0.22), transparent 30%),
+				radial-gradient(circle at top right, rgba(93, 144, 163, 0.18), transparent 26%),
+				linear-gradient(180deg, #efe6d7 0%, #f8f3eb 36%, #edf2ee 100%);
+		}
+
+		h1,
+		h2,
+		h3,
+		h4 {
+			font-family: "Fraunces", serif;
+			margin: 0;
+			line-height: 1.05;
+		}
+
+		p {
+			margin: 0;
+			line-height: 1.65;
+		}
+
+		button,
+		select {
+			font: inherit;
+		}
+
+		.page-shell {
+			width: min(1480px, calc(100% - 32px));
+			margin: 20px auto 42px;
+		}
+
+		.hero {
+			position: relative;
+			overflow: hidden;
+			padding: 38px;
+			border-radius: 34px;
+			border: 1px solid rgba(108, 88, 55, 0.14);
+			background:
+				linear-gradient(135deg, rgba(249, 243, 229, 0.96), rgba(238, 246, 247, 0.96)),
+				#fffdf8;
+			box-shadow: var(--shadow);
+		}
+
+		.hero::before,
+		.hero::after {
+			content: "";
+			position: absolute;
+			inset: auto;
+			border-radius: 999px;
+			opacity: 0.5;
+			pointer-events: none;
+		}
+
+		.hero::before {
+			width: 320px;
+			height: 320px;
+			right: -90px;
+			top: -110px;
+			background: radial-gradient(circle, rgba(134, 198, 217, 0.45), transparent 65%);
+		}
+
+		.hero::after {
+			width: 260px;
+			height: 260px;
+			left: -60px;
+			bottom: -100px;
+			background: radial-gradient(circle, rgba(202, 121, 82, 0.22), transparent 70%);
+		}
+
+		.hero-grid {
+			position: relative;
+			z-index: 1;
+			display: grid;
+			grid-template-columns: 1.25fr 0.85fr;
+			gap: 28px;
+			align-items: end;
+		}
+
+		.eyebrow {
+			display: inline-flex;
+			align-items: center;
+			gap: 10px;
+			padding: 8px 14px;
+			margin-bottom: 20px;
+			border-radius: 999px;
+			background: rgba(165, 75, 42, 0.1);
+			color: var(--accent-dark);
+			font-size: 0.92rem;
+			font-weight: 700;
+			letter-spacing: 0.03em;
+			text-transform: uppercase;
+		}
+
+		.hero h1 {
+			max-width: 12ch;
+			font-size: clamp(2.8rem, 5.8vw, 5rem);
+			margin-bottom: 18px;
+		}
+
+		.hero p {
+			max-width: 67ch;
+			color: var(--muted);
+			font-size: 1.06rem;
+		}
+
+		.hero-stats {
+			display: grid;
+			gap: 14px;
+		}
+
+		.stat-card {
+			display: grid;
+			grid-template-columns: auto 1fr;
+			gap: 14px;
+			align-items: start;
+			padding: 18px 18px 16px;
+			border-radius: var(--radius-lg);
+			background: rgba(255, 255, 255, 0.72);
+			border: 1px solid rgba(109, 89, 56, 0.12);
+		}
+
+		.stat-value {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 54px;
+			height: 54px;
+			border-radius: 18px;
+			font-weight: 700;
+			font-size: 1.1rem;
+			color: white;
+		}
+
+		.stat-card h3 {
+			font-size: 1.1rem;
+			margin-bottom: 4px;
+		}
+
+		.stat-card p {
+			color: var(--muted);
+			font-size: 0.96rem;
+		}
+
+		.dashboard {
+			display: grid;
+			grid-template-columns: minmax(0, 1.42fr) minmax(320px, 0.92fr);
+			gap: 24px;
+			margin-top: 24px;
+			align-items: start;
+		}
+
+		.panel {
+			background: var(--panel);
+			backdrop-filter: blur(10px);
+			border-radius: var(--radius-xl);
+			border: 1px solid rgba(108, 88, 55, 0.14);
+			box-shadow: var(--shadow);
+		}
+
+		.map-panel {
+			overflow: hidden;
+		}
+
+		.panel-header {
+			display: flex;
+			justify-content: space-between;
+			gap: 18px;
+			padding: 24px 24px 18px;
+			align-items: end;
+			flex-wrap: wrap;
+		}
+
+		.panel-header h2 {
+			font-size: clamp(1.8rem, 3vw, 2.4rem);
+			margin-bottom: 8px;
+		}
+
+		.panel-header p {
+			max-width: 58ch;
+			color: var(--muted);
+			font-size: 0.98rem;
+		}
+
+		.map-actions {
+			display: flex;
+			gap: 10px;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+
+		.map-toolbar {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			padding: 0 24px 18px;
+		}
+
+		.filter-chip,
+		.ghost-button {
+			border: 1px solid rgba(108, 88, 55, 0.16);
+			background: rgba(255, 255, 255, 0.72);
+			color: var(--ink);
+			border-radius: 999px;
+			padding: 10px 14px;
+			cursor: pointer;
+			transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+		}
+
+		.filter-chip:hover,
+		.ghost-button:hover,
+		.feature-item:hover,
+		.process-tab:hover,
+		.quiz-option:hover {
+			transform: translateY(-1px);
+		}
+
+		.filter-chip.active {
+			background: var(--ink);
+			color: #fffaf2;
+		}
+
+		.map-frame {
+			padding: 0 24px 24px;
+		}
+
+		#hk-map {
+			width: 100%;
+			height: 620px;
+			border-radius: 24px;
+			border: 1px solid rgba(51, 78, 84, 0.12);
+			overflow: hidden;
+			box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+		}
+
+		#hk-map.map-fallback {
+			background: linear-gradient(180deg, #d7e7ea 0%, #eaf1ef 100%);
+		}
+
+		.map-panel:fullscreen {
+			width: 100vw;
+			height: 100vh;
+			max-width: none;
+			margin: 0;
+			padding: 0;
+			border-radius: 0;
+			background: rgba(248, 243, 235, 0.98);
+		}
+
+		.map-panel:fullscreen .panel-header,
+		.map-panel:fullscreen .map-toolbar,
+		.map-panel:fullscreen .map-frame {
+			padding-left: 18px;
+			padding-right: 18px;
+		}
+
+		.map-panel:fullscreen .panel-header {
+			padding-top: 18px;
+			padding-bottom: 14px;
+		}
+
+		.map-panel:fullscreen .map-frame {
+			padding-bottom: 18px;
+			height: calc(100vh - 166px);
+			display: grid;
+			grid-template-rows: minmax(0, 1fr) auto auto;
+		}
+
+		.map-panel:fullscreen #hk-map {
+			height: 100%;
+			min-height: 0;
+			border-radius: 20px;
+		}
+
+		.map-panel:fullscreen .relief-note,
+		.map-panel:fullscreen .map-legend {
+			margin-top: 12px;
+		}
+
+		.leaflet-container {
+			font-family: "Space Grotesk", sans-serif;
+			background: #dbe9ee;
+		}
+
+		.relief-note {
+			display: grid;
+			grid-template-columns: 1fr auto;
+			gap: 14px;
+			align-items: center;
+			margin-top: 14px;
+			padding: 14px 16px;
+			border-radius: 18px;
+			background: rgba(255, 255, 255, 0.72);
+			border: 1px solid rgba(108, 88, 55, 0.12);
+		}
+
+		.relief-note p {
+			font-size: 0.9rem;
+			color: var(--muted);
+		}
+
+		.relief-note strong {
+			color: var(--ink);
+		}
+
+		.altitude-strip {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 6px;
+			border-radius: 999px;
+			background: rgba(255, 250, 242, 0.9);
+			border: 1px solid rgba(108, 88, 55, 0.12);
+		}
+
+		.altitude-band {
+			width: 28px;
+			height: 12px;
+			border-radius: 999px;
+		}
+
+		.altitude-labels {
+			display: flex;
+			justify-content: space-between;
+			gap: 8px;
+			margin-top: 8px;
+			font-size: 0.74rem;
+			color: var(--muted);
+		}
+
+		.map-legend {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 12px;
+			margin-top: 16px;
+		}
+
+		.legend-card {
+			display: flex;
+			gap: 12px;
+			align-items: start;
+			padding: 14px;
+			border-radius: 18px;
+			background: rgba(255, 255, 255, 0.74);
+			border: 1px solid rgba(108, 88, 55, 0.12);
+		}
+
+		.legend-dot {
+			width: 14px;
+			height: 14px;
+			border-radius: 999px;
+			margin-top: 4px;
+			flex: 0 0 auto;
+		}
+
+		.legend-card strong {
+			display: block;
+			margin-bottom: 4px;
+			font-size: 0.95rem;
+		}
+
+		.legend-card span {
+			color: var(--muted);
+			font-size: 0.88rem;
+			line-height: 1.45;
+		}
+
+		.sidebar {
+			display: grid;
+			gap: 18px;
+			position: sticky;
+			top: 18px;
+		}
+
+		.info-panel {
+			padding: 24px;
+		}
+
+		.kicker {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 6px 10px;
+			border-radius: 999px;
+			background: rgba(45, 111, 136, 0.1);
+			color: var(--sea-dark);
+			font-size: 0.82rem;
+			font-weight: 700;
+			letter-spacing: 0.03em;
+			text-transform: uppercase;
+		}
+
+		#feature-title {
+			font-size: clamp(2rem, 3vw, 2.7rem);
+			margin-top: 14px;
+			margin-bottom: 12px;
+		}
+
+		.lead {
+			color: var(--muted);
+			margin-bottom: 18px;
+			font-size: 1rem;
+		}
+
+		.detail-grid {
+			display: grid;
+			gap: 12px;
+			margin: 18px 0;
+		}
+
+		.detail-box {
+			padding: 14px 16px;
+			border-radius: 18px;
+			background: rgba(255, 255, 255, 0.72);
+			border: 1px solid rgba(108, 88, 55, 0.12);
+		}
+
+		.detail-box strong {
+			display: block;
+			font-size: 0.84rem;
+			letter-spacing: 0.06em;
+			text-transform: uppercase;
+			color: var(--accent-dark);
+			margin-bottom: 6px;
+		}
+
+		.detail-box span {
+			color: var(--ink);
+			font-size: 0.98rem;
+			line-height: 1.55;
+		}
+
+		.exam-link {
+			margin-top: 14px;
+			padding: 16px 18px;
+			border-radius: 20px;
+			background: linear-gradient(135deg, rgba(165, 75, 42, 0.12), rgba(216, 173, 98, 0.2));
+			border: 1px solid rgba(165, 75, 42, 0.16);
+		}
+
+		.exam-link strong {
+			display: block;
+			margin-bottom: 6px;
+			color: var(--accent-dark);
+			letter-spacing: 0.04em;
+			text-transform: uppercase;
+			font-size: 0.82rem;
+		}
+
+		.feature-list-panel {
+			padding: 22px 24px 24px;
+		}
+
+		.feature-list-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 14px;
+			gap: 12px;
+			flex-wrap: wrap;
+		}
+
+		.feature-list-header h3 {
+			font-size: 1.3rem;
+		}
+
+		.feature-count {
+			color: var(--muted);
+			font-size: 0.92rem;
+		}
+
+		.feature-list {
+			display: grid;
+			gap: 10px;
+			max-height: 470px;
+			overflow: auto;
+			padding-right: 4px;
+		}
+
+		.feature-item {
+			text-align: left;
+			display: grid;
+			gap: 8px;
+			width: 100%;
+			padding: 14px 16px;
+			border-radius: 18px;
+			border: 1px solid rgba(108, 88, 55, 0.12);
+			background: rgba(255, 255, 255, 0.66);
+			cursor: pointer;
+			transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+		}
+
+		.feature-item.active {
+			border-color: rgba(45, 111, 136, 0.42);
+			background: rgba(195, 227, 235, 0.42);
+		}
+
+		.feature-item strong {
+			font-size: 1rem;
+		}
+
+		.feature-item p {
+			font-size: 0.9rem;
+			color: var(--muted);
+			line-height: 1.45;
+		}
+
+		.tag-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+		}
+
+		.mini-tag {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			padding: 6px 10px;
+			border-radius: 999px;
+			font-size: 0.78rem;
+			font-weight: 700;
+			color: var(--ink);
+			background: rgba(255, 255, 255, 0.88);
+			border: 1px solid rgba(108, 88, 55, 0.1);
+		}
+
+		.content-grid {
+			display: grid;
+			gap: 22px;
+			margin-top: 24px;
+		}
+
+		.section-card {
+			padding: 28px;
+		}
+
+		.section-head {
+			display: flex;
+			justify-content: space-between;
+			gap: 18px;
+			align-items: end;
+			flex-wrap: wrap;
+			margin-bottom: 22px;
+		}
+
+		.section-head h2 {
+			font-size: clamp(2rem, 3vw, 2.8rem);
+			margin-bottom: 10px;
+		}
+
+		.section-head p {
+			max-width: 64ch;
+			color: var(--muted);
+		}
+
+		.landscape-grid,
+		.geology-grid,
+		.summary-grid,
+		.quiz-grid {
+			display: grid;
+			gap: 18px;
+		}
+
+		.landscape-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.geology-grid {
+			grid-template-columns: 1.05fr 0.95fr;
+		}
+
+		.summary-grid {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+
+		.quiz-grid {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+
+		.study-card,
+		.timeline-card,
+		.quiz-card,
+		.summary-card {
+			padding: 22px;
+			border-radius: 24px;
+			background: rgba(255, 255, 255, 0.68);
+			border: 1px solid rgba(108, 88, 55, 0.12);
+		}
+
+		.study-card h3,
+		.timeline-card h3,
+		.quiz-card h3,
+		.summary-card h3 {
+			font-size: 1.38rem;
+			margin-bottom: 12px;
+		}
+
+		.study-card p,
+		.timeline-card p,
+		.summary-card p {
+			color: var(--muted);
+		}
+
+		.bullet-list {
+			margin: 16px 0 0;
+			padding-left: 18px;
+			color: var(--muted);
+			line-height: 1.7;
+		}
+
+		.bullet-list strong {
+			color: var(--ink);
+		}
+
+		.timeline {
+			display: grid;
+			gap: 14px;
+			margin-top: 18px;
+		}
+
+		.timeline-step {
+			display: grid;
+			grid-template-columns: 84px 1fr;
+			gap: 14px;
+			align-items: start;
+		}
+
+		.timeline-year {
+			padding: 10px 12px;
+			border-radius: 16px;
+			text-align: center;
+			font-weight: 700;
+			color: white;
+			background: linear-gradient(135deg, var(--sea-dark), #1f5365);
+		}
+
+		.timeline-note {
+			padding: 14px 16px;
+			border-radius: 18px;
+			background: rgba(255, 255, 255, 0.78);
+			border: 1px solid rgba(108, 88, 55, 0.1);
+		}
+
+		.timeline-note strong {
+			display: block;
+			margin-bottom: 5px;
+		}
+
+		.process-studio {
+			display: grid;
+			grid-template-columns: 0.84fr 1.16fr;
+			gap: 18px;
+			margin-top: 18px;
+		}
+
+		.process-nav {
+			display: grid;
+			gap: 12px;
+		}
+
+		.process-tab {
+			text-align: left;
+			padding: 16px 18px;
+			border-radius: 18px;
+			border: 1px solid rgba(108, 88, 55, 0.12);
+			background: rgba(255, 255, 255, 0.7);
+			cursor: pointer;
+			transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+		}
+
+		.process-tab.active {
+			background: rgba(216, 173, 98, 0.24);
+			border-color: rgba(165, 75, 42, 0.28);
+		}
+
+		.process-tab strong {
+			display: block;
+			margin-bottom: 4px;
+			font-size: 1rem;
+		}
+
+		.process-tab span {
+			font-size: 0.9rem;
+			color: var(--muted);
+			line-height: 1.45;
+		}
+
+		.process-display {
+			padding: 22px;
+			border-radius: 24px;
+			background: linear-gradient(145deg, rgba(255, 255, 255, 0.84), rgba(247, 240, 227, 0.86));
+			border: 1px solid rgba(108, 88, 55, 0.12);
+		}
+
+		.process-display h3 {
+			font-size: 1.52rem;
+			margin-bottom: 10px;
+		}
+
+		.process-visual {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 12px;
+			margin: 18px 0;
+		}
+
+		.process-node {
+			min-height: 120px;
+			padding: 16px;
+			border-radius: 20px;
+			color: white;
+			display: flex;
+			flex-direction: column;
+			justify-content: end;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.process-node::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.18));
+			pointer-events: none;
+		}
+
+		.process-node strong,
+		.process-node span {
+			position: relative;
+			z-index: 1;
+		}
+
+		.process-node span {
+			font-size: 0.86rem;
+			line-height: 1.45;
+			margin-top: 6px;
+			opacity: 0.94;
+		}
+
+		.quiz-card {
+			display: grid;
+			gap: 14px;
+		}
+
+		.quiz-meta {
+			color: var(--accent-dark);
+			font-size: 0.8rem;
+			font-weight: 700;
+			letter-spacing: 0.04em;
+			text-transform: uppercase;
+		}
+
+		.quiz-options {
+			display: grid;
+			gap: 10px;
+		}
+
+		.quiz-option {
+			text-align: left;
+			width: 100%;
+			padding: 12px 14px;
+			border-radius: 16px;
+			border: 1px solid rgba(108, 88, 55, 0.12);
+			background: rgba(255, 255, 255, 0.82);
+			cursor: pointer;
+			transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+		}
+
+		.quiz-option.correct {
+			background: rgba(110, 172, 103, 0.16);
+			border-color: rgba(85, 123, 67, 0.42);
+		}
+
+		.quiz-option.incorrect {
+			background: rgba(197, 90, 61, 0.12);
+			border-color: rgba(197, 90, 61, 0.34);
+		}
+
+		.quiz-feedback {
+			min-height: 68px;
+			padding: 14px 16px;
+			border-radius: 16px;
+			background: rgba(255, 255, 255, 0.7);
+			border: 1px solid rgba(108, 88, 55, 0.12);
+			color: var(--muted);
+		}
+
+		.summary-card {
+			position: relative;
+			overflow: hidden;
+		}
+
+		.summary-card::after {
+			content: "";
+			position: absolute;
+			inset: auto -20px -24px auto;
+			width: 120px;
+			height: 120px;
+			border-radius: 50%;
+			background: radial-gradient(circle, rgba(134, 198, 217, 0.22), transparent 72%);
+			pointer-events: none;
+		}
+
+		.summary-badge {
+			display: inline-flex;
+			align-items: center;
+			padding: 6px 10px;
+			border-radius: 999px;
+			font-size: 0.78rem;
+			font-weight: 700;
+			color: var(--accent-dark);
+			background: rgba(165, 75, 42, 0.08);
+			margin-bottom: 12px;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+		}
+
+		.leaflet-popup-content-wrapper,
+		.leaflet-popup-tip {
+			background: #fffaf2;
+			color: var(--ink);
+		}
+
+		.leaflet-popup-content {
+			margin: 14px 16px;
+			font-family: "Space Grotesk", sans-serif;
+			line-height: 1.5;
+		}
+
+		.popup-title {
+			font-family: "Fraunces", serif;
+			font-size: 1.12rem;
+			margin-bottom: 6px;
+		}
+
+		.popup-body {
+			font-size: 0.9rem;
+			color: var(--muted);
+			max-width: 220px;
+		}
+
+		@media (max-width: 1180px) {
+			.hero-grid,
+			.dashboard,
+			.geology-grid,
+			.process-studio,
+			.quiz-grid,
+			.summary-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.sidebar {
+				position: static;
+			}
+		}
+
+		@media (max-width: 900px) {
+			.page-shell {
+				width: min(100% - 20px, 1480px);
+				margin-top: 10px;
+			}
+
+			.hero,
+			.section-card,
+			.info-panel,
+			.feature-list-panel {
+				padding: 22px;
+			}
+
+			.landscape-grid,
+			.map-legend {
+				grid-template-columns: 1fr;
+			}
+
+			#hk-map {
+				height: 460px;
+			}
+		}
+
+		@media (max-width: 620px) {
+			.hero {
+				padding: 20px;
+			}
+
+			.panel-header,
+			.map-toolbar,
+			.map-frame {
+				padding-left: 18px;
+				padding-right: 18px;
+			}
+
+			.timeline-step {
+				grid-template-columns: 1fr;
+			}
+
+			.process-visual {
+				grid-template-columns: 1fr;
+			}
+
+			.feature-list {
+				max-height: 380px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="page-shell">
+		<header class="hero">
+			<div class="hero-grid">
+				<div>
+					<div class="eyebrow">Interactive Physical Geography and Geology Lesson</div>
+					<h1>Hong Kong as a landscape of steep relief, drowned coasts and ancient rocks.</h1>
+					<p>
+						Explore Hong Kong the way a field geographer would: zoom into the map, pan between islands and harbours, and click major landforms to connect relief, coastline shape, slope processes and rock structure. The lesson is built around core themes that repeatedly matter in senior secondary geography: rugged topography, limited lowland, a ria coastline, and a geological foundation dominated by volcanic and granitic rocks.
+					</p>
+				</div>
+
+				<div class="hero-stats">
+					<article class="stat-card">
+						<div class="stat-value" style="background: linear-gradient(135deg, var(--ridge), #38542d);">R</div>
+						<div>
+							<h3>Relief controls land use</h3>
+							<p>Mountains and steep slopes dominate much of the territory, so settlements, transport and reclamation cluster on the small areas of flatter ground.</p>
+						</div>
+					</article>
+					<article class="stat-card">
+						<div class="stat-value" style="background: linear-gradient(135deg, var(--sea-dark), #19495b);">C</div>
+						<div>
+							<h3>Coastline is deeply indented</h3>
+							<p>Sea-level rise drowned river valleys to create harbours, coves and sheltered bays, making Hong Kong one of the classic ria coasts in East Asia.</p>
+						</div>
+					</article>
+					<article class="stat-card">
+						<div class="stat-value" style="background: linear-gradient(135deg, var(--volcanic), #8f3821);">G</div>
+						<div>
+							<h3>Geology shapes scenery</h3>
+							<p>Volcanic tuffs, granite intrusions and sedimentary sequences produce different cliff forms, weathering patterns and coastal landscapes.</p>
+						</div>
+					</article>
+				</div>
+			</div>
+		</header>
+
+		<section class="dashboard">
+			<article class="panel map-panel">
+				<div class="panel-header">
+					<div>
+						<h2>Zoomable Study Map</h2>
+						<p>Use the filters to focus on hills and ridges, engineered and natural slopes, drowned bays and harbours, or geology-rich coastal sites. Click a marker or the study list to bring up a detailed explanation.</p>
+					</div>
+					<div class="map-actions">
+						<button id="toggle-fullscreen" class="ghost-button" type="button">Full screen map</button>
+						<button id="reset-view" class="ghost-button" type="button">Reset Hong Kong view</button>
+					</div>
+				</div>
+
+				<div class="map-toolbar" id="filter-bar">
+					<button class="filter-chip active" type="button" data-filter="all">All features</button>
+					<button class="filter-chip" type="button" data-filter="relief">Hills and ridges</button>
+					<button class="filter-chip" type="button" data-filter="slope">Slopes and weathering</button>
+					<button class="filter-chip" type="button" data-filter="coast">Harbours and bays</button>
+					<button class="filter-chip" type="button" data-filter="volcanic">Volcanic coast</button>
+					<button class="filter-chip" type="button" data-filter="granite">Granite landforms</button>
+					<button class="filter-chip" type="button" data-filter="sedimentary">Sedimentary rocks</button>
+				</div>
+
+				<div class="map-frame">
+					<div id="hk-map" aria-label="Interactive map of Hong Kong geographic and geological features"></div>
+					<div class="relief-note">
+						<p><strong>Hillshade overlay:</strong> darker flanks and lighter ridgelines now come from a real terrain-shading map layer, so slopes and mountain blocks read more like a physical atlas.</p>
+						<div>
+							<div class="altitude-strip" aria-hidden="true">
+								<span class="altitude-band" style="background: rgba(233, 226, 208, 0.9);"></span>
+								<span class="altitude-band" style="background: rgba(192, 211, 186, 0.88);"></span>
+								<span class="altitude-band" style="background: rgba(119, 144, 111, 0.86);"></span>
+								<span class="altitude-band" style="background: rgba(66, 74, 61, 0.88);"></span>
+							</div>
+							<div class="altitude-labels">
+								<span>Gentle</span>
+								<span>Steep</span>
+							</div>
+						</div>
+					</div>
+					<div class="map-legend">
+						<div class="legend-card">
+							<div class="legend-dot" style="background: var(--ridge);"></div>
+							<div>
+								<strong>Relief and slopes</strong>
+								<span>Peaks, ridges, cut slopes and shaded uplands reveal why Hong Kong has little level land and strong local relief.</span>
+							</div>
+						</div>
+						<div class="legend-card">
+							<div class="legend-dot" style="background: var(--sea-dark);"></div>
+							<div>
+								<strong>Harbours and bays</strong>
+								<span>Indented coastlines show drowned valleys, shelter from waves and the importance of marine access.</span>
+							</div>
+						</div>
+						<div class="legend-card">
+							<div class="legend-dot" style="background: var(--volcanic);"></div>
+							<div>
+								<strong>Geological contrasts</strong>
+								<span>Volcanic ash, granite and sedimentary layers weather differently, producing distinct landforms.</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</article>
+
+			<aside class="sidebar">
+				<section class="panel info-panel">
+					<div class="kicker" id="feature-type-badge">Relief feature</div>
+					<h2 id="feature-title">Tai Mo Shan</h2>
+					<p class="lead" id="feature-summary">The highest point in Hong Kong stands on rugged upland terrain and helps show how relief, weathering and slope processes dominate the territory.</p>
+
+					<div class="tag-row" id="feature-tags"></div>
+
+					<div class="detail-grid">
+						<div class="detail-box">
+							<strong>Why it matters</strong>
+							<span id="feature-importance"></span>
+						</div>
+						<div class="detail-box">
+							<strong>Geographic reading</strong>
+							<span id="feature-geography"></span>
+						</div>
+						<div class="detail-box">
+							<strong>Geological reading</strong>
+							<span id="feature-geology"></span>
+						</div>
+						<div class="detail-box">
+							<strong>Location precision</strong>
+							<span id="feature-precision"></span>
+						</div>
+
+						<div class="detail-box" id="feature-controls-box">
+							<strong>Pin controls</strong>
+							<div style="margin-top:6px; display:flex; gap:6px; align-items:center;">
+								<button id="reposition-btn" type="button">Reposition (click map)</button>
+								<input id="coord-input" placeholder="lat,lng" style="flex:1; padding:6px; border-radius:4px; border:1px solid #ddd;" />
+								<button id="apply-coord-btn" type="button">Apply</button>
+								<button id="download-overrides-btn" type="button" title="Download saved coordinate overrides">Download</button>
+								<button id="clear-overrides-btn" type="button" title="Clear saved overrides">Clear</button>
+							</div>
+							<div id="reposition-hint" style="margin-top:6px; color:#666; font-size:0.9em; display:none;">Click a spot on the map to place the selected feature. Or paste coordinates and click Apply.</div>
+						</div>
+					</div>
+
+					<div class="exam-link">
+						<strong>Exam-style link</strong>
+						<p id="feature-exam"></p>
+					</div>
+				</section>
+
+				<section class="panel feature-list-panel">
+					<div class="feature-list-header">
+						<h3>Feature Directory</h3>
+						<div class="feature-count" id="feature-count">0 features shown</div>
+					</div>
+					<div class="feature-list" id="feature-list"></div>
+				</section>
+			</aside>
+		</section>
+
+		<div class="content-grid">
+			<section class="panel section-card">
+				<div class="section-head">
+					<div>
+						<h2>Landscape Systems of Hong Kong</h2>
+						<p>Hong Kong is best understood as a compact territory where relief, coast and geology interact. These cards organise the major landscape ideas you should be able to explain in paragraphs, map reading, photo interpretation and data-response questions.</p>
+					</div>
+				</div>
+
+				<div class="landscape-grid">
+					<article class="study-card">
+						<h3>1. High relief and dissected uplands</h3>
+						<p>Much of Hong Kong is hilly or mountainous. Peaks such as Tai Mo Shan, Lantau Peak and the Ma On Shan ridge create steep gradients, narrow valleys and a fragmented pattern of accessible land.</p>
+						<ul class="bullet-list">
+							<li><strong>Relief:</strong> short but steep slopes mean rapid runoff during intense rainfall.</li>
+							<li><strong>Settlement pattern:</strong> lowlands, coastal fringes and reclaimed land attract dense urban development.</li>
+							<li><strong>Transport:</strong> tunnels, bridges and slope engineering are necessary because ridges interrupt direct routes.</li>
+						</ul>
+					</article>
+
+					<article class="study-card">
+						<h3>2. A ria coastline with sheltered water</h3>
+						<p>Post-glacial sea-level rise drowned former river valleys. The result is an irregular coastline with inlets, harbours, coves and peninsulas. Victoria Harbour and Tolo Harbour are classic examples of drowned lowland or valley systems.</p>
+						<ul class="bullet-list">
+							<li><strong>Indented coast:</strong> more natural shelter than a straight coastline.</li>
+							<li><strong>Economic value:</strong> ports, ferry routes and fish culture benefit from protected water.</li>
+							<li><strong>Geomorphology:</strong> headlands, embayments and small islands reflect resistance differences in bedrock.</li>
+						</ul>
+					</article>
+
+					<article class="study-card">
+						<h3>3. Slope processes and weathering hazards</h3>
+						<p>Hong Kong experiences hot wet summers, intense rainstorms and deeply weathered regolith on steep ground. These factors make mass movement a persistent hazard, especially where human activity modifies slopes.</p>
+						<ul class="bullet-list">
+							<li><strong>Physical weathering:</strong> unloading and jointing in granite can produce blocky slopes and boulders.</li>
+							<li><strong>Chemical weathering:</strong> humid conditions help decompose feldspar-rich rocks into weakened material.</li>
+							<li><strong>Human response:</strong> retaining walls, drainage channels, soil nails and vegetation are used to stabilise cut slopes.</li>
+						</ul>
+					</article>
+
+					<article class="study-card">
+						<h3>4. Coast and geology together</h3>
+						<p>Rock type controls how the coast responds to wave attack. Volcanic tuffs can form striking cliffs and columnar joint patterns; granite commonly produces rounded tors, blocky headlands and corestone landscapes; sedimentary layers reveal bedding and differential erosion.</p>
+						<ul class="bullet-list">
+							<li><strong>Hard rock coasts:</strong> sea cliffs, stacks and wave-cut platforms are common where resistant bedrock is exposed.</li>
+							<li><strong>Structure:</strong> joints, faults and bedding planes guide erosion.</li>
+							<li><strong>Field evidence:</strong> texture, grain size and rock structure help explain landscape appearance.</li>
+						</ul>
+					</article>
+				</div>
+			</section>
+
+			<section class="panel section-card">
+				<div class="section-head">
+					<div>
+						<h2>Geological Framework</h2>
+						<p>Hong Kong’s scenery is not random. It records volcanic eruptions, magma intrusion, later uplift, weathering and marine erosion. The timeline and process studio below connect the rock story to visible landforms.</p>
+					</div>
+				</div>
+
+				<div class="geology-grid">
+					<article class="timeline-card">
+						<h3>From eruption to present-day coast</h3>
+						<div class="timeline">
+							<div class="timeline-step">
+								<div class="timeline-year">Mesozoic</div>
+								<div class="timeline-note">
+									<strong>Explosive volcanism</strong>
+									<p>Large eruptions spread ash and pyroclastic materials across eastern Hong Kong. The tuffs later solidified, and cooling created fractures that now influence cliff forms and the famous hexagonal columns.</p>
+								</div>
+							</div>
+							<div class="timeline-step">
+								<div class="timeline-year">Later phase</div>
+								<div class="timeline-note">
+									<strong>Granite intrusion</strong>
+									<p>Magma intruded at depth and cooled slowly, forming coarse-grained granite. Subsequent uplift and erosion exposed these intrusive rocks at the surface, especially in western and central areas.</p>
+								</div>
+							</div>
+							<div class="timeline-step">
+								<div class="timeline-year">Younger basins</div>
+								<div class="timeline-note">
+									<strong>Sedimentary deposition</strong>
+									<p>In places such as Tung Ping Chau, sediments accumulated in layers. These layered rocks now provide textbook examples of bedding, differential erosion and coastal retreat along weaker planes.</p>
+								</div>
+							</div>
+							<div class="timeline-step">
+								<div class="timeline-year">Quaternary to now</div>
+								<div class="timeline-note">
+									<strong>Sea-level rise and coastal shaping</strong>
+									<p>As sea level rose after the last glacial period, river valleys were flooded. Waves then reworked exposed rock coasts, producing cliffs, inlets, shore platforms and irregular headland-bay patterns.</p>
+								</div>
+							</div>
+						</div>
+					</article>
+
+					<article class="timeline-card">
+						<h3>Process studio</h3>
+						<p>Select a process to see how rock type becomes a visible landscape. This is the reasoning chain that turns description into explanation.</p>
+
+						<div class="process-studio">
+							<div class="process-nav" id="process-nav">
+								<button class="process-tab active" type="button" data-process="volcanic">
+									<strong>Volcanic tuff</strong>
+									<span>Explosive eruptions, welding, jointing and marine cliff development.</span>
+								</button>
+								<button class="process-tab" type="button" data-process="granite">
+									<strong>Granite</strong>
+									<span>Slow cooling, jointing, spheroidal weathering and blocky coastal forms.</span>
+								</button>
+								<button class="process-tab" type="button" data-process="sedimentary">
+									<strong>Sedimentary rocks</strong>
+									<span>Layered deposition, bedding planes and differential erosion.</span>
+								</button>
+								<button class="process-tab" type="button" data-process="slope">
+									<strong>Slope instability</strong>
+									<span>Weathered mantle, intense rainfall and landslide risk on steep terrain.</span>
+								</button>
+							</div>
+
+							<div class="process-display">
+								<h3 id="process-title">Volcanic tuff and the eastern cliffs</h3>
+								<p id="process-summary">Pyroclastic material from ancient eruptions consolidated into hard volcanic rock. Cooling fractures and later marine erosion helped create very steep coastal scenery in eastern Hong Kong.</p>
+								<div class="process-visual" id="process-visual"></div>
+								<ul class="bullet-list" id="process-points"></ul>
+							</div>
+						</div>
+					</article>
+				</div>
+			</section>
+
+			<section class="panel section-card">
+				<div class="section-head">
+					<div>
+						<h2>Quick Check</h2>
+						<p>Answer these short questions to test whether you can connect location, landform and geological reasoning. The feedback explains the thinking, not just the correct option.</p>
+					</div>
+				</div>
+
+				<div class="quiz-grid" id="quiz-grid"></div>
+			</section>
+
+			<section class="panel section-card">
+				<div class="section-head">
+					<div>
+						<h2>What to Remember</h2>
+						<p>These are the high-value conclusions that tie the map and the explanations together. If you can explain each one with examples, you understand the lesson.</p>
+					</div>
+				</div>
+
+				<div class="summary-grid">
+					<article class="summary-card">
+						<div class="summary-badge">Relief</div>
+						<h3>Hong Kong is mountainous rather than plain</h3>
+						<p>Steep uplands and ridges dominate the territory. Flat land is limited, which is why so much development concentrates on alluvial plains, coastal strips and reclaimed land.</p>
+					</article>
+
+					<article class="summary-card">
+						<div class="summary-badge">Coast</div>
+						<h3>The coastline is drowned and highly irregular</h3>
+						<p>Bays and harbours are not random gaps in the coast. They are flooded valleys and structurally controlled inlets that provide shelter and create major advantages for transport and port activity.</p>
+					</article>
+
+					<article class="summary-card">
+						<div class="summary-badge">Geology</div>
+						<h3>Rock type is visible in the landscape</h3>
+						<p>Eastern volcanic coasts, granite headlands and layered sedimentary islands each weather and erode in different ways. Landforms become easier to explain once the bedrock story is known.</p>
+					</article>
+				</div>
+			</section>
+		</div>
+	</div>
+
+	<script
+		src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+		integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+		crossorigin=""
+	></script>
+	<script>
+		const featureData = [
+			{
+				id: "tai-mo-shan",
+				name: "Tai Mo Shan",
+				coords: [22.4098, 114.1247],
+				altitude: "957 m",
+				typeLabel: "Relief feature",
+				shortType: "Peak",
+				tags: ["relief", "slope"],
+				summary: "Hong Kong's highest summit stands on rugged upland terrain and highlights the territory's overall steep relief.",
+				importance: "It is a clear example of how relief limits flat land, encourages rapid runoff and creates a strong contrast between upland catchments and the urban lowlands.",
+				geography: "The mountain rises well above surrounding districts and helps define the dissected upland core of the New Territories. Its steep gradients and exposed position make it ideal for discussing slope angle, drainage and microclimate.",
+				geology: "The upland area includes hard igneous rocks that resist erosion better than weaker materials. Weathering along joints still creates unstable debris on steep slopes, especially under heavy summer rain.",
+				exam: "Use Tai Mo Shan when explaining why settlement and transport avoid steep terrain and why intense rainfall can quickly trigger runoff and slope problems.",
+				card: "Highest peak; strong evidence that Hong Kong is a high-relief territory rather than a low plain.",
+				popup: "Highest summit and a key reference point for rugged upland relief."
+			},
+			{
+				id: "lantau-peak",
+				name: "Lantau Peak",
+				coords: [22.254, 113.9344],
+				altitude: "934 m",
+				typeLabel: "Relief feature",
+				shortType: "Peak",
+				tags: ["relief"],
+				summary: "A major peak on Lantau Island that demonstrates how steep relief continues beyond the urban core.",
+				importance: "The mountain shows that island topography in Hong Kong is often rugged, limiting large-scale settlement and leaving many slopes under country park protection.",
+				geography: "Its steep flanks feed short, flashy streams and force transport corridors and urban development into narrow coastal fringes such as Tung Chung and the north shore.",
+				geology: "Lantau includes volcanic and intrusive rocks. Differential resistance and structural weaknesses help shape the mountain mass and adjacent valleys.",
+				exam: "Good evidence for answers about constrained land use, steep island topography and the environmental importance of upland catchments.",
+				card: "Mountainous island relief with limited lowland space.",
+				popup: "Shows how Hong Kong's islands are also steep and mountainous."
+			},
+			{
+				id: "lion-rock",
+				name: "Lion Rock",
+				coords: [22.3524, 114.1884],
+				altitude: "495 m",
+				typeLabel: "Relief feature",
+				shortType: "Ridge",
+				tags: ["relief", "granite"],
+				summary: "A prominent ridge between Kowloon and the New Territories, famous for its steep-sided topography and structural strength.",
+				importance: "Lion Rock is a classic example of a resistant ridge standing above surrounding urban areas, making relief visible even inside the metropolitan zone.",
+				geography: "Its skyline dominance shows how closely city development in Hong Kong is pressed against steep uplands. The ridge also illustrates how narrow valley corridors channel movement.",
+				geology: "Resistant rock and joint-controlled weathering help the ridge retain a distinct form. Granite and related intrusive rocks often produce hard, durable hill masses.",
+				exam: "Useful for explaining urban pressure at the foot of steep hills and the way bedrock resistance can preserve prominent ridges.",
+				card: "A resistant ridge rising directly beside dense urban land.",
+				popup: "A clear ridge-form landform beside Hong Kong's urban districts."
+			},
+			{
+				id: "ma-on-shan",
+				name: "Ma On Shan ridge",
+				coords: [22.4187, 114.2434],
+				altitude: "702 m",
+				typeLabel: "Relief feature",
+				shortType: "Ridge",
+				tags: ["relief", "slope"],
+				summary: "A steep mountain ridge overlooking Tolo Harbour, linking uplifted relief with adjacent drowned coastline.",
+				importance: "This location allows direct comparison of mountain backslopes and sheltered coastal water within a very short distance.",
+				geography: "The ridge descends sharply towards coastal settlements, showing why drainage is short, slopes are steep and buildable land is scarce.",
+				geology: "Weathered rock, fractured bedrock and slope wash contribute to unstable conditions on very steep terrain, especially where vegetation cover is disturbed.",
+				exam: "Useful when describing the close relationship between upland relief and coastal development pressure.",
+				card: "Steep ridge above sheltered coastal water.",
+				popup: "Connects steep relief with adjacent Tolo Harbour."
+			},
+			{
+				id: "mid-levels-slopes",
+				name: "Mid-Levels engineered slopes",
+				coords: [22.2794, 114.1519],
+				altitude: "Urban slope belt",
+				typeLabel: "Slope feature",
+				shortType: "Cut slope",
+				tags: ["slope"],
+				summary: "Urban slopes on Hong Kong Island show how humans modify steep terrain to create roads, housing platforms and retaining structures.",
+				importance: "These slopes reveal that hazard management is a major part of living in a high-relief city with intense summer rainfall.",
+				geography: "Cut slopes, retaining walls and drainage systems are common wherever development climbs onto steeper land. They are evidence that flat sites are limited and engineering must compensate.",
+				geology: "Weathered rock and colluvium become unstable when saturated. Engineering reduces the chance of landslides by controlling water, reinforcing slope material and protecting exposed faces.",
+				exam: "A strong case study point when linking heavy rainfall, steep slopes, weathering and the need for slope safety works.",
+				card: "Human modification of steep slopes to create urban land.",
+				popup: "Shows how slope engineering supports urban expansion on steep ground."
+			},
+			{
+				id: "shing-mun-weathered-slope",
+				name: "Shing Mun weathered slopes",
+				coords: [22.3819, 114.1458],
+				altitude: "Catchment slopes",
+				typeLabel: "Slope feature",
+				shortType: "Weathered hillside",
+				tags: ["slope", "granite"],
+				summary: "Steep hillsides around the reservoir catchment show deep weathering, runoff concentration and the importance of vegetation cover.",
+				importance: "This area helps explain why natural slopes can fail as well as engineered ones, especially when prolonged rain saturates soil and regolith.",
+				geography: "Catchment slopes funnel water quickly into reservoirs and streams. The combination of gradient and rainfall encourages erosion and debris movement where slopes are exposed.",
+				geology: "Granitic terrain often develops thick weathered mantles. Once the decomposed material becomes saturated, shear strength falls and slope failure becomes more likely.",
+				exam: "Use it to discuss mass movement, catchment management and the role of vegetation in slope stability.",
+				card: "Weathered catchment slopes influenced by intense runoff.",
+				popup: "Illustrates deep weathering and slope instability risk in upland catchments."
+			},
+			{
+				id: "victoria-harbour",
+				name: "Victoria Harbour",
+				coords: [22.2944, 114.1689],
+				altitude: "Sea level",
+				typeLabel: "Coastal feature",
+				shortType: "Harbour",
+				tags: ["coast"],
+				summary: "Hong Kong's best-known harbour lies between Hong Kong Island and Kowloon and is a textbook example of sheltered water supporting intense human use.",
+				importance: "It demonstrates why a ria coastline matters economically: sheltered deep water encourages shipping, port activity and dense waterfront development.",
+				geography: "The harbour sits within an indented coast where water access is naturally protected from the strongest open-sea wave conditions. Reclamation has further modified the shoreline to create urban space.",
+				geology: "The harbour form reflects a drowned lowland corridor shaped by earlier erosion and later marine flooding. Resistant surrounding hills frame and shelter the water body.",
+				exam: "Use Victoria Harbour when linking physical geography to human geography: natural shelter, accessibility and reclamation all matter.",
+				card: "Sheltered ria water that supports port and urban growth.",
+				popup: "Classic sheltered harbour created within Hong Kong's drowned coastline."
+			},
+			{
+				id: "tolo-harbour",
+				name: "Tolo Harbour",
+				coords: [22.4444, 114.2333],
+				altitude: "Sea level",
+				typeLabel: "Coastal feature",
+				shortType: "Harbour",
+				tags: ["coast"],
+				summary: "A sheltered inlet in the northeast New Territories that clearly shows valley drowning and an irregular shoreline.",
+				importance: "The harbour is a strong example of a ria landscape because its long, indented shape reflects the flooding of former valleys and lowlands.",
+				geography: "The surrounding slopes descend directly to the water, leaving only narrow settlement zones around its edges. It is also sheltered enough for recreation, mariculture and coastal settlement.",
+				geology: "Rock structure and valley orientation influence the shape of the harbour. Erosion first carved the lowlands, and later sea-level rise flooded them.",
+				exam: "Useful for explaining the origin of a ria coast and the relationship between valley shape and present shoreline pattern.",
+				card: "Long inlet showing drowned-valley coastline.",
+				popup: "A strong visual example of a drowned valley system."
+			},
+			{
+				id: "deep-bay",
+				name: "Deep Bay",
+				coords: [22.4905, 113.995],
+				altitude: "Sea level",
+				typeLabel: "Coastal feature",
+				shortType: "Bay",
+				tags: ["coast"],
+				summary: "A broad bay on the northwestern side of Hong Kong where lower-energy conditions encourage mudflat and wetland development.",
+				importance: "Deep Bay shows that not every coastal feature is a steep rocky inlet. Sheltered settings can accumulate fine sediment instead of forming cliffs.",
+				geography: "Reduced wave energy and shallow water allow deposition, creating mudflats and ecologically important wetland zones around the bay margin.",
+				geology: "Its sediment-rich setting reflects active deposition rather than dominant rock-coast erosion. Fine material can settle where energy is low.",
+				exam: "Use Deep Bay to contrast depositional coastal environments with the harder, wave-cut coasts of eastern Hong Kong.",
+				card: "Sheltered bay with lower-energy depositional conditions.",
+				popup: "Contrasts with the harder and more erosional eastern coast."
+			},
+			{
+				id: "port-shelter",
+				name: "Port Shelter",
+				coords: [22.3617, 114.2988],
+				altitude: "Sea level",
+				typeLabel: "Coastal feature",
+				shortType: "Bay",
+				tags: ["coast", "volcanic"],
+				summary: "An extensive sheltered water body bordered by rugged peninsulas and islands, ideal for reading headland-bay complexity.",
+				importance: "Port Shelter demonstrates how drowned valleys, resistant rock and island fragmentation combine to make a very intricate coastline.",
+				geography: "Its shape provides many coves and small channels, with slopes descending steeply into the sea. Such water bodies are naturally attractive for boating, fish culture and marine recreation.",
+				geology: "Volcanic rocks in eastern Hong Kong help create hard, resistant coastal scenery. Structural weaknesses still guide erosion and inlet formation.",
+				exam: "Useful when describing why eastern Hong Kong has both sheltered water and dramatic hard-rock coasts.",
+				card: "Sheltered ria water surrounded by resistant rocky coasts.",
+				popup: "Shows complex headland-bay patterns in eastern Hong Kong."
+			},
+			{
+				id: "plover-cove",
+				name: "Plover Cove",
+				coords: [22.4772, 114.266],
+				altitude: "Sea level",
+				typeLabel: "Coastal feature",
+				shortType: "Cove",
+				tags: ["coast", "sedimentary"],
+				summary: "A northeastern cove whose shape and surrounding rock exposures help illustrate the relationship between coastlines and local geological structure.",
+				importance: "It is useful for connecting drowned coastlines with nearby sedimentary outcrops and structurally guided erosion.",
+				geography: "The cove form reflects an indented shore and sheltered water, while nearby ridges and slopes show strong relief close to the coast.",
+				geology: "Sedimentary sequences and structural lines help explain local contrasts in resistance, slope shape and coastal retreat.",
+				exam: "A good example when you need to combine coast, relief and rock structure in one explanation.",
+				card: "Indented northeastern cove with structural influence.",
+				popup: "Useful for linking coast shape to surrounding rock structure."
+			},
+			{
+				id: "sai-kung-columns",
+				name: "Sai Kung East hexagonal columns",
+				coords: [22.3659, 114.3618],
+				altitude: "Cliff coast",
+				typeLabel: "Geological feature",
+				shortType: "Volcanic columns",
+				tags: ["volcanic"],
+				summary: "This is one of Hong Kong's most spectacular volcanic landscapes, where cooling joints formed large hexagonal rock columns.",
+				importance: "It provides direct visual evidence that eastern Hong Kong was shaped by explosive volcanism and later coastal erosion.",
+				geography: "The columns stand along a dramatic rocky coastline, helping create cliffs and resistant headlands that contrast sharply with low-energy bays elsewhere.",
+				geology: "Cooling contraction in thick volcanic material produced the joint pattern. Wave attack then exploited fractures, exposing the columns in sea cliffs.",
+				exam: "Use this site to show how geological structure controls landform appearance and why eastern Hong Kong is famous for striking coastal scenery.",
+				card: "Volcanic jointing exposed by coastal erosion.",
+				popup: "One of the clearest volcanic structure sites in Hong Kong."
+			},
+			{
+				id: "high-island-east-dam",
+				name: "High Island East Dam",
+				coords: [22.3813, 114.3704],
+				altitude: "Coastal cliffs",
+				typeLabel: "Geological feature",
+				shortType: "Volcanic coast",
+				tags: ["volcanic", "coast"],
+				summary: "The East Dam area exposes resistant volcanic rock and dramatic sea cliffs at the edge of the Sai Kung volcanic field.",
+				importance: "It is ideal for reading the interaction of hard bedrock, wave erosion and engineered coastal access.",
+				geography: "The site sits where steep relief meets the open sea. Resistant cliffs and rough coastal morphology reflect strong marine erosion on hard rock.",
+				geology: "Rhyolitic tuffs and related volcanic rocks dominate the area. Jointing and differential weathering guide the shape of cliffs and detached blocks.",
+				exam: "A good place to explain why hard volcanic coasts tend to form steep cliffs rather than wide depositional beaches.",
+				card: "Resistant volcanic coast with exposed cliffs and joints.",
+				popup: "Hard volcanic bedrock creates a dramatic erosional coast."
+			},
+			{
+				id: "shek-o-granite",
+				name: "Shek O granite coast",
+				coords: [22.2368, 114.2519],
+				altitude: "Headland coast",
+				typeLabel: "Geological feature",
+				shortType: "Granite coast",
+				tags: ["granite", "coast"],
+				summary: "The rocky coast around Shek O helps show how granite produces rounded blocks, jointed outcrops and resistant headlands.",
+				importance: "It contrasts well with eastern volcanic sites by showing a different bedrock type and a different style of weathering and erosion.",
+				geography: "Headlands and embayments are shaped by wave attack, but the details of cliff profile and boulder distribution reflect the properties of the granite.",
+				geology: "Granite cools slowly underground, creating coarse crystals. Later unloading and jointing promote block disintegration and spheroidal weathering, which can produce rounded forms.",
+				exam: "Use Shek O when contrasting granite with volcanic rocks in terms of texture, structure and resulting coastal landforms.",
+				card: "Granite weathering and erosion visible along an exposed coast.",
+				popup: "A strong contrast site for granite landforms and weathering."
+			},
+			{
+				id: "po-toi",
+				name: "Po Toi Island sea-worn granite",
+				coords: [22.1607, 114.2674],
+				altitude: "Exposed island coast",
+				typeLabel: "Geological feature",
+				shortType: "Granite headland",
+				tags: ["granite", "coast"],
+				summary: "Po Toi is known for wave-sculpted granite and exposed coastal rock forms that reflect strong marine erosion on resistant bedrock.",
+				importance: "It shows how granite can produce unusual coastal scenery when joints and wave attack work together over long periods.",
+				geography: "The island is exposed to energetic marine conditions, so cliffs, notches and isolated rocky forms are common around the coast.",
+				geology: "Joint patterns guide erosion, while spheroidal weathering and block separation help create distinctive boulder and tors-like forms.",
+				exam: "Useful for demonstrating how structure and exposure together shape hard-rock coastal landforms.",
+				card: "Marine erosion acting on jointed granite.",
+				popup: "Exposed granite coast with strong evidence of wave attack."
+			},
+			{
+				id: "tung-ping-chau",
+				name: "Tung Ping Chau",
+				coords: [22.5475, 114.4337],
+				altitude: "Layered low island",
+				typeLabel: "Geological feature",
+				shortType: "Sedimentary island",
+				tags: ["sedimentary"],
+				summary: "This island is famous for layered sedimentary rocks that reveal bedding planes, differential erosion and step-like coastal profiles.",
+				importance: "It is one of the clearest places in Hong Kong to show that sedimentary structure directly controls landscape form.",
+				geography: "Coastal benches, notches and retreat patterns can be traced along the bedding. The scenery is very different from the more massive igneous rock coasts elsewhere.",
+				geology: "Layered sediments were deposited in quieter environments and later lithified. Differences in hardness between beds create alternating resistant and weak layers.",
+				exam: "Use Tung Ping Chau to explain bedding, differential erosion and why sedimentary coasts often show step-like structure.",
+				card: "Layered sedimentary rocks exposed in coastal retreat.",
+				popup: "Best-known sedimentary rock landscape in Hong Kong."
+			},
+			{
+				id: "bluff-head",
+				name: "Bluff Head sedimentary cliffs",
+				coords: [22.5282, 114.3032],
+				altitude: "Sedimentary coast",
+				typeLabel: "Geological feature",
+				shortType: "Sedimentary cliff",
+				tags: ["sedimentary", "coast"],
+				summary: "Sedimentary cliffs near the northeastern coast reveal structure, bedding and the influence of differential erosion on cliff retreat.",
+				importance: "This is another useful sedimentary contrast site and helps show that not all cliffed coasts are made of igneous rock.",
+				geography: "The coastline is rugged, but the cliff profile often follows rock structure more closely than in massive unlayered rocks.",
+				geology: "Sedimentary beds offer lines of weakness that waves and weathering can exploit. The resulting landforms may include ledges, narrow platforms and uneven cliff faces.",
+				exam: "Useful when comparing how rock structure influences cliff form in sedimentary and igneous environments.",
+				card: "Cliffs shaped by layered rock structure.",
+				popup: "Sedimentary coastal structure visible in the cliff profile."
+			},
+			{
+				id: "kam-tin-plain",
+				name: "Kam Tin plain",
+				coords: [22.4388, 114.0642],
+				altitude: "Lowland plain",
+				typeLabel: "Relief feature",
+				shortType: "Lowland plain",
+				tags: ["relief", "coast"],
+				summary: "One of the clearer lowland areas in the New Territories, contrasting strongly with the surrounding hills.",
+				importance: "The plain shows how rare flatter land is in Hong Kong and why lowland zones are so important for agriculture, transport and settlement.",
+				geography: "Compared with adjacent uplands, gradients are gentle and land is far easier to cultivate or develop. This makes the contrast between plain and hill especially valuable.",
+				geology: "Lowland areas often accumulate alluvium and other loose deposits, unlike the more resistant upland bedrock slopes nearby.",
+				exam: "Use it to contrast lowland plains with mountainous terrain and to explain why level land has high strategic and economic value.",
+				card: "A relatively flat plain within a mostly rugged territory.",
+				popup: "Shows the importance of the small amount of flatter land in Hong Kong."
+			},
+			{
+				id: "clear-water-bay-cliffs",
+				name: "Clear Water Bay cliffs",
+				coords: [22.2843, 114.2999],
+				altitude: "Sea cliffs",
+				typeLabel: "Coastal feature",
+				shortType: "Sea cliffs",
+				tags: ["coast", "volcanic"],
+				summary: "This exposed coast shows how wave attack acts on resistant bedrock to produce cliffs and rough headlands.",
+				importance: "It is a helpful site for distinguishing between sheltered embayments and high-energy erosional coasts.",
+				geography: "The coastline faces stronger marine energy than inner harbours, so cliffing and rock exposure are more important than quiet-water deposition.",
+				geology: "Volcanic rocks in this region are resistant enough to maintain steep rocky coastlines, while fractures guide local erosion.",
+				exam: "Useful when comparing hard-rock erosional coasts with lower-energy bays and harbours.",
+				card: "High-energy rocky coast with strong marine erosion.",
+				popup: "An exposed erosional coast in southeastern Hong Kong."
+			},
+			{
+				id: "sunset-peak",
+				name: "Sunset Peak",
+				coords: [22.2694, 113.9527],
+				altitude: "869 m",
+				typeLabel: "Relief feature",
+				shortType: "Peak",
+				tags: ["relief", "slope"],
+				summary: "A major Lantau summit that helps show how rugged upland relief dominates much of western Hong Kong.",
+				importance: "Together with Lantau Peak, it shows that even areas away from the main urban core can rise sharply to high elevations.",
+				geography: "The summit overlooks steep valleys and narrow coastal fringes, reinforcing the idea that level land is scarce and often disconnected.",
+				geology: "Volcanic and intrusive rocks, structural weakness and intense weathering together shape the broad upland mass and steep side slopes.",
+				exam: "Useful as added evidence when explaining why Hong Kong's relief is not limited to one mountain block.",
+				card: "High Lantau upland showing strong relief contrast.",
+				popup: "One of Hong Kong's highest peaks on the Lantau uplands."
+			},
+			{
+				id: "needle-hill",
+				name: "Needle Hill",
+				coords: [22.3904, 114.1556],
+				altitude: "532 m",
+				typeLabel: "Relief feature",
+				shortType: "Peak",
+				tags: ["relief", "slope"],
+				summary: "A sharp peak near the Shing Mun uplands that reinforces the dissected nature of central New Territories relief.",
+				importance: "Its steep-sided form is useful for discussing narrow ridge crests, short streams and rapid runoff concentration.",
+				geography: "The peak lies close to major urban districts, demonstrating again how tightly settlements are pressed against upland terrain.",
+				geology: "Jointed bedrock and deep weathering along steep slopes increase debris production and instability during intense rain.",
+				exam: "Useful when you need more than one named example of steep, dissected relief in the New Territories.",
+				card: "Sharp central peak with steep runoff-producing slopes.",
+				popup: "A steep peak reinforcing Hong Kong's rugged upland character."
+			},
+			{
+				id: "pat-sin-leng",
+				name: "Pat Sin Leng ridge",
+				coords: [22.5099, 114.221],
+				altitude: "Multiple peaks above 500 m",
+				typeLabel: "Relief feature",
+				shortType: "Ridge chain",
+				tags: ["relief", "sedimentary"],
+				summary: "This long northeastern ridge system stands above Plover Cove and helps show the strong contrast between mountain backbones and drowned coastal inlets.",
+				importance: "It is a good place to compare ridge topography with ria coastline in the same field of view.",
+				geography: "The ridge chain forms a dramatic skyline and leaves only narrow lower ground near the coast, limiting settlement and transport corridors.",
+				geology: "Structural control and rock resistance help maintain the ridge, while nearby sedimentary exposures aid explanation of slope and cliff differences.",
+				exam: "Useful for combined answers on relief, coastal drowning and structure-guided landforms.",
+				card: "Long ridge chain overlooking drowned northeastern inlets.",
+				popup: "A prominent northeastern ridge above Plover Cove."
+			},
+			{
+				id: "sharp-peak",
+				name: "Sharp Peak",
+				coords: [22.3947, 114.3707],
+				altitude: "468 m",
+				typeLabel: "Relief feature",
+				shortType: "Conical peak",
+				tags: ["relief", "volcanic"],
+				summary: "A very steep peak in Sai Kung that emphasizes the close link between volcanic terrain and dramatic relief.",
+				importance: "Its steep conical slopes make it an effective visual example of rugged volcanic topography near the coast.",
+				geography: "The peak rises directly behind the Tai Long Wan coast, showing how little transition there can be between coastal lowland and mountain slope in Hong Kong.",
+				geology: "Volcanic rocks and structural controls maintain a strong relief profile, while weathering and marine proximity accentuate local landscape contrast.",
+				exam: "Useful for answers linking eastern volcanic terrain with steep coastal mountains.",
+				card: "Steep volcanic peak rising close to the coast.",
+				popup: "A dramatic steep-sided peak in eastern Hong Kong."
+			},
+			{
+				id: "tai-long-wan",
+				name: "Tai Long Wan",
+				coords: [22.3840, 114.3445],
+				altitude: "Sea level bay",
+				typeLabel: "Coastal feature",
+				shortType: "Bay",
+				tags: ["coast", "volcanic"],
+				summary: "A well-known bay in eastern Hong Kong where exposed coastal scenery contrasts with sheltered inner harbours.",
+				importance: "It helps distinguish between open-coast wave action and lower-energy ria environments.",
+				geography: "The bay is more exposed to marine energy than Victoria Harbour or Tolo Harbour, so beach and cliff processes reflect stronger open-sea influence.",
+				geology: "Resistant volcanic rocks frame the bay and nearby headlands, influencing coastal profile and sediment distribution.",
+				exam: "Useful for comparing high-energy open bays with more sheltered drowned inlets.",
+				card: "Open bay framed by steep eastern volcanic terrain.",
+				popup: "An exposed eastern bay contrasting with more sheltered waters."
+			},
+			{
+				id: "starling-inlet",
+				name: "Starling Inlet",
+				coords: [22.5338, 114.2736],
+				altitude: "Sea level inlet",
+				typeLabel: "Coastal feature",
+				shortType: "Inlet",
+				tags: ["coast", "sedimentary"],
+				summary: "A deeply indented northeastern inlet that helps illustrate the irregularity of Hong Kong's drowned coast.",
+				importance: "Its branching shoreline provides strong evidence that flooding affected a pre-existing lowland and valley system.",
+				geography: "The narrow arms and sheltered waters show how ria coastlines preserve the shape of earlier drainage lines.",
+				geology: "Local rock structure influences valley orientation and coastal detail, while the present inlet reflects later marine flooding.",
+				exam: "Useful if you need another named example of a drowned and highly indented inlet in northeastern Hong Kong.",
+				card: "Branching ria inlet showing drowned valley pattern.",
+				popup: "A highly indented inlet in the northeast New Territories."
+			},
+			{
+				id: "cape-daguilar",
+				name: "Cape D'Aguilar coast",
+				coords: [22.2148, 114.2512],
+				altitude: "Headland coast",
+				typeLabel: "Geological feature",
+				shortType: "Granite headland",
+				tags: ["granite", "coast"],
+				summary: "This southeastern headland exposes hard coastal bedrock and shows the effect of marine erosion on resistant rock.",
+				importance: "It broadens the granite-coast examples beyond Shek O and Po Toi, giving the map better spatial coverage.",
+				geography: "The exposed position encourages cliffing, notching and strong wave attack compared with more sheltered inner waters.",
+				geology: "Jointed granitic rock responds to unloading and wave erosion by forming rugged outcrops, blocky ledges and resistant headlands.",
+				exam: "Useful as another named example when comparing granite headlands with volcanic coasts.",
+				card: "Exposed granite headland shaped by wave attack.",
+				popup: "A granite headland on Hong Kong Island's southeastern coast."
+			},
+			{
+				id: "tung-lung-chau",
+				name: "Tung Lung Chau volcanic coast",
+				coords: [22.2384, 114.2978],
+				altitude: "Island coast",
+				typeLabel: "Geological feature",
+				shortType: "Volcanic island",
+				tags: ["volcanic", "coast"],
+				summary: "An island with resistant volcanic rock, coastal cliffs and visible structural control of erosion.",
+				importance: "It extends the volcanic-coast examples south of Sai Kung and shows that similar processes occur on offshore islands too.",
+				geography: "Its exposed coast faces stronger marine energy, so erosional forms are especially visible.",
+				geology: "Volcanic rocks and fractures guide cliff retreat, block separation and the shape of small inlets around the island.",
+				exam: "Useful for comparing offshore volcanic coasts with sheltered ria waters inside the territory.",
+				card: "Offshore volcanic island with exposed rocky coast.",
+				popup: "An exposed volcanic island coast southeast of Hong Kong Island."
+			},
+			{
+				id: "sha-tin-hoi",
+				name: "Sha Tin Hoi",
+				coords: [22.3874, 114.2025],
+				altitude: "Sea level inlet",
+				typeLabel: "Coastal feature",
+				shortType: "Inner inlet",
+				tags: ["coast"],
+				summary: "An inner sheltered inlet connected to Tolo Harbour, useful for showing how ria coastlines penetrate inland.",
+				importance: "It demonstrates how drowned coastal systems can extend inland and influence urban development along narrow lowland margins.",
+				geography: "The water body reaches into built-up districts, showing the close relationship between lowland settlement and drowned coastline features.",
+				geology: "The inlet follows a lowland corridor created by earlier erosion before later marine inundation.",
+				exam: "Useful when explaining how drowned valley coastlines create sheltered inland-facing waters.",
+				card: "Sheltered inner inlet penetrating into urban lowland.",
+				popup: "An inland-reaching sheltered inlet linked to Tolo Harbour."
+			},
+			{
+				id: "ninepin-group",
+				name: "Ninepin Group volcanic islands",
+				coords: [22.2691, 114.3826],
+				altitude: "Rocky island group",
+				typeLabel: "Geological feature",
+				shortType: "Volcanic islands",
+				tags: ["volcanic", "coast"],
+				summary: "A group of exposed volcanic islands showing dramatic cliffed coasts, jointed rock and strong marine erosion.",
+				importance: "These islands strengthen the map's coverage of eastern Hong Kong's volcanic seascape.",
+				geography: "Their offshore position exposes them to energetic wave conditions, so rugged rocky landforms dominate.",
+				geology: "Volcanic rocks and fractures control the shape of cliffs, stacks and detached blocks around the islands.",
+				exam: "Useful for describing highly exposed hard-rock island coasts in eastern Hong Kong.",
+				card: "Offshore volcanic islands with cliffed erosional coasts.",
+				popup: "Exposed volcanic islands in Hong Kong's eastern waters."
+			}
+		];
+
+		const filterConfig = {
+			all: { label: "All features", color: "#1d2a2f" },
+			relief: { label: "Hills and ridges", color: getCssValue("--ridge") },
+			slope: { label: "Slopes and weathering", color: getCssValue("--slope") },
+			coast: { label: "Harbours and bays", color: getCssValue("--sea-dark") },
+			volcanic: { label: "Volcanic coast", color: getCssValue("--volcanic") },
+			granite: { label: "Granite landforms", color: getCssValue("--granite") },
+			sedimentary: { label: "Sedimentary rocks", color: getCssValue("--sedimentary") }
+		};
+
+		const processContent = {
+			volcanic: {
+				title: "Volcanic tuff and the eastern cliffs",
+				summary: "Pyroclastic material from ancient eruptions consolidated into hard volcanic rock. Cooling fractures and later marine erosion helped create very steep coastal scenery in eastern Hong Kong.",
+				nodes: [
+					{ title: "Explosive eruption", text: "Ash and pyroclastic material spread over large areas.", color: "linear-gradient(135deg, #d46e44, #9c3f26)" },
+					{ title: "Cooling and jointing", text: "Contraction created fractures, sometimes in striking geometric patterns.", color: "linear-gradient(135deg, #cb8a5d, #a35533)" },
+					{ title: "Coastal exposure", text: "Waves erode cliffs and reveal the internal structure of the rock.", color: "linear-gradient(135deg, #34718d, #214e62)" }
+				],
+				points: [
+					"Resistant volcanic rocks help eastern Hong Kong keep steep sea cliffs and headlands.",
+					"Joint patterns guide wave attack, so structure matters as much as rock hardness.",
+					"The hexagonal columns near Sai Kung are evidence of cooling processes, not sedimentary layering."
+				]
+			},
+			granite: {
+				title: "Granite, jointing and rounded rock forms",
+				summary: "Granite formed slowly underground, so it developed coarse crystals. Once exposed, unloading, jointing and weathering helped break the rock into blocks and rounded boulders.",
+				nodes: [
+					{ title: "Intrusion", text: "Magma cooled slowly below ground to form coarse-grained granite.", color: "linear-gradient(135deg, #e0b16a, #b98243)" },
+					{ title: "Joint development", text: "Pressure release opened fractures that divide the rock mass.", color: "linear-gradient(135deg, #c89a65, #9d6d3f)" },
+					{ title: "Weathering and waves", text: "Blocks round off and coastlines develop headlands, boulders and tors-like forms.", color: "linear-gradient(135deg, #6989a0, #3f6178)" }
+				],
+				points: [
+					"Granite commonly shows block disintegration and spheroidal weathering along joints.",
+					"Rounded boulders and headlands at sites such as Shek O and Po Toi reflect both rock structure and marine erosion.",
+					"Granite is different from volcanic tuff because it is intrusive, coarse-grained and usually lacks layered bedding."
+				]
+			},
+			sedimentary: {
+				title: "Sedimentary layers and differential erosion",
+				summary: "Layered rocks record deposition in different environments. Once uplifted and exposed at the coast, weaker beds erode faster than resistant ones, producing ledges and stepped profiles.",
+				nodes: [
+					{ title: "Deposition", text: "Sediments accumulated in layers under changing conditions.", color: "linear-gradient(135deg, #7ea2bc, #4f728d)" },
+					{ title: "Lithification", text: "Pressure and cementation turned the sediments into layered rock.", color: "linear-gradient(135deg, #6789a4, #45637d)" },
+					{ title: "Differential erosion", text: "Wave attack exploits weaker beds and bedding planes first.", color: "linear-gradient(135deg, #446173, #243945)" }
+				],
+				points: [
+					"Tung Ping Chau is the clearest local example of visible bedding planes shaping the coast.",
+					"Sedimentary rocks often create step-like landforms because not all layers have the same resistance.",
+					"When you see repeated horizontal or gently dipping layers, think structure first, then erosion."
+				]
+			},
+			slope: {
+				title: "Steep slopes, heavy rainfall and instability",
+				summary: "Hong Kong combines steep gradients with deep weathering and intense rainstorms. That combination makes both natural and human-modified slopes vulnerable to failure unless drainage and reinforcement are effective.",
+				nodes: [
+					{ title: "Weathering", text: "Warm humid conditions weaken rock and build a mantle of decomposed material.", color: "linear-gradient(135deg, #916248, #674232)" },
+					{ title: "Rainfall saturation", text: "Water raises pore pressure and reduces the strength of slope materials.", color: "linear-gradient(135deg, #6d8997, #44616f)" },
+					{ title: "Mass movement", text: "Debris slides or rock falls occur unless slopes are drained and stabilised.", color: "linear-gradient(135deg, #b46f52, #7e4732)" }
+				],
+				points: [
+					"Slope angle, weathered material, vegetation cover and drainage all influence stability.",
+					"Cut slopes can fail because human modification changes the balance of forces on a hillside.",
+					"In Hong Kong, slope management is a major adaptation to living in a rugged, high-rainfall environment."
+				]
+			}
+		};
+
+		const quizData = [
+			{
+				topic: "Coastline",
+				question: "Which statement best explains why Victoria Harbour became such a valuable harbour site?",
+				options: [
+					"It is a wide sandy bay built entirely by deposition.",
+					"It provides sheltered water within a drowned and irregular coastline.",
+					"It exists because sedimentary rocks always form deep channels.",
+					"It is located on the highest part of Hong Kong Island."
+				],
+				answer: 1,
+				explanation: "Victoria Harbour sits in naturally sheltered water within Hong Kong's drowned coastline. Shelter and accessibility matter far more than beach deposition or elevation."
+			},
+			{
+				topic: "Geology",
+				question: "Why are the hexagonal columns in eastern Hong Kong strong evidence of volcanic origin?",
+				options: [
+					"They formed when river sediment settled in even layers.",
+					"They are cooling joints produced as thick volcanic material contracted.",
+					"They are coral structures that later became rock.",
+					"They were cut by people to make the cliff look regular."
+				],
+				answer: 1,
+				explanation: "Columnar jointing forms when hot volcanic material cools and contracts. The pattern is structural evidence linked to a volcanic history, not deposition."
+			},
+			{
+				topic: "Slope processes",
+				question: "Why is slope management so important in Hong Kong?",
+				options: [
+					"Because most of Hong Kong is perfectly flat and poorly drained.",
+					"Because intense rainfall acts on steep, weathered slopes in a densely used territory.",
+					"Because sea cliffs are the only hazardous landform in Hong Kong.",
+					"Because granite cannot be weathered in humid climates."
+				],
+				answer: 1,
+				explanation: "Steep slopes, deeply weathered materials and intense summer rainfall increase instability. Dense urban development means slope failure poses serious risk."
+			}
+		];
+
+		const defaultBounds = L.latLngBounds([
+			[22.14, 113.83],
+			[22.58, 114.46]
+		]);
+
+		const map = L.map("hk-map", {
+			zoomControl: true,
+			minZoom: 9,
+			maxZoom: 19,
+			zoomSnap: 0.5
+		});
+
+		const topoTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+			subdomains: "abcd",
+			maxZoom: 20,
+			maxNativeZoom: 20,
+			attribution: "&copy; OpenStreetMap contributors &copy; CARTO"
+		});
+
+		map.createPane("hillshade-pane");
+		map.getPane("hillshade-pane").style.zIndex = 240;
+		map.getPane("hillshade-pane").style.mixBlendMode = "multiply";
+
+		const hillshadeTiles = L.tileLayer("https://services.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}", {
+			pane: "hillshade-pane",
+			maxZoom: 19,
+			maxNativeZoom: 19,
+			opacity: 0.42,
+			attribution: "Hillshade &copy; Esri, Airbus DS, USGS, NGA, NASA and partners"
+		});
+
+		let fallbackTerrainOnly = false;
+		topoTiles.on("tileerror", () => {
+			if (fallbackTerrainOnly) return;
+			fallbackTerrainOnly = true;
+			map.removeLayer(topoTiles);
+			document.getElementById("hk-map").classList.add("map-fallback");
+		});
+
+		hillshadeTiles.on("tileerror", () => {
+			hillshadeTiles.setOpacity(0.22);
+		});
+
+		topoTiles.addTo(map);
+		hillshadeTiles.addTo(map);
+
+		map.fitBounds(defaultBounds, { padding: [10, 10] });
+
+		const markerLayer = L.layerGroup().addTo(map);
+		const markersById = new Map();
+		let activeFilter = "all";
+		let selectedFeatureId = featureData[0].id;
+
+		const featureTitle = document.getElementById("feature-title");
+		const featureTypeBadge = document.getElementById("feature-type-badge");
+		const featureSummary = document.getElementById("feature-summary");
+		const featureImportance = document.getElementById("feature-importance");
+		const featureGeography = document.getElementById("feature-geography");
+		const featureGeology = document.getElementById("feature-geology");
+		const featureExam = document.getElementById("feature-exam");
+		const featurePrecision = document.getElementById("feature-precision");
+		const featureTags = document.getElementById("feature-tags");
+		const featureList = document.getElementById("feature-list");
+		const featureCount = document.getElementById("feature-count");
+		const filterBar = document.getElementById("filter-bar");
+		const mapPanel = document.querySelector(".map-panel");
+		const fullscreenButton = document.getElementById("toggle-fullscreen");
+
+		const pinpointFeatureIds = new Set([
+			"tai-mo-shan",
+			"lantau-peak",
+			"sunset-peak",
+			"needle-hill",
+			"sharp-peak",
+			"high-island-east-dam"
+		]);
+
+		function getCssValue(name) {
+			return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+		}
+
+		function getPrimaryColor(tags) {
+			if (tags.includes("volcanic")) return getCssValue("--volcanic");
+			if (tags.includes("granite")) return getCssValue("--granite");
+			if (tags.includes("sedimentary")) return getCssValue("--sedimentary");
+			if (tags.includes("coast")) return getCssValue("--sea-dark");
+			if (tags.includes("slope")) return getCssValue("--slope");
+			return getCssValue("--ridge");
+		}
+
+		function getPrecisionText(feature) {
+			if (pinpointFeatureIds.has(feature.id)) {
+				return "This marker is used as a discrete site location. It can be positioned closely on a summit or named point, but the map still cannot guarantee a literal 1 mm on-screen error because screen size, zoom level, projection and tile resolution all vary.";
+			}
+
+			return "This marker is a representative study location, not a mathematically exact edge or centre. That is necessary because this feature is spatially broad, elongated or irregular, for example a ridge, harbour, bay, coastline, slope belt or plain.";
+		}
+
+		// --- Coordinate overrides (autosave to localStorage) ---
+		const OVERRIDES_KEY = "geog_feature_coords_overrides_v1";
+		let coordOverrides = {};
+
+		function loadOverrides() {
+			try {
+				const raw = localStorage.getItem(OVERRIDES_KEY);
+				if (!raw) return;
+				coordOverrides = JSON.parse(raw) || {};
+				Object.keys(coordOverrides).forEach((id) => {
+					const f = featureData.find((x) => x.id === id);
+					if (f && Array.isArray(coordOverrides[id]) && coordOverrides[id].length === 2) {
+						f.coords = [parseFloat(coordOverrides[id][0]), parseFloat(coordOverrides[id][1])];
+					}
+				});
+				console.log("Loaded coordinate overrides:", coordOverrides);
+			} catch (e) {
+				console.warn("Failed to load coord overrides", e);
+			}
+		}
+
+		function saveOverrides() {
+			try {
+				localStorage.setItem(OVERRIDES_KEY, JSON.stringify(coordOverrides));
+				console.log("Saved coordinate overrides", coordOverrides);
+			} catch (e) {
+				console.warn("Failed to save coord overrides", e);
+			}
+		}
+
+		function clearOverrides() {
+			coordOverrides = {};
+			localStorage.removeItem(OVERRIDES_KEY);
+			renderMarkers();
+			renderSelection();
+			alert("Saved coordinate overrides cleared.");
+		}
+
+		function downloadOverrides() {
+			const payload = JSON.stringify(coordOverrides, null, 2);
+			const blob = new Blob([payload], { type: "application/json" });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = "geog-coords-overrides.json";
+			document.body.appendChild(a);
+			a.click();
+			a.remove();
+			URL.revokeObjectURL(url);
+		}
+
+		function matchesFilter(feature, filter) {
+			return filter === "all" || feature.tags.includes(filter);
+		}
+
+		function getVisibleFeatures() {
+			return featureData.filter((feature) => matchesFilter(feature, activeFilter));
+		}
+
+		function buildMarker(feature) {
+			const color = getPrimaryColor(feature.tags);
+			const isPinpoint = pinpointFeatureIds.has(feature.id);
+			const marker = L.circleMarker(feature.coords, {
+				radius: isPinpoint ? 8.5 : (feature.tags.includes("relief") ? 10 : 9),
+				color: "#fff7ed",
+				weight: isPinpoint ? 3 : 2,
+				dashArray: isPinpoint ? null : "4 3",
+				fillColor: color,
+				fillOpacity: isPinpoint ? 0.98 : 0.88
+			});
+
+			marker.bindPopup(`
+				<div class="popup-title">${feature.name}</div>
+				<div class="popup-body">${feature.popup}${feature.altitude ? ` <br><strong>${feature.altitude}</strong>` : ""}<br><strong>${isPinpoint ? "Pinpoint site" : "Representative study pin"}</strong></div>
+			`);
+
+			marker.on("click", () => {
+				selectedFeatureId = feature.id;
+				renderSelection();
+				renderFeatureList();
+			});
+
+			return marker;
+		}
+
+		function renderMarkers() {
+			markerLayer.clearLayers();
+			markersById.clear();
+
+			getVisibleFeatures().forEach((feature) => {
+				const marker = buildMarker(feature);
+				markersById.set(feature.id, marker);
+				marker.addTo(markerLayer);
+			});
+		}
+
+		function renderFeatureList() {
+			const visibleFeatures = getVisibleFeatures();
+			featureCount.textContent = `${visibleFeatures.length} feature${visibleFeatures.length === 1 ? "" : "s"} shown`;
+			featureList.innerHTML = visibleFeatures.map((feature) => {
+				const activeClass = feature.id === selectedFeatureId ? " active" : "";
+				const tags = feature.tags.map((tag) => `<span class="mini-tag">${filterConfig[tag].label}</span>`).join("");
+				return `
+					<button class="feature-item${activeClass}" type="button" data-id="${feature.id}">
+						<strong>${feature.name}</strong>
+						<p>${feature.card}</p>
+						<div class="tag-row">${tags}</div>
+					</button>
+				`;
+			}).join("");
+
+			Array.from(featureList.querySelectorAll(".feature-item")).forEach((button) => {
+				button.addEventListener("click", () => {
+					selectedFeatureId = button.dataset.id;
+					renderSelection();
+					renderFeatureList();
+				});
+			});
+		}
+
+		function renderSelection() {
+			const visibleFeatures = getVisibleFeatures();
+			const selectedFeature = visibleFeatures.find((feature) => feature.id === selectedFeatureId) || visibleFeatures[0] || featureData[0];
+			selectedFeatureId = selectedFeature.id;
+
+			featureTypeBadge.textContent = `${selectedFeature.typeLabel} · ${selectedFeature.shortType}`;
+			featureTitle.textContent = selectedFeature.name;
+			featureSummary.textContent = selectedFeature.summary;
+			featureImportance.textContent = selectedFeature.importance;
+			featureGeography.textContent = selectedFeature.geography;
+			featureGeology.textContent = selectedFeature.geology;
+			featurePrecision.textContent = getPrecisionText(selectedFeature);
+			featureExam.textContent = selectedFeature.exam;
+			const altTag = selectedFeature.altitude ? `<span class="mini-tag">${selectedFeature.altitude}</span>` : "";
+			featureTags.innerHTML = altTag + selectedFeature.tags.map((tag) => `<span class="mini-tag">${filterConfig[tag].label}</span>`).join("");
+
+			const marker = markersById.get(selectedFeature.id);
+			if (marker) {
+				map.flyTo(selectedFeature.coords, Math.max(map.getZoom(), 11), {
+					duration: 0.7
+				});
+				marker.openPopup();
+			}
+
+			// update reposition UI state
+			const repositionBtn = document.getElementById("reposition-btn");
+			const coordInput = document.getElementById("coord-input");
+			const repositionHint = document.getElementById("reposition-hint");
+			if (repositionBtn) {
+				repositionBtn.dataset.id = selectedFeature.id;
+				coordInput.value = selectedFeature.coords[0].toFixed(6) + "," + selectedFeature.coords[1].toFixed(6);
+				repositionHint.style.display = "none";
+			}
+		}
+
+		function setFilter(filter) {
+			activeFilter = filter;
+			Array.from(filterBar.querySelectorAll(".filter-chip")).forEach((button) => {
+				button.classList.toggle("active", button.dataset.filter === filter);
+			});
+			renderMarkers();
+			renderSelection();
+			renderFeatureList();
+		}
+
+		// --- Repositioning helpers ---
+		let repositionMode = false;
+		let repositionTargetId = null;
+
+		document.getElementById("reposition-btn").addEventListener("click", (e) => {
+			repositionTargetId = e.currentTarget.dataset.id || selectedFeatureId;
+			repositionMode = true;
+			document.getElementById("reposition-hint").style.display = "block";
+			e.currentTarget.textContent = "Click map to set — Cancel";
+		});
+
+		document.getElementById("apply-coord-btn").addEventListener("click", () => {
+			const raw = document.getElementById("coord-input").value.trim();
+			const parts = raw.split(/\s*,\s*/);
+			if (parts.length !== 2) {
+				alert("Please enter coordinates as: lat,lng");
+				return;
+			}
+			const lat = parseFloat(parts[0]);
+			const lng = parseFloat(parts[1]);
+			if (!isFinite(lat) || !isFinite(lng)) {
+				alert("Invalid coordinates");
+				return;
+			}
+			applyNewCoords(repositionTargetId || selectedFeatureId, [lat, lng]);
+		});
+
+		map.on("click", (ev) => {
+			if (!repositionMode) return;
+			const latlng = ev.latlng;
+			applyNewCoords(repositionTargetId || selectedFeatureId, [latlng.lat, latlng.lng]);
+		});
+
+		document.getElementById("download-overrides-btn").addEventListener("click", () => {
+			downloadOverrides();
+		});
+
+		document.getElementById("clear-overrides-btn").addEventListener("click", () => {
+			if (!confirm("Clear all saved coordinate overrides?")) return;
+			clearOverrides();
+		});
+
+		function applyNewCoords(featureId, coords) {
+			// update in-memory featureData
+			const feature = featureData.find((f) => f.id === featureId);
+			if (!feature) return;
+			feature.coords = [parseFloat(coords[0]), parseFloat(coords[1])];
+
+			// rebuild marker
+			renderMarkers();
+			renderSelection();
+			document.getElementById("reposition-hint").style.display = "none";
+			repositionMode = false;
+			repositionTargetId = null;
+			document.getElementById("reposition-btn").textContent = "Reposition (click map)";
+			console.log(`Updated ${featureId} → ${feature.coords[0].toFixed(6)}, ${feature.coords[1].toFixed(6)}`);
+			// store override and persist
+			coordOverrides[featureId] = [feature.coords[0], feature.coords[1]];
+			saveOverrides();
+			// also expose a small export string so the user can paste into the file if they want
+			const exportText = `${featureId}: [${feature.coords[0].toFixed(6)}, ${feature.coords[1].toFixed(6)}]`;
+			console.log("EXPORT_COORDFIX:", exportText);
+			alert(`Updated ${feature.name} to ${feature.coords[0].toFixed(6)}, ${feature.coords[1].toFixed(6)} and saved to localStorage.`);
+		}
+
+		filterBar.addEventListener("click", (event) => {
+			const target = event.target.closest(".filter-chip");
+			if (!target) return;
+			setFilter(target.dataset.filter);
+		});
+
+		document.getElementById("reset-view").addEventListener("click", () => {
+			map.fitBounds(defaultBounds, { padding: [10, 10] });
+		});
+
+		function updateFullscreenButton() {
+			fullscreenButton.textContent = document.fullscreenElement === mapPanel ? "Exit full screen" : "Full screen map";
+		}
+
+		fullscreenButton.addEventListener("click", async () => {
+			if (document.fullscreenElement === mapPanel) {
+				await document.exitFullscreen();
+				return;
+			}
+
+			if (mapPanel.requestFullscreen) {
+				await mapPanel.requestFullscreen();
+			}
+		});
+
+		document.addEventListener("fullscreenchange", () => {
+			updateFullscreenButton();
+			setTimeout(() => map.invalidateSize(), 120);
+		});
+
+		function renderProcess(processKey) {
+			const process = processContent[processKey];
+			document.getElementById("process-title").textContent = process.title;
+			document.getElementById("process-summary").textContent = process.summary;
+			document.getElementById("process-visual").innerHTML = process.nodes.map((node) => `
+				<div class="process-node" style="background: ${node.color};">
+					<strong>${node.title}</strong>
+					<span>${node.text}</span>
+				</div>
+			`).join("");
+			document.getElementById("process-points").innerHTML = process.points.map((point) => `<li>${point}</li>`).join("");
+
+			Array.from(document.querySelectorAll(".process-tab")).forEach((button) => {
+				button.classList.toggle("active", button.dataset.process === processKey);
+			});
+		}
+
+		document.getElementById("process-nav").addEventListener("click", (event) => {
+			const tab = event.target.closest(".process-tab");
+			if (!tab) return;
+			renderProcess(tab.dataset.process);
+		});
+
+		function renderQuiz() {
+			const quizGrid = document.getElementById("quiz-grid");
+			quizGrid.innerHTML = quizData.map((item, index) => `
+				<article class="quiz-card">
+					<div class="quiz-meta">${item.topic}</div>
+					<h3>Question ${index + 1}</h3>
+					<p>${item.question}</p>
+					<div class="quiz-options">
+						${item.options.map((option, optionIndex) => `
+							<button class="quiz-option" type="button" data-question="${index}" data-option="${optionIndex}">${option}</button>
+						`).join("")}
+					</div>
+					<div class="quiz-feedback" id="quiz-feedback-${index}">Choose an answer to see the explanation.</div>
+				</article>
+			`).join("");
+
+			Array.from(document.querySelectorAll(".quiz-option")).forEach((button) => {
+				button.addEventListener("click", () => {
+					const questionIndex = Number(button.dataset.question);
+					const optionIndex = Number(button.dataset.option);
+					const question = quizData[questionIndex];
+					const group = document.querySelectorAll(`.quiz-option[data-question="${questionIndex}"]`);
+					group.forEach((optionButton, currentIndex) => {
+						optionButton.classList.remove("correct", "incorrect");
+						if (currentIndex === question.answer) {
+							optionButton.classList.add("correct");
+						} else if (currentIndex === optionIndex) {
+							optionButton.classList.add("incorrect");
+						}
+					});
+
+					const feedback = document.getElementById(`quiz-feedback-${questionIndex}`);
+					feedback.textContent = question.explanation;
+				});
+			});
+		}
+
+		renderMarkers();
+		renderSelection();
+		renderFeatureList();
+		// apply any saved overrides from localStorage before initial render
+		loadOverrides();
+		renderProcess("volcanic");
+		renderQuiz();
+		updateFullscreenButton();
+	</script>
+</body>
+</html>

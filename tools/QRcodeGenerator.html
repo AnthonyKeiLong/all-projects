@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Static QR Code Generator</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- QRCode.js Library for client-side generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 font-sans text-slate-800">
+
+    <div class="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden border border-slate-100">
+        
+        <!-- Header -->
+        <div class="bg-indigo-600 p-6 text-center">
+            <h1 class="text-2xl font-bold text-white flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                QR Code Generator
+            </h1>
+            <p class="text-indigo-200 text-sm mt-2">Enter any URL or text to create a static QR code.</p>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 sm:p-8 flex flex-col items-center">
+            
+            <!-- Input Area -->
+            <div class="w-full mb-6">
+                <label for="url-input" class="block text-sm font-semibold text-slate-700 mb-2">URL or Text</label>
+                <div class="flex gap-2">
+                    <input type="text" id="url-input" placeholder="https://example.com" 
+                           class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow text-slate-700 placeholder-slate-400">
+                </div>
+                <button id="generate-btn" class="w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md hover:shadow-lg flex justify-center items-center gap-2">
+                    Generate QR Code
+                </button>
+            </div>
+
+            <!-- QR Code Display Area -->
+            <div id="qr-wrapper" class="hidden flex-col items-center w-full animate-[fadeIn_0.3s_ease-out]">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-6">
+                    <div id="qrcode-container" class="flex justify-center items-center w-[200px] h-[200px]">
+                        <!-- QR Code will be injected here -->
+                    </div>
+                </div>
+
+                <div class="flex gap-3 w-full">
+                    <button id="download-btn" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-xl transition-colors flex justify-center items-center gap-2 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        Download
+                    </button>
+                    <button id="clear-btn" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl transition-colors flex justify-center items-center gap-2 text-sm border border-slate-300">
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="flex flex-col items-center justify-center py-8 text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="mb-3 opacity-50"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="9" x2="9" y1="21" y2="9"/></svg>
+                <p class="text-sm">Your QR code will appear here</p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const urlInput = document.getElementById('url-input');
+        const generateBtn = document.getElementById('generate-btn');
+        const qrWrapper = document.getElementById('qr-wrapper');
+        const qrcodeContainer = document.getElementById('qrcode-container');
+        const emptyState = document.getElementById('empty-state');
+        const downloadBtn = document.getElementById('download-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        let currentQR = null;
+
+        function generateQR() {
+            const text = urlInput.value.trim();
+            
+            if (!text) {
+                // Visual shake effect for empty input
+                urlInput.classList.add('animate-[shake_0.4s_ease-in-out]');
+                urlInput.classList.add('border-red-500');
+                setTimeout(() => {
+                    urlInput.classList.remove('animate-[shake_0.4s_ease-in-out]');
+                    urlInput.classList.remove('border-red-500');
+                }, 400);
+                return;
+            }
+
+            // Clear previous QR
+            qrcodeContainer.innerHTML = '';
+            
+            // Generate new QR
+            currentQR = new QRCode(qrcodeContainer, {
+                text: text,
+                width: 200,
+                height: 200,
+                colorDark : "#0f172a", // Slate 900
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H // High error correction
+            });
+
+            // Update UI
+            emptyState.classList.add('hidden');
+            qrWrapper.classList.remove('hidden');
+            qrWrapper.classList.add('flex');
+        }
+
+        function downloadQR() {
+            // QRCode.js creates a canvas and an image inside the container
+            const img = qrcodeContainer.querySelector('img');
+            const canvas = qrcodeContainer.querySelector('canvas');
+            
+            let imageUrl = '';
+            
+            if (img && img.src) {
+                imageUrl = img.src;
+            } else if (canvas) {
+                imageUrl = canvas.toDataURL("image/png");
+            }
+
+            if (imageUrl) {
+                const link = document.createElement('a');
+                link.href = imageUrl;
+                // Create a clean filename from the URL domain if possible, otherwise generic
+                let filename = 'qrcode.png';
+                try {
+                    if (urlInput.value.startsWith('http')) {
+                        const urlObj = new URL(urlInput.value);
+                        filename = `qr-${urlObj.hostname.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.png`;
+                    }
+                } catch(e) {}
+                
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        function clearUI() {
+            urlInput.value = '';
+            qrcodeContainer.innerHTML = '';
+            qrWrapper.classList.add('hidden');
+            qrWrapper.classList.remove('flex');
+            emptyState.classList.remove('hidden');
+            urlInput.focus();
+        }
+
+        // Event Listeners
+        generateBtn.addEventListener('click', generateQR);
+        
+        urlInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                generateQR();
+            }
+        });
+
+        downloadBtn.addEventListener('click', downloadQR);
+        clearBtn.addEventListener('click', clearUI);
+
+        // Add tailwind arbitrary keyframes for shake animation dynamically
+        tailwind.config = {
+            theme: {
+                extend: {
+                    keyframes: {
+                        shake: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '25%': { transform: 'translateX(-5px)' },
+                            '50%': { transform: 'translateX(5px)' },
+                            '75%': { transform: 'translateX(-5px)' },
+                        },
+                        fadeIn: {
+                            'from': { opacity: '0', transform: 'translateY(-10px)' },
+                            'to': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

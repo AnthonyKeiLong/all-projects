@@ -1,0 +1,2 @@
+FreeSimpleGUI>=5.0
+python-dateutil>=2.8

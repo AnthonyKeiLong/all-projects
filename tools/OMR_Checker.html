@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMR Verifier - Conflict Resolver</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        #scanned-image { transform-origin: 0 0; transition: transform 0.1s ease-out; cursor: grab; }
+        .answer-btn.selected { background-color: #4f46e5 !important; color: white !important; border-color: #4f46e5 !important; }
+        .answer-btn.conflict-active { 
+            background-color: #fff1f2; 
+            border: 2px dashed #ef4444 !important; 
+            color: #b91c1c; 
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0%, 100% { border-color: #ef4444; }
+            50% { border-color: #fca5a5; }
+        }
+        .conflict-badge {
+            background: #ef4444;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 h-screen flex flex-col overflow-hidden text-slate-900">
+
+    <!-- Header -->
+    <header class="bg-white border-b h-16 flex items-center justify-between px-6 shrink-0 z-10 shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="bg-rose-600 text-white p-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            </div>
+            <h1 class="text-lg font-bold tracking-tight">OMR Conflict Resolver</h1>
+        </div>
+        <div id="stats" class="text-sm font-medium text-slate-500 bg-slate-100 px-4 py-1.5 rounded-full">
+            0 / 0 Records Verified
+        </div>
+        <button onclick="exportCSV()" id="export-btn" disabled class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg text-sm font-bold disabled:opacity-30 transition-colors">
+            Export Verified Data
+        </button>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden">
+        <!-- Left: Image Viewer -->
+        <div class="w-1/2 bg-slate-200 relative flex items-center justify-center overflow-hidden border-r shadow-inner" id="viewer-parent">
+            <!-- Initial Upload Overlay -->
+            <div id="upload-overlay" class="absolute inset-0 bg-white z-20 flex flex-col items-center justify-center p-12 text-center">
+                <div class="max-w-sm w-full space-y-6">
+                    <div class="mx-auto w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold">Import Scan Results</h2>
+                        <p class="text-slate-500 text-sm mt-1">First, upload the CSV from your OMR scanner.</p>
+                    </div>
+                    <input type="file" id="csv-input" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
+                    <button onclick="document.getElementById('csv-input').click()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700 transition-all">Choose CSV File</button>
+                    <button onclick="loadDemo()" class="w-full text-indigo-600 font-medium text-sm hover:underline">Or Load Demo with Conflicts</button>
+                </div>
+            </div>
+
+            <!-- Image Asset Prompt (Shows after CSV is loaded) -->
+            <div id="image-upload-prompt" class="hidden absolute inset-0 bg-slate-900/80 z-10 flex flex-col items-center justify-center p-8 text-center backdrop-blur-sm">
+                <div class="max-w-md bg-white rounded-3xl p-8 shadow-2xl space-y-6">
+                    <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold">Upload Scanned Images</h2>
+                        <p class="text-slate-500 text-sm mt-2">Select the image files corresponding to your records. Files should be named with the <b>Student ID</b> (e.g., 88291.jpg).</p>
+                    </div>
+                    <input type="file" id="image-input" accept="image/*" multiple class="hidden" onchange="handleImageUpload(event)">
+                    <div class="flex flex-col gap-3">
+                        <button onclick="document.getElementById('image-input').click()" class="bg-indigo-600 text-white py-3 px-6 rounded-xl font-bold hover:bg-indigo-700 transition-all">Select Image Files</button>
+                        <button onclick="skipImages()" class="text-slate-400 font-medium text-sm hover:text-slate-600">Skip and use placeholders</button>
+                    </div>
+                </div>
+            </div>
+            
+            <img id="scanned-image" src="" style="display:none;" class="shadow-2xl">
+            <div id="no-img" class="text-slate-400 font-medium">No Image Loaded</div>
+        </div>
+
+        <!-- Right: Control Panel -->
+        <div class="w-1/2 flex flex-col bg-white">
+            <div class="h-14 border-b flex items-center justify-between px-6 bg-slate-50/50">
+                <div class="flex items-center gap-4">
+                    <button onclick="navigate(-1)" class="p-2 hover:bg-white rounded-lg border shadow-sm disabled:opacity-30" id="prev-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    <span id="nav-info" class="text-sm font-bold text-slate-600 uppercase tracking-widest">RECORD 0 / 0</span>
+                    <button onclick="navigate(1)" class="p-2 hover:bg-white rounded-lg border shadow-sm disabled:opacity-30" id="next-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                </div>
+                <div id="record-status"></div>
+            </div>
+
+            <div id="editor" class="flex-1 overflow-y-auto p-8 hidden">
+                <!-- Conflict Summary Banner -->
+                <div id="conflict-banner" class="hidden mb-8 bg-rose-50 border border-rose-200 rounded-2xl p-5 flex items-start gap-4 animate-in fade-in slide-in-from-top-4">
+                    <div class="bg-rose-100 p-2 rounded-xl text-rose-600 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-rose-900 leading-tight">Attention Required</h3>
+                        <p id="conflict-text" class="text-sm text-rose-700 mt-0.5">Multiple bubbles detected for 2 questions.</p>
+                    </div>
+                </div>
+
+                <!-- Fields -->
+                <div class="space-y-8">
+                    <div class="group">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Student Identifier</label>
+                        <input type="text" id="student-id-field" oninput="syncField('student_id', this.value)" class="w-full text-2xl font-bold bg-transparent border-b-2 border-slate-100 focus:border-indigo-500 outline-none transition-colors pb-2">
+                    </div>
+
+                    <div id="questions-grid" class="grid grid-cols-2 gap-x-12 gap-y-6">
+                        <!-- Questions injected here -->
+                    </div>
+                </div>
+
+                <div class="mt-12 pt-8 border-t flex items-center justify-between">
+                    <div class="text-xs text-slate-400 max-w-[200px]">
+                        Verify the marks against the scan on the left before finalizing.
+                    </div>
+                    <button id="verify-btn" onclick="verifyCurrent()" class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-bold shadow-xl hover:bg-indigo-700 disabled:opacity-20 disabled:grayscale transition-all transform active:scale-95">
+                        Verify & Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let records = [];
+        let imageMap = {};
+        let curIdx = 0;
+        let scale = 0.8, panX = 0, panY = 0, isDragging = false, startX, startY;
+        const OPTIONS = ['A', 'B', 'C', 'D', 'E'];
+
+        // Helper to generate a dummy OMR SVG image
+        function generateDemoImage(id, conflictType) {
+            const svg = `
+            <svg width="800" height="1200" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" fill="white"/>
+                <text x="50" y="80" font-family="Arial" font-size="24" font-weight="bold" fill="#334155">OMR SCAN #${id}</text>
+                <text x="50" y="110" font-family="Arial" font-size="14" fill="#64748b">STUDENT ID: ${id}</text>
+                
+                <!-- OMR Header Area -->
+                <rect x="50" y="150" width="700" height="2" fill="#e2e8f0"/>
+                
+                <!-- Simulated Bubbles -->
+                ${[1, 2, 3, 4, 5].map(q => {
+                    let fillA = q === 1 ? '#1e293b' : 'none';
+                    let fillB = (q === 2 || q === 5) ? '#1e293b' : 'none';
+                    let fillC = (q === 2 || q === 5) ? '#475569' : 'none'; // Smudged C
+                    let fillD = q === 4 ? '#1e293b' : 'none';
+                    let fillE = q === 5 ? 'none' : 'none';
+
+                    // Special case for conflicts in demo 1
+                    if (id === '88291' && q === 2) { fillB = '#1e293b'; fillC = '#1e293b'; }
+                    if (id === '88291' && q === 3) { fillA = fillB = fillC = fillD = 'none'; }
+                    
+                    // Special case for conflicts in demo 2
+                    if (id === '88292') {
+                        if (q === 1) { fillB = '#1e293b'; fillD = '#1e293b'; }
+                        if (q === 4) { fillD = '#1e293b'; fillE = '#475569'; }
+                    }
+
+                    return `
+                    <g transform="translate(0, ${200 + (q * 80)})">
+                        <text x="50" y="25" font-family="Arial" font-size="16" font-weight="bold" fill="#64748b">Q${q}</text>
+                        <circle cx="150" cy="20" r="15" stroke="#94a3b8" stroke-width="2" fill="${fillA}"/> <text x="145" y="25" font-family="Arial" font-size="12" fill="${fillA === 'none' ? '#94a3b8' : 'white'}">A</text>
+                        <circle cx="210" cy="20" r="15" stroke="#94a3b8" stroke-width="2" fill="${fillB}"/> <text x="205" y="25" font-family="Arial" font-size="12" fill="${fillB === 'none' ? '#94a3b8' : 'white'}">B</text>
+                        <circle cx="270" cy="20" r="15" stroke="#94a3b8" stroke-width="2" fill="${fillC}"/> <text x="265" y="25" font-family="Arial" font-size="12" fill="${fillC === 'none' ? '#94a3b8' : 'white'}">C</text>
+                        <circle cx="330" cy="20" r="15" stroke="#94a3b8" stroke-width="2" fill="${fillD}"/> <text x="325" y="25" font-family="Arial" font-size="12" fill="${fillD === 'none' ? '#94a3b8' : 'white'}">D</text>
+                        <circle cx="390" cy="20" r="15" stroke="#94a3b8" stroke-width="2" fill="${fillE}"/> <text x="385" y="25" font-family="Arial" font-size="12" fill="${fillE === 'none' ? '#94a3b8' : 'white'}">E</text>
+                        
+                        <!-- Red indicator for conflicts -->
+                        ${((id === '88291' && (q === 2 || q === 3)) || (id === '88292' && (q === 1 || q === 4))) ? 
+                            `<rect x="40" y="-5" width="400" height="50" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4"/>` : ''}
+                    </g>`;
+                }).join('')}
+
+                <!-- Footer marks -->
+                <rect x="0" y="1150" width="50" height="50" fill="black"/>
+                <rect x="750" y="1150" width="50" height="50" fill="black"/>
+                <rect x="0" y="0" width="50" height="50" fill="black"/>
+                <rect x="750" y="0" width="50" height="50" fill="black"/>
+            </svg>`.replace(/>\s+</g, '><');
+            return `data:image/svg+xml;base64,${btoa(svg)}`;
+        }
+
+        function analyzeConflicts(r) {
+            r._conflicts = [];
+            Object.keys(r).forEach(k => {
+                if (k.startsWith('q')) {
+                    const val = String(r[k] || '').trim();
+                    if (val.includes(',') || val.length > 1 || val === '?' || val === '') {
+                        r._conflicts.push(k);
+                    }
+                }
+            });
+            if (r._status !== 'verified') {
+                r._status = r._conflicts.length > 0 ? 'conflict' : 'clean';
+            }
+        }
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: (results) => {
+                    records = results.data;
+                    records.forEach(analyzeConflicts);
+                    document.getElementById('upload-overlay').classList.add('hidden');
+                    document.getElementById('image-upload-prompt').classList.remove('hidden');
+                }
+            });
+        }
+
+        function handleImageUpload(e) {
+            const files = Array.from(e.target.files);
+            let loaded = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const id = file.name.split('.')[0]; // Assuming name is {student_id}.ext
+                    imageMap[id] = event.target.result;
+                    loaded++;
+                    if (loaded === files.length) initApp();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function skipImages() {
+            initApp();
+        }
+
+        function loadDemo() {
+            records = [
+                { student_id: '88291', q1: 'A', q2: 'B,C', q3: '?', q4: 'D', q5: 'E', _img: generateDemoImage('88291', 'single') },
+                { student_id: '88292', q1: 'B,D', q2: 'A', q3: 'C', q4: 'D,E', q5: 'B', _img: generateDemoImage('88292', 'multi') }
+            ];
+            records.forEach(analyzeConflicts);
+            initApp();
+        }
+
+        function initApp() {
+            document.getElementById('upload-overlay').classList.add('hidden');
+            document.getElementById('image-upload-prompt').classList.add('hidden');
+            document.getElementById('editor').classList.remove('hidden');
+            document.getElementById('export-btn').disabled = false;
+            curIdx = 0;
+            render();
+        }
+
+        function render() {
+            const r = records[curIdx];
+            if (!r) return;
+
+            // Nav
+            document.getElementById('nav-info').innerText = `RECORD ${curIdx + 1} / ${records.length}`;
+            document.getElementById('prev-btn').disabled = curIdx === 0;
+            document.getElementById('next-btn').disabled = curIdx === records.length - 1;
+
+            // Header Stats
+            const verifiedCount = records.filter(x => x._status === 'verified').length;
+            document.getElementById('stats').innerText = `${verifiedCount} / ${records.length} Verified`;
+
+            // Status Badge
+            const statusEl = document.getElementById('record-status');
+            if (r._status === 'verified') {
+                statusEl.innerHTML = `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> VERIFIED</span>`;
+            } else if (r._status === 'conflict') {
+                statusEl.innerHTML = `<span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-xs font-bold tracking-tight">ACTION REQUIRED</span>`;
+            } else {
+                statusEl.innerHTML = `<span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold tracking-tight">READY</span>`;
+            }
+
+            // Banner
+            const banner = document.getElementById('conflict-banner');
+            if (r._conflicts.length > 0 && r._status !== 'verified') {
+                banner.classList.remove('hidden');
+                document.getElementById('conflict-text').innerText = `${r._conflicts.length} ambiguity detected. Review the red-pulsing rows.`;
+            } else {
+                banner.classList.add('hidden');
+            }
+
+            // Image handling (User uploaded vs Demo generated)
+            const img = document.getElementById('scanned-image');
+            const studentId = r.student_id;
+            if (imageMap[studentId]) {
+                img.src = imageMap[studentId];
+            } else if (r._img) {
+                img.src = r._img;
+            } else {
+                img.src = generateDemoImage(studentId || 'UNKNOWN', 'none');
+            }
+            img.style.display = 'block';
+            document.getElementById('no-img').style.display = 'none';
+
+            // Reset view on new record
+            panX = 20; panY = 20; scale = 0.6;
+            img.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+
+            // Fields
+            document.getElementById('student-id-field').value = r.student_id || '';
+
+            // Questions
+            const grid = document.getElementById('questions-grid');
+            grid.innerHTML = '';
+            Object.keys(r).filter(k => k.startsWith('q')).sort((a,b) => parseInt(a.slice(1)) - parseInt(b.slice(1))).forEach(k => {
+                const val = r[k];
+                const isConflict = r._conflicts.includes(k) && r._status !== 'verified';
+                
+                const qRow = document.createElement('div');
+                qRow.className = "space-y-2";
+                qRow.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${k}</span>
+                        ${isConflict ? `<span class="conflict-badge">Conflict: ${val}</span>` : ''}
+                    </div>
+                    <div class="flex gap-1.5">
+                        ${OPTIONS.map(opt => `
+                            <button onclick="resolve('${k}', '${opt}')" 
+                                class="answer-btn flex-1 h-10 rounded-lg border text-sm font-bold transition-all ${val === opt ? 'selected' : (isConflict ? 'conflict-active' : 'bg-white hover:bg-slate-50 text-slate-600')}">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+                grid.appendChild(qRow);
+            });
+
+            // Verify Button
+            const vBtn = document.getElementById('verify-btn');
+            vBtn.disabled = r._conflicts.length > 0;
+        }
+
+        function resolve(k, v) {
+            records[curIdx][k] = v;
+            analyzeConflicts(records[curIdx]);
+            render();
+        }
+
+        function syncField(k, v) { records[curIdx][k] = v; }
+
+        function navigate(dir) {
+            const next = curIdx + dir;
+            if (next >= 0 && next < records.length) {
+                curIdx = next;
+                render();
+            }
+        }
+
+        function verifyCurrent() {
+            records[curIdx]._status = 'verified';
+            if (curIdx < records.length - 1) {
+                navigate(1);
+            } else {
+                render();
+            }
+        }
+
+        async function exportCSV() {
+            const cleanData = records.map(({_conflicts, _status, _img, ...rest}) => rest);
+            const csv = Papa.unparse(cleanData);
+            
+            try {
+                if ('showSaveFilePicker' in window) {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: 'verified_omr_results.csv',
+                        types: [{
+                            description: 'CSV File',
+                            accept: {'text/csv': ['.csv']},
+                        }],
+                    });
+                    const writable = await handle.createWritable();
+                    await writable.write(csv);
+                    await writable.close();
+                } else {
+                    const blob = new Blob([csv], {type: 'text/csv'});
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = "verified_omr_results.csv";
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+            } catch (err) {
+                if (err.name !== 'AbortError') console.error('Export failed:', err);
+            }
+        }
+
+        // Viewport Interaction
+        window.onload = () => {
+            const parent = document.getElementById('viewer-parent');
+            const img = document.getElementById('scanned-image');
+            
+            parent.onwheel = (e) => {
+                e.preventDefault();
+                const delta = e.deltaY * -0.001;
+                scale = Math.min(Math.max(0.1, scale + delta), 4);
+                img.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+            };
+
+            parent.onmousedown = (e) => {
+                isDragging = true;
+                startX = e.clientX - panX;
+                startY = e.clientY - panY;
+                img.style.cursor = 'grabbing';
+            };
+
+            window.onmouseup = () => {
+                isDragging = false;
+                img.style.cursor = 'grab';
+            };
+
+            window.onmousemove = (e) => {
+                if (!isDragging) return;
+                panX = e.clientX - startX;
+                panY = e.clientY - startY;
+                img.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+            };
+        };
+    </script>
+</body>
+</html>

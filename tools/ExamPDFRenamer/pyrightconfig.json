@@ -1,0 +1,6 @@
+{
+  "reportOptionalMemberAccess": false,
+  "reportArgumentType": false,
+  "reportUnknownMemberType": false,
+  "reportReturnType": false
+}

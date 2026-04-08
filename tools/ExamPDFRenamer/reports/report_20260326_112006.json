@@ -1,0 +1,102 @@
+{
+  "timestamp": "20260326_112006",
+  "total_files": 5,
+  "actions": [
+    {
+      "old_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326105516.pdf",
+      "new_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\Mock Exam Papers[PAPER 1].pdf"
+    }
+  ],
+  "details": [
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\Common Question Types.pdf",
+      "sha256": "301bea267e50812d4150ba0647be0eb931df04b7f69d5480b4fe564af9bc8c3c",
+      "text_method": "",
+      "fields": {},
+      "suggested_name": "",
+      "skipped": true,
+      "skip_reason": "Already processed"
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\DOC260326-20260326105516.pdf",
+      "sha256": "d568e8d6f28f7a19a2c8b696cd33b713a6f679480665b25f30e406456cb592cc",
+      "text_method": "ocr",
+      "fields": {
+        "year": {
+          "value": "2025",
+          "confidence": 0.7,
+          "snippet": "shers Ltd\nAll Rights Reserved 2025\n\nPlease stick the barcode lab"
+        },
+        "publisher": {
+          "value": "Pan Lloyds",
+          "confidence": 0.95,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS C"
+        },
+        "subject": {
+          "value": "Mathematics",
+          "confidence": 0.8,
+          "snippet": "Pan Lloyds Publishers Ltd\n\nMATHEMATICS Compulsory Part\nMOCK EXAM 1\nP"
+        },
+        "part": {
+          "value": "PAPER 1",
+          "confidence": 0.9,
+          "snippet": "S Compulsory Part\nMOCK EXAM 1\nPAPER 1\nQuestion-Answer Book\n\n(2% hou"
+        },
+        "language": "eng",
+        "multi_papers": [
+          {
+            "part": "Paper 1",
+            "offset": "67"
+          },
+          {
+            "part": "Paper M",
+            "offset": "113"
+          },
+          {
+            "part": "Paper C",
+            "offset": "421"
+          },
+          {
+            "part": "Paper A",
+            "offset": "671"
+          },
+          {
+            "part": "Paper\n\nA",
+            "offset": "13817"
+          }
+        ],
+        "overall_confidence": 0.838
+      },
+      "suggested_name": "Mock Exam Papers[PAPER 1].pdf",
+      "skipped": false,
+      "skip_reason": ""
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\Mock Exam Guidebook.pdf",
+      "sha256": "b4ec7c36588b4e6368ddec9274107b08ffcb6949c69703ac648164904bfe6d05",
+      "text_method": "",
+      "fields": {},
+      "suggested_name": "",
+      "skipped": true,
+      "skip_reason": "Already processed"
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\Prep for DSE.pdf",
+      "sha256": "3140ebf58bdb68e5320be64423cb770f42b66bdd35be0205d82e98afb57988cf",
+      "text_method": "",
+      "fields": {},
+      "suggested_name": "",
+      "skipped": true,
+      "skip_reason": "Already processed"
+    },
+    {
+      "original_path": "T:\\Subject\\math\\Question Banks\\Mock Exam(Core part)\\Pan Lloys\\2526MOCK(New syllabus)\\waiting rename\\Mock Exam Papers[Paper I].pdf",
+      "sha256": "301bea267e50812d4150ba0647be0eb931df04b7f69d5480b4fe564af9bc8c3c",
+      "text_method": "",
+      "fields": {},
+      "suggested_name": "",
+      "skipped": true,
+      "skip_reason": "Already processed"
+    }
+  ]
+}
