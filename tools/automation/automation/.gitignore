@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Logs
+sync.log
+
+# Resources (class data - likely private/large)
+resources/
+
+# Old manifests (keep only the latest or none)
+manifest_*.json
