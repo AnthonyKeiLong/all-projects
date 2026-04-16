@@ -103,7 +103,11 @@ Tests cover checksum computation, filename sanitization, path building, collisio
 - Download links: `<a>` tags with `href` pointing to files with extensions `.pdf`, `.doc`, `.docx`, `.xls`, `.xlsx`, `.ppt`, `.pptx`, `.zip`, `.rar`.
 
 If the site structure changes, these heuristics may need tuning — the code includes multi-strategy fallbacks for each step.
+
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 # ⚠️ Absence Automation — Setup Guide
 ### Google Sheets + Gmail | 缺考自動通知系統
 
