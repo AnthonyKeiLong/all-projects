@@ -1,0 +1,9 @@
+{
+  "reportMissingImports": "warning",
+  "pythonVersion": "3.10",
+  "executionEnvironments": [
+    {
+      "root": "."
+    }
+  ]
+}
